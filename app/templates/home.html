@@ -1,0 +1,398 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Navigation Menu -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary fs-3" href="/">
+            <i class="fas fa-hospital-alt me-2"></i>
+            HMS
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/">
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/patient/appointments">
+                        <i class="fas fa-calendar-alt me-1"></i>My Appointments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/patient">
+                        <i class="fas fa-user-injured me-1"></i>Patient Portal
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/admin/login">
+                        <i class="fas fa-user-shield me-1"></i>Admin
+                    </a>
+                </li>
+                <li class="nav-item ms-2">
+                    <a href="/patient/book-appointment" class="btn btn-primary rounded-pill px-4">
+                        <i class="fas fa-calendar-plus me-1"></i>Book Now
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<div class="hero-section bg-gradient-primary text-white position-relative overflow-hidden">
+    <div class="hero-background"></div>
+    <div class="container position-relative z-index-2">
+        <div class="row min-vh-100 align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content animate-fade-in">
+                    <h1 class="display-2 fw-bold mb-4 text-shadow">
+                        Your Health, <br>
+                        <span class="text-warning">Our Priority</span>
+                    </h1>
+                    <p class="lead mb-5 fs-4 opacity-90">
+                        Experience world-class healthcare with our comprehensive Hospital Management System. 
+                        Advanced care, compassionate service, and cutting-edge technology.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="/patient" class="btn btn-success btn-lg px-5 py-3 rounded-pill shadow-lg hover-lift">
+                            <i class="fas fa-user-injured me-2"></i>
+                            Patient Portal
+                        </a>
+                        <a href="/admin/login" class="btn btn-outline-light btn-lg px-5 py-3 rounded-pill shadow-lg hover-lift">
+                            <i class="fas fa-user-shield me-2"></i>
+                            Admin Portal
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-image text-center animate-float">
+                    <img src="/placeholder.svg?height=500&width=600" 
+                         alt="Hospital" class="img-fluid rounded-4 shadow-2xl">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="hero-wave">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="currentColor"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="currentColor"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="currentColor"></path>
+        </svg>
+    </div>
+</div>
+
+<!-- Features Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-4 fw-bold text-primary mb-4">Why Choose Our HMS?</h2>
+                <p class="lead text-muted">Advanced healthcare management with cutting-edge technology and compassionate care</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift">
+                    <div class="feature-icon bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
+                        <i class="fas fa-heartbeat text-white fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold text-primary mb-3">24/7 Emergency Care</h4>
+                    <p class="text-muted mb-0">Round-the-clock emergency services with state-of-the-art equipment and experienced medical professionals.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift">
+                    <div class="feature-icon bg-success bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
+                        <i class="fas fa-user-md text-white fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold text-success mb-3">Expert Doctors</h4>
+                    <p class="text-muted mb-0">Highly qualified specialists and consultants with years of experience in their respective fields.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift">
+                    <div class="feature-icon bg-info bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
+                        <i class="fas fa-laptop-medical text-white fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold text-info mb-3">Digital Records</h4>
+                    <p class="text-muted mb-0">Secure digital patient records and seamless appointment management system for better healthcare delivery.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift">
+                    <div class="feature-icon bg-warning bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
+                        <i class="fas fa-ambulance text-white fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold text-warning mb-3">Ambulance Service</h4>
+                    <p class="text-muted mb-0">Quick response ambulance service equipped with life-saving equipment and trained paramedics.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift">
+                    <div class="feature-icon bg-danger bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
+                        <i class="fas fa-pills text-white fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold text-danger mb-3">Pharmacy</h4>
+                    <p class="text-muted mb-0">In-house pharmacy with a wide range of medicines and healthcare products available 24/7.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift">
+                    <div class="feature-icon bg-secondary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
+                        <i class="fas fa-microscope text-white fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold text-secondary mb-3">Lab Services</h4>
+                    <p class="text-muted mb-0">Advanced diagnostic laboratory with latest equipment for accurate and quick test results.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5 bg-primary bg-gradient text-white">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-item">
+                    <div class="stat-number display-3 fw-bold mb-2">500+</div>
+                    <div class="stat-label fs-5">Happy Patients</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-item">
+                    <div class="stat-number display-3 fw-bold mb-2">50+</div>
+                    <div class="stat-label fs-5">Expert Doctors</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-item">
+                    <div class="stat-number display-3 fw-bold mb-2">24/7</div>
+                    <div class="stat-label fs-5">Emergency Care</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-item">
+                    <div class="stat-number display-3 fw-bold mb-2">15+</div>
+                    <div class="stat-label fs-5">Years Experience</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="display-5 fw-bold text-primary mb-3">Ready to Experience Better Healthcare?</h3>
+                <p class="lead text-muted mb-4">Join thousands of satisfied patients who trust our healthcare management system for their medical needs.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="/patient/book-appointment" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-lg hover-lift">
+                    <i class="fas fa-calendar-plus me-2"></i>
+                    Book Appointment
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-dark text-white py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <h5 class="fw-bold mb-4">Hospital Management System</h5>
+                <p class="text-light opacity-75 mb-4">Providing exceptional healthcare services with advanced technology and compassionate care.</p>
+                <div class="social-links">
+                    <a href="#" class="text-white me-3 fs-4"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="text-white me-3 fs-4"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-white me-3 fs-4"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-white fs-4"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <h6 class="fw-bold mb-4">Quick Links</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#" class="text-light opacity-75 text-decoration-none">About Us</a></li>
+                    <li class="mb-2"><a href="#" class="text-light opacity-75 text-decoration-none">Services</a></li>
+                    <li class="mb-2"><a href="#" class="text-light opacity-75 text-decoration-none">Doctors</a></li>
+                    <li class="mb-2"><a href="#" class="text-light opacity-75 text-decoration-none">Contact</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <h6 class="fw-bold mb-4">Services</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#" class="text-light opacity-75 text-decoration-none">Emergency Care</a></li>
+                    <li class="mb-2"><a href="#" class="text-light opacity-75 text-decoration-none">Surgery</a></li>
+                    <li class="mb-2"><a href="#" class="text-light opacity-75 text-decoration-none">Cardiology</a></li>
+                    <li class="mb-2"><a href="#" class="text-light opacity-75 text-decoration-none">Pediatrics</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3">
+                <h6 class="fw-bold mb-4">Contact Info</h6>
+                <div class="contact-info">
+                    <p class="text-light opacity-75 mb-2">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        123 Healthcare St, Medical City
+                    </p>
+                    <p class="text-light opacity-75 mb-2">
+                        <i class="fas fa-phone me-2"></i>
+                        +1 (555) 123-4567
+                    </p>
+                    <p class="text-light opacity-75 mb-2">
+                        <i class="fas fa-envelope me-2"></i>
+                        info@hospital.com
+                    </p>
+                </div>
+            </div>
+        </div>
+        <hr class="my-4 opacity-25">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <p class="text-light opacity-75 mb-0">&copy; 2024 Hospital Management System. All rights reserved.</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <a href="#" class="text-light opacity-75 text-decoration-none me-3">Privacy Policy</a>
+                <a href="#" class="text-light opacity-75 text-decoration-none">Terms of Service</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.hero-section {
+    min-height: 100vh;
+    position: relative;
+    margin-top: -76px;
+    padding-top: 76px;
+}
+
+.hero-background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('/placeholder.svg?height=1080&width=1920') center/cover;
+    opacity: 0.1;
+    z-index: 1;
+}
+
+.z-index-2 {
+    z-index: 2;
+}
+
+.text-shadow {
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.shadow-2xl {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.hover-lift {
+    transition: all 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+}
+
+.feature-card {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.animate-fade-in {
+    animation: fadeIn 1s ease-in;
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+.hero-wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+    transform: rotate(180deg);
+}
+
+.hero-wave svg {
+    position: relative;
+    display: block;
+    width: calc(100% + 1.3px);
+    height: 120px;
+    color: #f8f9fa;
+}
+
+.stat-item {
+    padding: 2rem 0;
+}
+
+.social-links a {
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    transform: translateY(-3px);
+    color: #667eea !important;
+}
+
+.navbar {
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.navbar-brand {
+    font-size: 1.8rem !important;
+}
+
+.nav-link {
+    color: #495057 !important;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #667eea !important;
+    transform: translateY(-1px);
+}
+</style>
+{% endblock %}

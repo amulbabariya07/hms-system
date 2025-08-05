@@ -1,0 +1,399 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Navigation Menu -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary fs-3" href="/">
+            <i class="fas fa-hospital-alt me-2"></i>
+            HMS
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/">
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold active" href="/patient/appointments">
+                        <i class="fas fa-calendar-alt me-1"></i>My Appointments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/patient">
+                        <i class="fas fa-user-injured me-1"></i>Patient Portal
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/admin/login">
+                        <i class="fas fa-user-shield me-1"></i>Admin
+                    </a>
+                </li>
+                <li class="nav-item ms-2">
+                    <a href="/patient/book-appointment" class="btn btn-primary rounded-pill px-4">
+                        <i class="fas fa-calendar-plus me-1"></i>Book Now
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Appointments Hero -->
+<div class="appointments-hero bg-gradient-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="hero-content">
+                    <h1 class="display-4 fw-bold mb-3">My Appointments</h1>
+                    <p class="lead mb-0">Track and manage all your medical appointments in one place</p>
+                </div>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <div class="appointment-stats bg-white bg-opacity-20 rounded-4 p-4">
+                    <div class="stat-item text-center">
+                        <div class="stat-number display-6 fw-bold">{{ appointments|length }}</div>
+                        <div class="stat-label">Total Appointments</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Appointments Content -->
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            {% if appointments %}
+                <div class="appointments-list">
+                    {% for appointment in appointments %}
+                    <div class="appointment-card bg-white rounded-4 shadow-sm border-start border-5 border-{{ 'danger' if appointment.emergency else ('success' if appointment.status == 'Confirmed' else 'primary') }} mb-4 hover-lift">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center">
+                                <div class="col-lg-8">
+                                    <div class="appointment-info">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="appointment-avatar bg-{{ 'danger' if appointment.emergency else ('success' if appointment.status == 'Confirmed' else 'primary') }} bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3">
+                                                <i class="fas fa-{{ 'exclamation-triangle' if appointment.emergency else 'user-md' }} text-white fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="fw-bold text-dark mb-1">{{ appointment.patient_name }}</h4>
+                                                <p class="text-muted mb-0">
+                                                    <i class="fas fa-hospital me-1"></i>
+                                                    {{ appointment.department }}
+                                                    {% if appointment.doctor_preference %}
+                                                        - Dr. {{ appointment.doctor_preference }}
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="appointment-details">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <div class="detail-item">
+                                                        <i class="fas fa-calendar text-primary me-2"></i>
+                                                        <strong>Date:</strong> {{ appointment.appointment_date.strftime('%B %d, %Y') }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="detail-item">
+                                                        <i class="fas fa-clock text-success me-2"></i>
+                                                        <strong>Time:</strong> {{ appointment.appointment_time.strftime('%I:%M %p') }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="detail-item">
+                                                        <i class="fas fa-envelope text-info me-2"></i>
+                                                        <strong>Email:</strong> {{ appointment.patient_email }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="detail-item">
+                                                        <i class="fas fa-phone text-warning me-2"></i>
+                                                        <strong>Phone:</strong> {{ appointment.patient_phone }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            {% if appointment.symptoms %}
+                                            <div class="symptoms-section mt-3 p-3 bg-light rounded-3">
+                                                <h6 class="fw-bold text-dark mb-2">
+                                                    <i class="fas fa-notes-medical text-primary me-2"></i>
+                                                    Symptoms / Reason for Visit:
+                                                </h6>
+                                                <p class="text-muted mb-0">{{ appointment.symptoms }}</p>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-4 text-lg-end">
+                                    <div class="appointment-actions">
+                                        <div class="status-badge mb-3">
+                                            <span class="badge bg-{{ 'danger' if appointment.emergency else ('success' if appointment.status == 'Confirmed' else 'primary') }} bg-gradient px-3 py-2 fs-6">
+                                                {% if appointment.emergency %}
+                                                    <i class="fas fa-exclamation-triangle me-1"></i>Emergency
+                                                {% else %}
+                                                    <i class="fas fa-{{ 'check-circle' if appointment.status == 'Confirmed' else 'clock' }} me-1"></i>{{ appointment.status }}
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="action-buttons">
+                                            <a href="/patient/appointment/{{ appointment.id }}" class="btn btn-outline-primary btn-sm rounded-pill mb-2 w-100">
+                                                <i class="fas fa-eye me-1"></i>View Details
+                                            </a>
+                                            <button class="btn btn-outline-secondary btn-sm rounded-pill w-100" onclick="shareAppointment({{ appointment.id }})">
+                                                <i class="fas fa-share me-1"></i>Share
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="appointment-date-badge mt-3">
+                                            <small class="text-muted">
+                                                <i class="fas fa-calendar-plus me-1"></i>
+                                                Booked: {{ appointment.created_at.strftime('%b %d, %Y') }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-appointments text-center py-5">
+                    <div class="empty-state">
+                        <div class="empty-icon mb-4">
+                            <i class="fas fa-calendar-times text-muted" style="font-size: 5rem;"></i>
+                        </div>
+                        <h3 class="text-muted mb-3">No Appointments Found</h3>
+                        <p class="text-muted mb-4">You haven't booked any appointments yet. Schedule your first appointment with our expert doctors.</p>
+                        <a href="/patient/book-appointment" class="btn btn-primary btn-lg rounded-pill px-5">
+                            <i class="fas fa-calendar-plus me-2"></i>
+                            Book Your First Appointment
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="sidebar-content sticky-top">
+                <!-- Quick Actions -->
+                <div class="quick-actions-card bg-white rounded-4 shadow-sm p-4 mb-4">
+                    <h5 class="fw-bold text-primary mb-4">
+                        <i class="fas fa-bolt me-2"></i>
+                        Quick Actions
+                    </h5>
+                    <div class="d-grid gap-3">
+                        <a href="/patient/book-appointment" class="btn btn-primary rounded-pill">
+                            <i class="fas fa-calendar-plus me-2"></i>
+                            Book New Appointment
+                        </a>
+                        <button class="btn btn-outline-success rounded-pill" onclick="downloadAppointments()">
+                            <i class="fas fa-download me-2"></i>
+                            Download Records
+                        </button>
+                        <button class="btn btn-outline-info rounded-pill" onclick="printAppointments()">
+                            <i class="fas fa-print me-2"></i>
+                            Print Appointments
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Appointment Summary -->
+                <div class="summary-card bg-gradient-primary text-white rounded-4 p-4 mb-4">
+                    <h5 class="fw-bold mb-4">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        Appointment Summary
+                    </h5>
+                    <div class="summary-stats">
+                        <div class="stat-row d-flex justify-content-between mb-3">
+                            <span>Total Appointments:</span>
+                            <strong>{{ appointments|length }}</strong>
+                        </div>
+                        <div class="stat-row d-flex justify-content-between mb-3">
+                            <span>Emergency Visits:</span>
+                            <strong>{{ appointments|selectattr('emergency')|list|length }}</strong>
+                        </div>
+                        <div class="stat-row d-flex justify-content-between">
+                            <span>Confirmed:</span>
+                            <strong>{{ appointments|selectattr('status', 'equalto', 'Confirmed')|list|length }}</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contact Info -->
+                <div class="contact-card bg-white rounded-4 shadow-sm p-4">
+                    <h5 class="fw-bold text-primary mb-4">
+                        <i class="fas fa-headset me-2"></i>
+                        Need Help?
+                    </h5>
+                    <div class="contact-info">
+                        <p class="mb-3">
+                            <i class="fas fa-phone text-success me-2"></i>
+                            <strong>Emergency:</strong> 911
+                        </p>
+                        <p class="mb-3">
+                            <i class="fas fa-hospital text-primary me-2"></i>
+                            <strong>Hospital:</strong> +1 (555) 123-4567
+                        </p>
+                        <p class="mb-0">
+                            <i class="fas fa-envelope text-info me-2"></i>
+                            <strong>Email:</strong> support@hospital.com
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.appointments-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.appointment-card {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.appointment-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+.appointment-avatar {
+    width: 60px;
+    height: 60px;
+}
+
+.detail-item {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+}
+
+.status-badge .badge {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.hover-lift {
+    transition: all 0.3s ease;
+}
+
+.quick-actions-card,
+.summary-card,
+.contact-card {
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.summary-stats {
+    font-size: 0.95rem;
+}
+
+.stat-row {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+.stat-row:last-child {
+    border-bottom: none;
+}
+
+.empty-state {
+    padding: 3rem 2rem;
+}
+
+.navbar {
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.navbar-brand {
+    font-size: 1.8rem !important;
+}
+
+.nav-link {
+    color: #495057 !important;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: #667eea !important;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 991.98px) {
+    .sticky-top {
+        position: static !important;
+    }
+    
+    .sidebar-content {
+        margin-top: 2rem;
+    }
+}
+</style>
+
+<script>
+function shareAppointment(appointmentId) {
+    if (navigator.share) {
+        navigator.share({
+            title: 'My Medical Appointment',
+            text: 'Check out my upcoming medical appointment',
+            url: window.location.origin + '/patient/appointment/' + appointmentId
+        });
+    } else {
+        // Fallback for browsers that don't support Web Share API
+        const url = window.location.origin + '/patient/appointment/' + appointmentId;
+        navigator.clipboard.writeText(url).then(() => {
+            alert('Appointment link copied to clipboard!');
+        });
+    }
+}
+
+function downloadAppointments() {
+    // This would typically generate a PDF or CSV file
+    alert('Download feature will be implemented soon!');
+}
+
+function printAppointments() {
+    window.print();
+}
+
+// Add smooth scrolling for better UX
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate appointment cards on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    // Observe appointment cards
+    document.querySelectorAll('.appointment-card').forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = `all 0.6s ease ${index * 0.1}s`;
+        observer.observe(card);
+    });
+});
+</script>
+{% endblock %}
