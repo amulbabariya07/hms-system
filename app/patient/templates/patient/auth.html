@@ -22,7 +22,6 @@
             </div>
         </div>
     </div>
-    
     <!-- Main Content -->
     <div class="auth-content">
         <div class="container-fluid h-100">
@@ -39,20 +38,18 @@
                             <h2 class="auth-title">Patient Portal</h2>
                             <p class="auth-subtitle">Your Health, Our Priority</p>
                         </div>
-                        
                         <!-- Flash Messages -->
                         {% with messages = get_flashed_messages(with_categories=true) %}
-                            {% if messages %}
-                                {% for category, message in messages %}
-                                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show custom-alert" role="alert">
-                                        <i class="fas fa-{{ 'exclamation-triangle' if category == 'danger' else ('check-circle' if category == 'success' else 'info-circle') }} me-2"></i>
-                                        {{ message }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
+                        {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show custom-alert" role="alert">
+                            <i class="fas fa-{{ 'exclamation-triangle' if category == 'danger' else ('check-circle' if category == 'success' else 'info-circle') }} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
                         {% endwith %}
-                        
                         <!-- Tab Navigation -->
                         <div class="auth-tabs mb-4">
                             <div class="tab-buttons">
@@ -67,131 +64,98 @@
                             </div>
                             <div class="tab-indicator"></div>
                         </div>
-                        
                         <!-- Login Form -->
                         <div class="tab-content active" id="login-tab">
-                            <form method="POST" class="auth-form">
+                            <form method="POST" action="{{ url_for('patient.patient_login_post') }}" class="auth-form">
+                                <!-- Hidden field to identify form -->
+                                <input type="hidden" name="form_type" value="login">
                                 <div class="form-group mb-3">
                                     <div class="input-container">
                                         <div class="input-icon">
                                             <i class="fas fa-mobile-alt"></i>
                                         </div>
-                                        <input type="tel" 
-                                               class="form-control custom-input" 
-                                               name="mobile_number" 
-                                               placeholder="Mobile Number" 
-                                               required>
+                                        <input type="tel" class="form-control custom-input" name="mobile_number" placeholder="Mobile Number" required>
                                         <div class="input-border"></div>
                                     </div>
                                 </div>
-                                
                                 <div class="form-group mb-3">
                                     <div class="input-container">
                                         <div class="input-icon">
                                             <i class="fas fa-lock"></i>
                                         </div>
-                                        <input type="password" 
-                                               class="form-control custom-input" 
-                                               name="password" 
-                                               placeholder="Password" 
-                                               required>
+                                        <input type="password" class="form-control custom-input" name="password" placeholder="Password" required>
                                         <div class="input-border"></div>
                                         <div class="password-toggle" onclick="togglePassword(this)">
                                             <i class="fas fa-eye"></i>
                                         </div>
                                     </div>
                                 </div>
-                                
                                 <button type="submit" class="btn auth-btn w-100 mb-3">
                                     <span class="btn-text">Sign In</span>
                                 </button>
                             </form>
                         </div>
-                        
                         <!-- Signup Form -->
                         <div class="tab-content" id="signup-tab">
                             <form method="POST" action="{{ url_for('patient.patient_signup') }}" class="auth-form">
+                                <!-- Hidden field to identify form -->
+                                <input type="hidden" name="form_type" value="signup">
                                 <div class="form-group mb-3">
                                     <div class="input-container">
                                         <div class="input-icon">
                                             <i class="fas fa-user"></i>
                                         </div>
-                                        <input type="text" 
-                                               class="form-control custom-input" 
-                                               name="full_name" 
-                                               placeholder="Full Name" 
-                                               required>
+                                        <input type="text" class="form-control custom-input" name="full_name" placeholder="Full Name" required>
                                         <div class="input-border"></div>
                                     </div>
                                 </div>
-                                
                                 <div class="form-group mb-3">
                                     <div class="input-container">
                                         <div class="input-icon">
                                             <i class="fas fa-mobile-alt"></i>
                                         </div>
-                                        <input type="tel" 
-                                               class="form-control custom-input" 
-                                               name="mobile_number" 
-                                               placeholder="Mobile Number" 
-                                               required>
+                                        <input type="tel" class="form-control custom-input" name="mobile_number" placeholder="Mobile Number" required>
                                         <div class="input-border"></div>
                                     </div>
                                 </div>
-                                
                                 <div class="form-group mb-3">
                                     <div class="input-container">
                                         <div class="input-icon">
                                             <i class="fas fa-envelope"></i>
                                         </div>
-                                        <input type="email" 
-                                               class="form-control custom-input" 
-                                               name="email" 
-                                               placeholder="Email Address (Optional)">
+                                        <input type="email" class="form-control custom-input" name="email" placeholder="Email Address (Optional)">
                                         <div class="input-border"></div>
                                     </div>
                                 </div>
-                                
                                 <div class="form-group mb-3">
                                     <div class="input-container">
                                         <div class="input-icon">
                                             <i class="fas fa-lock"></i>
                                         </div>
-                                        <input type="password" 
-                                               class="form-control custom-input" 
-                                               name="password" 
-                                               placeholder="Password" 
-                                               required>
+                                        <input type="password" class="form-control custom-input" name="password" placeholder="Password" required>
                                         <div class="input-border"></div>
                                         <div class="password-toggle" onclick="togglePassword(this)">
                                             <i class="fas fa-eye"></i>
                                         </div>
                                     </div>
                                 </div>
-                                
                                 <div class="form-group mb-4">
                                     <div class="input-container">
                                         <div class="input-icon">
                                             <i class="fas fa-lock"></i>
                                         </div>
-                                        <input type="password" 
-                                               class="form-control custom-input" 
-                                               name="confirm_password" 
-                                               placeholder="Confirm Password" 
-                                               required>
+                                        <input type="password" class="form-control custom-input" name="confirm_password" placeholder="Confirm Password" required>
                                         <div class="input-border"></div>
                                         <div class="password-toggle" onclick="togglePassword(this)">
                                             <i class="fas fa-eye"></i>
                                         </div>
                                     </div>
                                 </div>
-                                
                                 <button type="submit" class="btn auth-btn w-100 mb-3">
                                     <span class="btn-text">Create Account</span>
                                 </button>
                             </form>
                         </div>
-                        
                         <!-- Footer -->
                         <div class="auth-footer text-center">
                             <div class="back-to-home">
@@ -207,7 +171,6 @@
         </div>
     </div>
 </div>
-
 <style>
 /* Base Styles */
 .auth-container {
@@ -234,17 +197,63 @@
     animation: floatMedicalEquipment 15s ease-in-out infinite;
 }
 
-.equipment-1 { top: 8%; left: 12%; animation-delay: 0s; color: rgba(244, 67, 54, 0.4); }
-.equipment-2 { top: 15%; right: 18%; animation-delay: 2s; color: rgba(33, 150, 243, 0.4); }
-.equipment-3 { top: 65%; left: 8%; animation-delay: 4s; color: rgba(76, 175, 80, 0.4); }
-.equipment-4 { top: 75%; right: 12%; animation-delay: 6s; color: rgba(255, 152, 0, 0.4); }
-.equipment-5 { top: 25%; left: 85%; animation-delay: 8s; color: rgba(156, 39, 176, 0.4); }
+.equipment-1 {
+    top: 8%;
+    left: 12%;
+    animation-delay: 0s;
+    color: rgba(244, 67, 54, 0.4);
+}
+
+.equipment-2 {
+    top: 15%;
+    right: 18%;
+    animation-delay: 2s;
+    color: rgba(33, 150, 243, 0.4);
+}
+
+.equipment-3 {
+    top: 65%;
+    left: 8%;
+    animation-delay: 4s;
+    color: rgba(76, 175, 80, 0.4);
+}
+
+.equipment-4 {
+    top: 75%;
+    right: 12%;
+    animation-delay: 6s;
+    color: rgba(255, 152, 0, 0.4);
+}
+
+.equipment-5 {
+    top: 25%;
+    left: 85%;
+    animation-delay: 8s;
+    color: rgba(156, 39, 176, 0.4);
+}
 
 @keyframes floatMedicalEquipment {
-    0%, 100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.3; }
-    25% { transform: translateY(-30px) rotate(5deg) scale(1.1); opacity: 0.5; }
-    50% { transform: translateY(-15px) rotate(-3deg) scale(0.9); opacity: 0.4; }
-    75% { transform: translateY(-35px) rotate(8deg) scale(1.2); opacity: 0.6; }
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg) scale(1);
+        opacity: 0.3;
+    }
+
+    25% {
+        transform: translateY(-30px) rotate(5deg) scale(1.1);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: translateY(-15px) rotate(-3deg) scale(0.9);
+        opacity: 0.4;
+    }
+
+    75% {
+        transform: translateY(-35px) rotate(8deg) scale(1.2);
+        opacity: 0.6;
+    }
 }
 
 .animated-background {
@@ -294,8 +303,17 @@
 }
 
 @keyframes logoPulse {
-    0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3); }
-    50% { transform: scale(1.05); box-shadow: 0 15px 40px rgba(76, 175, 80, 0.4); }
+
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+    }
+
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 15px 40px rgba(76, 175, 80, 0.4);
+    }
 }
 
 .auth-title {
@@ -372,6 +390,7 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -421,7 +440,7 @@
     border-radius: 0 0 12px 12px;
 }
 
-.custom-input:focus ~ .input-border {
+.custom-input:focus~.input-border {
     width: 100%;
 }
 
@@ -529,17 +548,17 @@
         margin: 1rem;
         border-radius: 16px;
     }
-    
+
     .auth-title {
         font-size: 1.8rem;
     }
-    
+
     .logo-circle {
         width: 70px;
         height: 70px;
         font-size: 1.8rem;
     }
-    
+
     .medical-equipment {
         font-size: 2.5rem;
     }
@@ -549,22 +568,22 @@
     .auth-card {
         padding: 1.5rem 1rem;
     }
-    
+
     .tab-btn {
         padding: 10px 16px;
         font-size: 0.9rem;
     }
-    
+
     .custom-input {
         height: 50px;
         font-size: 0.95rem;
     }
-    
+
     .auth-btn {
         height: 50px;
         font-size: 1rem;
     }
-    
+
     .medical-equipment {
         font-size: 2rem;
     }
@@ -575,25 +594,24 @@
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
 }
 </style>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Tab switching functionality
     const tabButtons = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
     const tabIndicator = document.querySelector('.tab-indicator');
-    
+
     tabButtons.forEach((button, index) => {
         button.addEventListener('click', () => {
             // Remove active class from all buttons and contents
             tabButtons.forEach(btn => btn.classList.remove('active'));
             tabContents.forEach(content => content.classList.remove('active'));
-            
+
             // Add active class to clicked button and corresponding content
             button.classList.add('active');
             const tabId = button.getAttribute('data-tab');
             document.getElementById(tabId + '-tab').classList.add('active');
-            
+
             // Move indicator
             if (index === 1) {
                 tabIndicator.classList.add('move-right');
@@ -602,7 +620,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
+
     // Phone number formatting
     const phoneInputs = document.querySelectorAll('input[name="mobile_number"]');
     phoneInputs.forEach(input => {
@@ -616,14 +634,14 @@ document.addEventListener('DOMContentLoaded', function() {
             e.target.value = value;
         });
     });
-    
+
     // Form validation
     const forms = document.querySelectorAll('form');
     forms.forEach(form => {
         form.addEventListener('submit', function(e) {
             const inputs = form.querySelectorAll('input[required]');
             let isValid = true;
-            
+
             inputs.forEach(input => {
                 if (!input.value.trim()) {
                     isValid = false;
@@ -632,7 +650,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     input.classList.remove('is-invalid');
                 }
             });
-            
+
             // Validate mobile number
             const mobileInput = form.querySelector('input[name="mobile_number"]');
             if (mobileInput && mobileInput.value.replace(/\D/g, '').length < 10) {
@@ -649,12 +667,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 const errorDiv = document.querySelector('.mobile-error');
                 if (errorDiv) errorDiv.remove();
             }
-            
+
             // Password validation for signup
             if (form.querySelector('input[name="confirm_password"]')) {
                 const passwordInput = form.querySelector('input[name="password"]');
                 const confirmPasswordInput = form.querySelector('input[name="confirm_password"]');
-                
+
                 if (passwordInput.value !== confirmPasswordInput.value) {
                     isValid = false;
                     confirmPasswordInput.classList.add('is-invalid');
@@ -670,7 +688,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (errorDiv) errorDiv.remove();
                 }
             }
-            
+
             if (!isValid) {
                 e.preventDefault();
             }
@@ -682,7 +700,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function togglePassword(element) {
     const input = element.parentElement.querySelector('input');
     const icon = element.querySelector('i');
-    
+
     if (input.type === 'password') {
         input.type = 'text';
         icon.classList.remove('fa-eye');

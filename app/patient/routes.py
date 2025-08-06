@@ -15,11 +15,15 @@ def patient_login():
 
 @patient_bp.route('/login', methods=['POST'])
 def patient_login_post():
+    if request.form.get('form_type') != 'login':
+        flash('Invalid form submission.', 'danger')
+        return redirect(url_for('patient.patient_login'))
+
     mobile_number = clean_mobile_number(request.form['mobile_number'])
     password = request.form['password']
-    
+
     user = User.query.filter_by(mobile_number=mobile_number).first()
-    
+
     if user and check_password_hash(user.password, password):
         session['user_id'] = user.id
         session['user_name'] = user.full_name
@@ -29,26 +33,37 @@ def patient_login_post():
         flash('Invalid mobile number or password', 'danger')
         return render_template('patient/auth.html')
 
+
 @patient_bp.route('/signup', methods=['POST'])
 def patient_signup():
-    full_name = request.form['full_name']
-    mobile_number = clean_mobile_number(request.form['mobile_number'])
+    print("________")
+    print("REQUEST FORM", request.form)
+    print("________")
+
+    # Defensive coding to avoid crashing
+    if request.form.get('form_type') != 'signup':
+        flash('Invalid form submission.', 'danger')
+        return redirect(url_for('patient.patient_login'))
+
+    full_name = request.form.get('full_name')
+    mobile_number = clean_mobile_number(request.form.get('mobile_number', ''))
     email = request.form.get('email', '')
-    password = request.form['password']
-    confirm_password = request.form['confirm_password']
-    
-    # Validation
-    if password != confirm_password:
-        flash('Passwords do not match', 'danger')
+    password = request.form.get('password')
+    confirm_password = request.form.get('confirm_password')
+
+    if not full_name or not mobile_number or not password or not confirm_password:
+        flash('All required fields must be filled.', 'danger')
         return render_template('patient/auth.html')
-    
-    # Check if mobile number already exists
+
+    if password != confirm_password:
+        flash('Passwords do not match.', 'danger')
+        return render_template('patient/auth.html')
+
     existing_user = User.query.filter_by(mobile_number=mobile_number).first()
     if existing_user:
-        flash('Mobile number already registered', 'danger')
+        flash('Mobile number already registered.', 'danger')
         return render_template('patient/auth.html')
-    
-    # Create new user
+
     hashed_password = generate_password_hash(password)
     new_user = User(
         full_name=full_name,
@@ -56,12 +71,13 @@ def patient_signup():
         email=email if email else None,
         password=hashed_password
     )
-    
+
     db.session.add(new_user)
     db.session.commit()
-    
+
     flash('Account created successfully! Please login.', 'success')
     return render_template('patient/auth.html')
+
 
 @patient_bp.route('/home')
 def patient_home():
