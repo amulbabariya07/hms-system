@@ -1,5 +1,4 @@
 Flask
 Flask-SQLAlchemy
 psycopg2-binary
-Flask-WTF
-Flask-Bootstrap
+Werkzeug
