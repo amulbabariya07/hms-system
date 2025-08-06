@@ -18,6 +18,9 @@ def create_app():
     from app.patient.routes import patient_bp
     app.register_blueprint(patient_bp, url_prefix='/patient')
 
+    from app.admin.routes import admin_bp
+    app.register_blueprint(admin_bp, url_prefix='/admin')
+
     from app import models
     with app.app_context():
         db.create_all()
