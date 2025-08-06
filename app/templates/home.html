@@ -23,7 +23,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link fw-semibold" href="/patient">
+                    <a class="nav-link fw-semibold" href="/patient/login">
                         <i class="fas fa-user-injured me-1"></i>Patient Portal
                     </a>
                 </li>
@@ -58,7 +58,7 @@
                         Advanced care, compassionate service, and cutting-edge technology.
                     </p>
                     <div class="d-flex flex-wrap gap-3">
-                        <a href="/patient" class="btn btn-success btn-lg px-5 py-3 rounded-pill shadow-lg hover-lift">
+                        <a href="/patient/login" class="btn btn-success btn-lg px-5 py-3 rounded-pill shadow-lg hover-lift">
                             <i class="fas fa-user-injured me-2"></i>
                             Patient Portal
                         </a>
@@ -71,8 +71,9 @@
             </div>
             <div class="col-lg-6">
                 <div class="hero-image text-center animate-float">
-                    <img src="/placeholder.svg?height=500&width=600" 
-                         alt="Hospital" class="img-fluid rounded-4 shadow-2xl">
+                    <img src="{{ url_for('static', filename='images/home-page-dr.png') }}" 
+                         alt="Hospital" style="height: 500px; width: 800px;"
+                         class="img-fluid rounded-4">
                 </div>
             </div>
         </div>

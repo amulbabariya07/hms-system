@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app import db
-from app.models import PatientAppointment
+from app.models import PatientAppointment, User
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 patient_bp = Blueprint('patient', __name__, template_folder='templates')
 
@@ -55,3 +56,66 @@ def view_appointments():
 def appointment_detail(appointment_id):
     appointment = PatientAppointment.query.get_or_404(appointment_id)
     return render_template('patient/appointment_detail.html', appointment=appointment)
+
+@patient_bp.route('/login', methods=['GET', 'POST'])
+def patient_login():
+    if request.method == 'POST':
+        mobile_number = request.form['mobile_number']
+        password = request.form['password']
+        remember_me = bool(request.form.get('remember_me'))
+        
+        user = User.query.filter_by(mobile_number=mobile_number).first()
+        
+        if user and check_password_hash(user.password, password):
+            # In a real app, you'd use Flask-Login here
+            flash(f'Welcome back, {user.full_name}!', 'success')
+            return redirect(url_for('patient.patient_home'))
+        else:
+            flash('Invalid mobile number or password', 'danger')
+    
+    return render_template('patient/auth.html')
+
+@patient_bp.route('/signup', methods=['POST'])
+def patient_signup():
+    try:
+        full_name = request.form['full_name']
+        mobile_number = request.form['mobile_number']
+        email = request.form.get('email', '')
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+        
+        # Validation
+        if password != confirm_password:
+            flash('Passwords do not match', 'danger')
+            return render_template('patient/auth.html')
+        
+        # Check if mobile number already exists
+        existing_user = User.query.filter_by(mobile_number=mobile_number).first()
+        if existing_user:
+            flash('Mobile number already registered', 'danger')
+            return render_template('patient/auth.html')
+        
+        # Create new user
+        hashed_password = generate_password_hash(password)
+        new_user = User(
+            full_name=full_name,
+            mobile_number=mobile_number,
+            email=email if email else None,
+            password=hashed_password
+        )
+        
+        db.session.add(new_user)
+        db.session.commit()
+        
+        flash('Account created successfully! Please login.', 'success')
+        return render_template('patient/auth.html')
+        
+    except Exception as e:
+        flash('Error creating account. Please try again.', 'danger')
+        return render_template('patient/auth.html')
+
+@patient_bp.route('/forgot-password')
+def forgot_password():
+    # This would typically send a reset email
+    flash('Password reset feature will be implemented soon! Please contact support.', 'info')
+    return redirect(url_for('patient.patient_login'))
