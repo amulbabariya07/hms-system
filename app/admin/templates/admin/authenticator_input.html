@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5 text-center">
+    <h3>Enter 2FA Code</h3>
+    <form method="POST" action="{{ url_for('admin.admin_authenticator_post') }}" class="mt-4">
+        <input type="text" name="code" maxlength="6" class="form-control text-center mb-3" placeholder="123456" required>
+        <button type="submit" class="btn btn-success">Verify Code</button>
+    </form>
+</div>
+{% endblock %}

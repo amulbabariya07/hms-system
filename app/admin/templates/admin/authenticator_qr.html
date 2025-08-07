@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5 text-center">
+    <h3>Scan this QR Code in Google Authenticator</h3>
+    <img src="data:image/png;base64,{{ qr_code }}" class="my-4" style="max-width: 250px;">
+    <p>After scanning, enter the 6-digit code to continue.</p>
+    <a href="{{ url_for('admin.admin_authenticator') }}" class="btn btn-primary mt-3">Enter Code</a>
+</div>
+{% endblock %}
