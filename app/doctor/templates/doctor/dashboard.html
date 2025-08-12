@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Navigation Menu -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary fs-3" href="/">
+            <i class="fas fa-hospital-alt me-2"></i>
+            HMS
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/">
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="{{ url_for('doctor.doctor_profile') }}">
+                        <i class="fas fa-user me-1"></i>Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <span class="nav-link fw-semibold text-success">
+                        <i class="fas fa-user-md me-1"></i>Dr. {{ doctor.full_name }}
+                    </span>
+                </li>
+                <li class="nav-item ms-2">
+                    <a href="{{ url_for('doctor.doctor_logout') }}" class="btn btn-outline-danger rounded-pill px-4">
+                        <i class="fas fa-sign-out-alt me-1"></i>Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Welcome Section -->
+<div class="doctor-welcome-section bg-gradient-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-8">
+                <div class="welcome-content">
+                    <h1 class="display-3 fw-bold mb-4">
+                        Welcome, <br>
+                        <span class="text-warning">Dr. {{ doctor.full_name }}</span>
+                    </h1>
+                    <p class="lead mb-4 fs-4">
+                        {{ doctor.specialization }} Specialist | {{ doctor.experience_years }} Years Experience
+                    </p>
+                    <div class="doctor-info-cards row g-3 mb-4">
+                        <div class="col-md-4">
+                            <div class="info-card bg-white bg-opacity-20 rounded-4 p-3 text-center">
+                                <div class="info-icon mb-2">
+                                    <i class="fas fa-stethoscope fs-2"></i>
+                                </div>
+                                <div class="info-title fw-bold">Specialization</div>
+                                <div class="info-value">{{ doctor.specialization }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-card bg-white bg-opacity-20 rounded-4 p-3 text-center">
+                                <div class="info-icon mb-2">
+                                    <i class="fas fa-calendar-alt fs-2"></i>
+                                </div>
+                                <div class="info-title fw-bold">Experience</div>
+                                <div class="info-value">{{ doctor.experience_years }} Years</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-card bg-white bg-opacity-20 rounded-4 p-3 text-center">
+                                <div class="info-icon mb-2">
+                                    <i class="fas fa-id-card fs-2"></i>
+                                </div>
+                                <div class="info-title fw-bold">License</div>
+                                <div class="info-value">{{ doctor.license_number }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="doctor-avatar text-center">
+                    <div class="avatar-circle">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div class="status-badge mt-3">
+                        <span class="badge bg-success bg-gradient px-3 py-2 rounded-pill">
+                            <i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i>
+                            Active
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard Content -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold text-primary mb-4">Doctor Dashboard</h2>
+                <p class="lead text-muted">Manage your practice and patient care efficiently</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="dashboard-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift text-center">
+                    <div class="card-icon bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
+                        <i class="fas fa-users text-white fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold text-primary mb-3">My Patients</h4>
+                    <p class="text-muted mb-4">View and manage your patient records and appointments.</p>
+                    <button class="btn btn-outline-primary rounded-pill px-4" disabled>
+                        Coming Soon
+                    </button>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="dashboard-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift text-center">
+                    <div class="card-icon bg-success bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
+                        <i class="fas fa-calendar-check text-white fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold text-success mb-3">Appointments</h4>
+                    <p class="text-muted mb-4">Schedule and manage patient appointments efficiently.</p>
+                    <button class="btn btn-outline-success rounded-pill px-4" disabled>
+                        Coming Soon
+                    </button>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="dashboard-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift text-center">
+                    <div class="card-icon bg-info bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
+                        <i class="fas fa-prescription-bottle-alt text-white fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold text-info mb-3">Prescriptions</h4>
+                    <p class="text-muted mb-4">Create and manage patient prescriptions and medications.</p>
+                    <button class="btn btn-outline-info rounded-pill px-4" disabled>
+                        Coming Soon
+                    </button>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="dashboard-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift text-center">
+                    <div class="card-icon bg-warning bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
+                        <i class="fas fa-chart-line text-white fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold text-warning mb-3">Analytics</h4>
+                    <p class="text-muted mb-4">View practice statistics and patient analytics.</p>
+                    <button class="btn btn-outline-warning rounded-pill px-4" disabled>
+                        Coming Soon
+                    </button>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="dashboard-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift text-center">
+                    <div class="card-icon bg-danger bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
+                        <i class="fas fa-file-medical text-white fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold text-danger mb-3">Medical Records</h4>
+                    <p class="text-muted mb-4">Access and update patient medical histories.</p>
+                    <button class="btn btn-outline-danger rounded-pill px-4" disabled>
+                        Coming Soon
+                    </button>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="dashboard-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift text-center">
+                    <div class="card-icon bg-secondary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
+                        <i class="fas fa-cog text-white fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold text-secondary mb-3">Settings</h4>
+                    <p class="text-muted mb-4">Configure your profile and practice preferences.</p>
+                    <a href="{{ url_for('doctor.doctor_profile') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                        View Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Stats Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h3 class="display-5 fw-bold text-primary mb-4">Your Practice Overview</h3>
+                <p class="lead text-muted mb-4">
+                    Monitor your practice performance and patient care metrics.
+                </p>
+                <div class="stats-list">
+                    <div class="stat-item d-flex align-items-center mb-3">
+                        <div class="stat-icon bg-success bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3">
+                            <i class="fas fa-user-check text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Total Patients</h6>
+                            <p class="text-muted mb-0">0 patients registered</p>
+                        </div>
+                    </div>
+                    <div class="stat-item d-flex align-items-center mb-3">
+                        <div class="stat-icon bg-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3">
+                            <i class="fas fa-calendar-day text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Today's Appointments</h6>
+                            <p class="text-muted mb-0">0 appointments scheduled</p>
+                        </div>
+                    </div>
+                    <div class="stat-item d-flex align-items-center">
+                        <div class="stat-icon bg-info bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3">
+                            <i class="fas fa-clock text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Practice Hours</h6>
+                            <p class="text-muted mb-0">Configure in settings</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="stats-image text-center">
+                    <img src="/placeholder.svg?height=400&width=500" 
+                         alt="Practice Analytics" 
+                         class="img-fluid rounded-4">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-dark text-white py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <h5 class="fw-bold mb-4">Doctor Portal - HMS System</h5>
+                <p class="text-light opacity-75 mb-4">Empowering healthcare professionals with advanced practice management tools.</p>
+            </div>
+            <div class="col-lg-6">
+                <h6 class="fw-bold mb-4">Support</h6>
+                <div class="contact-info">
+                    <p class="text-light opacity-75 mb-2">
+                        <i class="fas fa-phone me-2"></i>
+                        +1 (555) 123-4567
+                    </p>
+                    <p class="text-light opacity-75 mb-2">
+                        <i class="fas fa-envelope me-2"></i>
+                        support@hospital.com
+                    </p>
+                </div>
+            </div>
+        </div>
+        <hr class="my-4 opacity-25">
+        <div class="text-center">
+            <p class="text-light opacity-75 mb-0">&copy; 2024 Hospital Management System. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
+}
+
+.doctor-welcome-section {
+    min-height: 80vh;
+}
+
+.min-vh-75 {
+    min-height: 75vh;
+}
+
+.info-card {
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.3) !important;
+}
+
+.card-icon {
+    width: 80px;
+    height: 80px;
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+}
+
+.dashboard-card {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.dashboard-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.hover-lift {
+    transition: all 0.3s ease;
+}
+
+.avatar-circle {
+    width: 150px;
+    height: 150px;
+    background: linear-gradient(135deg, #0f4c75, #3282b8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 4rem;
+    margin: 0 auto;
+    box-shadow: 0 20px 40px rgba(15, 76, 117, 0.3);
+    animation: avatarFloat 6s ease-in-out infinite;
+}
+
+@keyframes avatarFloat {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-10px) scale(1.05); }
+}
+
+.navbar {
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.navbar-brand {
+    font-size: 1.8rem !important;
+}
+
+.nav-link {
+    color: #495057 !important;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #0f4c75 !important;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .doctor-welcome-section {
+        min-height: auto;
+        padding: 3rem 0;
+    }
+    
+    .display-3 {
+        font-size: 2.5rem;
+    }
+    
+    .doctor-info-cards {
+        margin-top: 2rem;
+    }
+    
+    .avatar-circle {
+        width: 120px;
+        height: 120px;
+        font-size: 3rem;
+    }
+}
+</style>
+{% endblock %}

@@ -16,10 +16,13 @@ def create_app():
         return render_template('home.html')
 
     from app.patient.routes import patient_bp
-    from app.admin.routes import admin_bp
-
     app.register_blueprint(patient_bp, url_prefix='/patient')
+
+    from app.admin.routes import admin_bp
     app.register_blueprint(admin_bp, url_prefix='/admin')
+
+    from app.doctor.routes import doctor_bp
+    app.register_blueprint(doctor_bp, url_prefix='/doctor')
 
     from app import models
     with app.app_context():

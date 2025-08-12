@@ -1,7 +1,282 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
-    <h2>Welcome to the Patient Panel</h2>
-    <p>View your records, appointments, and more.</p>
+<!-- Navigation Menu -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary fs-3" href="/">
+            <i class="fas fa-hospital-alt me-2"></i>
+            HMS
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/">
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <span class="nav-link fw-semibold text-success">
+                        <i class="fas fa-user me-1"></i>Welcome, {{ user_name }}!
+                    </span>
+                </li>
+                <li class="nav-item ms-2">
+                    <a href="/patient/logout" class="btn btn-outline-danger rounded-pill px-4">
+                        <i class="fas fa-sign-out-alt me-1"></i>Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Welcome Section -->
+<div class="welcome-section bg-gradient-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-6">
+                <div class="welcome-content">
+                    <h1 class="display-3 fw-bold mb-4">
+                        Welcome to Your <br>
+                        <span class="text-warning">Health Dashboard</span>
+                    </h1>
+                    <p class="lead mb-4 fs-4">
+                        Hello {{ user_name }}! You have successfully logged into your patient portal. 
+                        Manage your health records and stay connected with our healthcare services.
+                    </p>
+                    <div class="welcome-stats bg-white bg-opacity-20 rounded-4 p-4 mb-4">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="stat-number display-6 fw-bold">0</div>
+                                <div class="stat-label">Appointments</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-number display-6 fw-bold">0</div>
+                                <div class="stat-label">Records</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-number display-6 fw-bold">24/7</div>
+                                <div class="stat-label">Support</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="welcome-image text-center">
+                    <img src="/placeholder.svg?height=400&width=600" 
+                         alt="Patient Dashboard" 
+                         class="img-fluid rounded-4 shadow-lg">
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Quick Actions Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold text-primary mb-4">Your Health Dashboard</h2>
+                <p class="lead text-muted">Access all your healthcare needs in one place</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="action-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift text-center">
+                    <div class="action-icon bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
+                        <i class="fas fa-user-circle text-white fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold text-primary mb-3">My Profile</h4>
+                    <p class="text-muted mb-4">View and update your personal information and medical history.</p>
+                    <button class="btn btn-outline-primary rounded-pill px-4" disabled>
+                        Coming Soon
+                    </button>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="action-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift text-center">
+                    <div class="action-icon bg-success bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
+                        <i class="fas fa-calendar-alt text-white fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold text-success mb-3">Appointments</h4>
+                    <p class="text-muted mb-4">Schedule, view, and manage your medical appointments.</p>
+                    <button class="btn btn-outline-success rounded-pill px-4" disabled>
+                        Coming Soon
+                    </button>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="action-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift text-center">
+                    <div class="action-icon bg-info bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
+                        <i class="fas fa-file-medical text-white fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold text-info mb-3">Medical Records</h4>
+                    <p class="text-muted mb-4">Access your test results, prescriptions, and medical history.</p>
+                    <button class="btn btn-outline-info rounded-pill px-4" disabled>
+                        Coming Soon
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Health Tips Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h3 class="display-5 fw-bold text-primary mb-4">Stay Healthy, Stay Happy</h3>
+                <p class="lead text-muted mb-4">
+                    Your health is our priority. Here are some quick tips to maintain a healthy lifestyle.
+                </p>
+                <div class="health-tips">
+                    <div class="tip-item d-flex align-items-center mb-3">
+                        <div class="tip-icon bg-success bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3">
+                            <i class="fas fa-heart text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Regular Exercise</h6>
+                            <p class="text-muted mb-0">Stay active with at least 30 minutes of exercise daily</p>
+                        </div>
+                    </div>
+                    <div class="tip-item d-flex align-items-center mb-3">
+                        <div class="tip-icon bg-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3">
+                            <i class="fas fa-apple-alt text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Healthy Diet</h6>
+                            <p class="text-muted mb-0">Eat balanced meals with plenty of fruits and vegetables</p>
+                        </div>
+                    </div>
+                    <div class="tip-item d-flex align-items-center">
+                        <div class="tip-icon bg-info bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3">
+                            <i class="fas fa-bed text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Quality Sleep</h6>
+                            <p class="text-muted mb-0">Get 7-8 hours of quality sleep every night</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="health-image text-center">
+                    <img src="/placeholder.svg?height=400&width=500" 
+                         alt="Healthy Lifestyle" 
+                         class="img-fluid rounded-4">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-dark text-white py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <h5 class="fw-bold mb-4">Hospital Management System</h5>
+                <p class="text-light opacity-75 mb-4">Providing exceptional healthcare services with advanced technology and compassionate care.</p>
+            </div>
+            <div class="col-lg-6">
+                <h6 class="fw-bold mb-4">Contact Info</h6>
+                <div class="contact-info">
+                    <p class="text-light opacity-75 mb-2">
+                        <i class="fas fa-phone me-2"></i>
+                        +1 (555) 123-4567
+                    </p>
+                    <p class="text-light opacity-75 mb-2">
+                        <i class="fas fa-envelope me-2"></i>
+                        info@hospital.com
+                    </p>
+                </div>
+            </div>
+        </div>
+        <hr class="my-4 opacity-25">
+        <div class="text-center">
+            <p class="text-light opacity-75 mb-0">&copy; 2024 Hospital Management System. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.welcome-section {
+    min-height: 80vh;
+}
+
+.min-vh-75 {
+    min-height: 75vh;
+}
+
+.welcome-stats {
+    backdrop-filter: blur(10px);
+}
+
+.action-icon {
+    width: 80px;
+    height: 80px;
+}
+
+.tip-icon {
+    width: 50px;
+    height: 50px;
+}
+
+.action-card {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.action-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.hover-lift {
+    transition: all 0.3s ease;
+}
+
+.navbar {
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.navbar-brand {
+    font-size: 1.8rem !important;
+}
+
+.nav-link {
+    color: #495057 !important;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #667eea !important;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .welcome-section {
+        min-height: auto;
+        padding: 3rem 0;
+    }
+    
+    .display-3 {
+        font-size: 2.5rem;
+    }
+    
+    .welcome-stats {
+        margin-top: 2rem;
+    }
+}
+</style>
 {% endblock %}

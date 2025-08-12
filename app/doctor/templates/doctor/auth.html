@@ -1,0 +1,1314 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="doctor-auth-container">
+    <!-- Animated Medical Background -->
+    <div class="medical-background">
+        <!-- Floating Medical Icons -->
+        <div class="floating-medical-icons">
+            <div class="medical-icon icon-1">
+                <i class="fas fa-user-md"></i>
+            </div>
+            <div class="medical-icon icon-2">
+                <i class="fas fa-stethoscope"></i>
+            </div>
+            <div class="medical-icon icon-3">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+            <div class="medical-icon icon-4">
+                <i class="fas fa-prescription-bottle-alt"></i>
+            </div>
+            <div class="medical-icon icon-5">
+                <i class="fas fa-syringe"></i>
+            </div>
+            <div class="medical-icon icon-6">
+                <i class="fas fa-microscope"></i>
+            </div>
+            <div class="medical-icon icon-7">
+                <i class="fas fa-x-ray"></i>
+            </div>
+            <div class="medical-icon icon-8">
+                <i class="fas fa-dna"></i>
+            </div>
+        </div>
+        
+        <!-- Medical Cross Pattern -->
+        <div class="medical-crosses">
+            <div class="medical-cross cross-1"></div>
+            <div class="medical-cross cross-2"></div>
+            <div class="medical-cross cross-3"></div>
+            <div class="medical-cross cross-4"></div>
+        </div>
+        
+        <!-- Pulse Lines -->
+        <div class="pulse-lines">
+            <div class="pulse-line line-1"></div>
+            <div class="pulse-line line-2"></div>
+            <div class="pulse-line line-3"></div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="auth-content">
+        <div class="container-fluid h-100">
+            <div class="row h-100 align-items-center justify-content-center">
+                <div class="col-xl-8 col-lg-10 col-md-11 col-sm-12" id="auth-container">
+                    <div class="doctor-auth-card">
+                        <!-- Header -->
+                        <div class="auth-header text-center mb-4">
+                            <div class="doctor-logo-container mb-3">
+                                <div class="doctor-logo-circle">
+                                    <i class="fas fa-user-md"></i>
+                                </div>
+                                <div class="logo-pulse"></div>
+                            </div>
+                            <h2 class="auth-title">Doctor Portal</h2>
+                            <p class="auth-subtitle">Professional Healthcare Access</p>
+                        </div>
+                        
+                        <!-- Flash Messages -->
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show doctor-alert" role="alert">
+                            <i class="fas fa-{{ 'exclamation-triangle' if category == 'danger' else ('check-circle' if category == 'success' else 'info-circle') }} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+                        
+                        <!-- Tab Navigation -->
+                        <div class="doctor-auth-tabs mb-4">
+                            <div class="tab-buttons">
+                                <button class="tab-btn active" data-tab="login">
+                                    <i class="fas fa-sign-in-alt me-2"></i>
+                                    Login
+                                </button>
+                                <button class="tab-btn" data-tab="signup">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    Register
+                                </button>
+                            </div>
+                            <div class="tab-indicator"></div>
+                        </div>
+                        
+                        <!-- Login Form -->
+                        <div class="tab-content active" id="login-tab">
+                            <form method="POST" action="{{ url_for('doctor.doctor_login_post') }}" class="doctor-auth-form">
+                                <input type="hidden" name="form_type" value="login">
+                                
+                                <div class="form-group mb-3">
+                                    <div class="input-container">
+                                        <div class="input-icon">
+                                            <i class="fas fa-mobile-alt"></i>
+                                        </div>
+                                        <input type="tel" class="form-control doctor-input" name="mobile_number" placeholder="Mobile Number" required>
+                                        <div class="input-border"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group mb-4">
+                                    <div class="input-container">
+                                        <div class="input-icon">
+                                            <i class="fas fa-lock"></i>
+                                        </div>
+                                        <input type="password" class="form-control doctor-input" name="password" placeholder="Password" required>
+                                        <div class="input-border"></div>
+                                        <div class="password-toggle" onclick="toggleDoctorPassword(this)">
+                                            <i class="fas fa-eye"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn doctor-auth-btn w-100 mb-3">
+                                    <span class="btn-content">
+                                        <i class="fas fa-sign-in-alt me-2"></i>
+                                        <span class="btn-text">Sign In</span>
+                                    </span>
+                                    <div class="btn-loader">
+                                        <div class="spinner"></div>
+                                    </div>
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Registration Form -->
+                        <div class="tab-content" id="signup-tab">
+                            <div class="registration-header text-center mb-5">
+                                <h3 class="registration-title">Doctor Registration</h3>
+                                <p class="registration-subtitle">Join our healthcare network as a verified medical professional</p>
+                            </div>
+                            
+                            <form method="POST" action="{{ url_for('doctor.doctor_signup') }}" class="doctor-registration-form">
+                                <input type="hidden" name="form_type" value="signup">
+                                
+                                <!-- Personal Information Section -->
+                                <div class="form-section mb-5">
+                                    <div class="section-header mb-4">
+                                        <h4 class="section-title">
+                                            <i class="fas fa-user me-2"></i>
+                                            Personal Information
+                                        </h4>
+                                        <div class="section-divider"></div>
+                                    </div>
+                                    
+                                    <div class="row g-4">
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label class="form-label required">Full Name</label>
+                                                <div class="input-container">
+                                                    <div class="input-icon">
+                                                        <i class="fas fa-user"></i>
+                                                    </div>
+                                                    <input type="text" class="form-control doctor-input" name="full_name" placeholder="Dr. John Smith" required>
+                                                    <div class="input-border"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label class="form-label required">Mobile Number</label>
+                                                <div class="input-container">
+                                                    <div class="input-icon">
+                                                        <i class="fas fa-mobile-alt"></i>
+                                                    </div>
+                                                    <input type="tel" class="form-control doctor-input" name="mobile_number" placeholder="1234567890" required>
+                                                    <div class="input-border"></div>
+                                                </div>
+                                                <small class="form-text">10-digit mobile number for login</small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <label class="form-label">Email Address</label>
+                                                <div class="input-container">
+                                                    <div class="input-icon">
+                                                        <i class="fas fa-envelope"></i>
+                                                    </div>
+                                                    <input type="email" class="form-control doctor-input" name="email" placeholder="doctor@example.com">
+                                                    <div class="input-border"></div>
+                                                </div>
+                                                <small class="form-text">Optional - for notifications and updates</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Professional Information Section -->
+                                <div class="form-section mb-5">
+                                    <div class="section-header mb-4">
+                                        <h4 class="section-title">
+                                            <i class="fas fa-stethoscope me-2"></i>
+                                            Professional Information
+                                        </h4>
+                                        <div class="section-divider"></div>
+                                    </div>
+                                    
+                                    <div class="row g-4">
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label class="form-label required">Medical Specialization</label>
+                                                <div class="input-container">
+                                                    <div class="input-icon">
+                                                        <i class="fas fa-stethoscope"></i>
+                                                    </div>
+                                                    <select class="form-control doctor-input" name="specialization" required>
+                                                        <option value="">Choose your specialization</option>
+                                                        <option value="Cardiology">Cardiology</option>
+                                                        <option value="Neurology">Neurology</option>
+                                                        <option value="Orthopedics">Orthopedics</option>
+                                                        <option value="Pediatrics">Pediatrics</option>
+                                                        <option value="Dermatology">Dermatology</option>
+                                                        <option value="Ophthalmology">Ophthalmology</option>
+                                                        <option value="Psychiatry">Psychiatry</option>
+                                                        <option value="General Medicine">General Medicine</option>
+                                                        <option value="Surgery">Surgery</option>
+                                                        <option value="Gynecology">Gynecology</option>
+                                                        <option value="Radiology">Radiology</option>
+                                                        <option value="Anesthesiology">Anesthesiology</option>
+                                                        <option value="Emergency Medicine">Emergency Medicine</option>
+                                                        <option value="Oncology">Oncology</option>
+                                                        <option value="Pulmonology">Pulmonology</option>
+                                                        <option value="Gastroenterology">Gastroenterology</option>
+                                                        <option value="Endocrinology">Endocrinology</option>
+                                                        <option value="Nephrology">Nephrology</option>
+                                                        <option value="Rheumatology">Rheumatology</option>
+                                                        <option value="Other">Other</option>
+                                                    </select>
+                                                    <div class="input-border"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label class="form-label required">Medical License Number</label>
+                                                <div class="input-container">
+                                                    <div class="input-icon">
+                                                        <i class="fas fa-id-card"></i>
+                                                    </div>
+                                                    <input type="text" class="form-control doctor-input" name="license_number" placeholder="MED123456789" required>
+                                                    <div class="input-border"></div>
+                                                </div>
+                                                <small class="form-text">Your valid medical license number</small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label class="form-label required">Years of Experience</label>
+                                                <div class="input-container">
+                                                    <div class="input-icon">
+                                                        <i class="fas fa-calendar-alt"></i>
+                                                    </div>
+                                                    <input type="number" class="form-control doctor-input" name="experience_years" placeholder="5" min="0" max="50" required>
+                                                    <div class="input-border"></div>
+                                                </div>
+                                                <small class="form-text">Years of medical practice experience</small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label class="form-label required">Medical Qualification</label>
+                                                <div class="input-container">
+                                                    <div class="input-icon">
+                                                        <i class="fas fa-graduation-cap"></i>
+                                                    </div>
+                                                    <input type="text" class="form-control doctor-input" name="qualification" placeholder="MBBS, MD" required>
+                                                    <div class="input-border"></div>
+                                                </div>
+                                                <small class="form-text">e.g., MBBS, MD, MS, DM, etc.</small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <label class="form-label">Hospital/Clinic Affiliation</label>
+                                                <div class="input-container">
+                                                    <div class="input-icon">
+                                                        <i class="fas fa-hospital"></i>
+                                                    </div>
+                                                    <input type="text" class="form-control doctor-input" name="hospital_affiliation" placeholder="City General Hospital">
+                                                    <div class="input-border"></div>
+                                                </div>
+                                                <small class="form-text">Optional - Current hospital or clinic affiliation</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Security Information Section -->
+                                <div class="form-section mb-5">
+                                    <div class="section-header mb-4">
+                                        <h4 class="section-title">
+                                            <i class="fas fa-shield-alt me-2"></i>
+                                            Account Security
+                                        </h4>
+                                        <div class="section-divider"></div>
+                                    </div>
+                                    
+                                    <div class="row g-4">
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label class="form-label required">Password</label>
+                                                <div class="input-container">
+                                                    <div class="input-icon">
+                                                        <i class="fas fa-lock"></i>
+                                                    </div>
+                                                    <input type="password" class="form-control doctor-input" name="password" placeholder="Create strong password" required>
+                                                    <div class="input-border"></div>
+                                                    <div class="password-toggle" onclick="toggleDoctorPassword(this)">
+                                                        <i class="fas fa-eye"></i>
+                                                    </div>
+                                                </div>
+                                                <small class="form-text">Minimum 6 characters</small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label class="form-label required">Confirm Password</label>
+                                                <div class="input-container">
+                                                    <div class="input-icon">
+                                                        <i class="fas fa-lock"></i>
+                                                    </div>
+                                                    <input type="password" class="form-control doctor-input" name="confirm_password" placeholder="Confirm your password" required>
+                                                    <div class="input-border"></div>
+                                                    <div class="password-toggle" onclick="toggleDoctorPassword(this)">
+                                                        <i class="fas fa-eye"></i>
+                                                    </div>
+                                                </div>
+                                                <small class="form-text">Must match the password above</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Terms and Submit -->
+                                <div class="form-section">
+                                    <div class="terms-section mb-4">
+                                        <div class="custom-checkbox-container">
+                                            <input type="checkbox" id="terms" class="custom-checkbox" required>
+                                            <label for="terms" class="checkbox-label">
+                                                I agree to the <a href="#" class="terms-link">Terms of Service</a> and 
+                                                <a href="#" class="terms-link">Privacy Policy</a>. I confirm that all information provided is accurate and I am a licensed medical professional.
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn doctor-register-btn w-100 mb-4">
+                                        <span class="btn-content">
+                                            <i class="fas fa-user-plus me-2"></i>
+                                            <span class="btn-text">Register as Doctor</span>
+                                        </span>
+                                        <div class="btn-loader">
+                                            <div class="spinner"></div>
+                                        </div>
+                                    </button>
+                                    
+                                    <div class="text-center">
+                                        <p class="switch-form-text">
+                                            Already have an account? 
+                                            <a href="#" class="switch-link" onclick="switchToLogin()">Sign In Here</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="auth-footer text-center">
+                            <div class="back-to-home">
+                                <a href="/" class="text-decoration-none">
+                                    <i class="fas fa-arrow-left me-2"></i>
+                                    Back to Home
+                                </a>
+                            </div>
+                            <div class="professional-note mt-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-shield-alt me-1"></i>
+                                    Professional medical credentials required
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Doctor Auth Styles */
+.doctor-auth-container {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0f4c75 0%, #3282b8 25%, #bbe1fa 50%, #1b262c 75%, #0f3460 100%);
+}
+
+/* Medical Background Animation */
+.medical-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.floating-medical-icons {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.medical-icon {
+    position: absolute;
+    color: rgba(255, 255, 255, 0.1);
+    font-size: 3.5rem;
+    animation: floatMedical 25s ease-in-out infinite;
+}
+
+.icon-1 { top: 8%; left: 5%; animation-delay: 0s; }
+.icon-2 { top: 15%; right: 8%; animation-delay: 3s; }
+.icon-3 { top: 35%; left: 3%; animation-delay: 6s; }
+.icon-4 { top: 55%; right: 5%; animation-delay: 9s; }
+.icon-5 { top: 75%; left: 8%; animation-delay: 12s; }
+.icon-6 { top: 25%; left: 85%; animation-delay: 15s; }
+.icon-7 { top: 65%; left: 90%; animation-delay: 18s; }
+.icon-8 { top: 85%; right: 20%; animation-delay: 21s; }
+
+@keyframes floatMedical {
+    0%, 100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.1; }
+    25% { transform: translateY(-40px) rotate(10deg) scale(1.2); opacity: 0.3; }
+    50% { transform: translateY(-20px) rotate(-5deg) scale(0.8); opacity: 0.2; }
+    75% { transform: translateY(-50px) rotate(15deg) scale(1.4); opacity: 0.4; }
+}
+
+/* Medical Cross Pattern */
+.medical-crosses {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.medical-cross {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    opacity: 0.1;
+    animation: crossPulse 8s ease-in-out infinite;
+}
+
+.medical-cross::before,
+.medical-cross::after {
+    content: '';
+    position: absolute;
+    background: white;
+}
+
+.medical-cross::before {
+    width: 100%;
+    height: 6px;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+}
+
+.medical-cross::after {
+    width: 6px;
+    height: 100%;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+}
+
+.cross-1 { top: 20%; left: 15%; animation-delay: 0s; }
+.cross-2 { top: 40%; right: 25%; animation-delay: 2s; }
+.cross-3 { bottom: 30%; left: 20%; animation-delay: 4s; }
+.cross-4 { bottom: 15%; right: 15%; animation-delay: 6s; }
+
+@keyframes crossPulse {
+    0%, 100% { opacity: 0.1; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(1.2); }
+}
+
+/* Pulse Lines */
+.pulse-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.pulse-line {
+    position: absolute;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.2);
+    animation: pulseLine 6s ease-in-out infinite;
+}
+
+.line-1 {
+    top: 25%;
+    left: 0;
+    width: 100%;
+    animation-delay: 0s;
+}
+
+.line-2 {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    animation-delay: 2s;
+}
+
+.line-3 {
+    top: 75%;
+    left: 0;
+    width: 100%;
+    animation-delay: 4s;
+}
+
+@keyframes pulseLine {
+    0%, 100% { opacity: 0.2; transform: scaleX(1); }
+    50% { opacity: 0.6; transform: scaleX(1.1); }
+}
+
+/* Main Content */
+.auth-content {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+}
+
+/* Dynamic Container Width */
+#auth-container {
+    transition: all 0.4s ease;
+}
+
+#auth-container.login-mode {
+    max-width: 600px;
+}
+
+#auth-container.registration-mode {
+    max-width: 1200px;
+}
+
+.doctor-auth-card {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(25px);
+    border-radius: 25px;
+    padding: 3rem 2.5rem;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    margin: 0 auto;
+    transition: all 0.4s ease;
+}
+
+/* Doctor Logo */
+.doctor-logo-container {
+    position: relative;
+    display: inline-block;
+}
+
+.doctor-logo-circle {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2.8rem;
+    margin: 0 auto;
+    box-shadow: 0 20px 40px rgba(15, 76, 117, 0.4);
+    animation: logoFloat 8s ease-in-out infinite;
+    position: relative;
+    z-index: 2;
+}
+
+.logo-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 120px;
+    border: 3px solid rgba(50, 130, 184, 0.3);
+    border-radius: 50%;
+    animation: logoPulse 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-15px) scale(1.05); }
+}
+
+@keyframes logoPulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+    50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.1; }
+}
+
+/* Auth Header */
+.auth-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #0f4c75;
+    margin-bottom: 0.5rem;
+}
+
+.auth-subtitle {
+    color: #3282b8;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* Registration Header */
+.registration-header {
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 2rem;
+    margin-bottom: 3rem;
+}
+
+.registration-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #0f4c75;
+    margin-bottom: 0.5rem;
+}
+
+.registration-subtitle {
+    color: #64748b;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* Tab Navigation */
+.doctor-auth-tabs {
+    position: relative;
+}
+
+.tab-buttons {
+    display: flex;
+    background: #f8fafc;
+    border-radius: 15px;
+    padding: 6px;
+    position: relative;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tab-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-weight: 700;
+    color: #64748b;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 2;
+    font-size: 1rem;
+}
+
+.tab-btn.active {
+    color: #0f4c75;
+}
+
+.tab-indicator {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: calc(50% - 6px);
+    height: calc(100% - 12px);
+    background: linear-gradient(135deg, #0f4c75, #3282b8);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(15, 76, 117, 0.3);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-indicator.move-right {
+    transform: translateX(100%);
+}
+
+/* Form Styles */
+.tab-content {
+    display: none;
+    animation: fadeInUp 0.6s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Form Sections */
+.form-section {
+    margin-bottom: 2.5rem;
+}
+
+.section-header {
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #0f4c75;
+    margin-bottom: 1rem;
+}
+
+.section-divider {
+    height: 3px;
+    background: linear-gradient(90deg, #0f4c75, #3282b8, transparent);
+    border-radius: 2px;
+    width: 100px;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+    display: block;
+}
+
+.form-label.required::after {
+    content: ' *';
+    color: #ef4444;
+    font-weight: bold;
+}
+
+.form-text {
+    color: #6b7280;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: block;
+}
+
+.input-container {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.input-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #3282b8;
+    font-size: 1.3rem;
+    z-index: 2;
+}
+
+.doctor-input {
+    height: 60px;
+    padding-left: 55px;
+    padding-right: 55px;
+    border-radius: 15px;
+    border: 2px solid #e2e8f0;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+}
+
+.doctor-input:focus {
+    border-color: #3282b8;
+    box-shadow: 0 0 0 0.2rem rgba(50, 130, 184, 0.25);
+    background: white;
+    outline: none;
+}
+
+.doctor-input option {
+    padding: 10px;
+    font-weight: 500;
+}
+
+.input-border {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 0;
+    background: linear-gradient(90deg, #0f4c75, #3282b8);
+    transition: width 0.3s ease;
+    border-radius: 0 0 15px 15px;
+}
+
+.doctor-input:focus ~ .input-border {
+    width: 100%;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+    z-index: 2;
+}
+
+.password-toggle:hover {
+    color: #3282b8;
+}
+
+/* Custom Checkbox */
+.custom-checkbox-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.custom-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #3282b8;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.custom-checkbox:checked {
+    background: #3282b8;
+    border-color: #3282b8;
+}
+
+.checkbox-label {
+    color: #374151;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+.terms-link {
+    color: #3282b8;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.terms-link:hover {
+    color: #0f4c75;
+    text-decoration: underline;
+}
+
+/* Button Styles */
+.doctor-auth-btn, .doctor-register-btn {
+    height: 60px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: none;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.doctor-auth-btn:hover, .doctor-register-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(15, 76, 117, 0.4);
+    background: linear-gradient(135deg, #0d3f63 0%, #2a6fa0 100%);
+}
+
+.doctor-auth-btn:active, .doctor-register-btn:active {
+    transform: translateY(-1px);
+}
+
+.btn-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.btn-loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Switch Form Links */
+.switch-form-text {
+    color: #64748b;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.switch-link {
+    color: #3282b8;
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.3s ease;
+}
+
+.switch-link:hover {
+    color: #0f4c75;
+    text-decoration: underline;
+}
+
+/* Footer */
+.auth-footer {
+    margin-top: 2rem;
+}
+
+.back-to-home a {
+    color: #3282b8;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.back-to-home a:hover {
+    color: #0f4c75;
+    transform: translateX(-5px);
+}
+
+.professional-note {
+    color: #64748b;
+}
+
+/* Alert Styles */
+.doctor-alert {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+}
+
+.doctor-alert.alert-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+}
+
+.doctor-alert.alert-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    border: none;
+}
+
+.doctor-alert.alert-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    border: none;
+}
+
+.doctor-alert.alert-info {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    border: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .doctor-auth-container {
+        padding: 1rem 0;
+    }
+
+    .doctor-auth-card {
+        padding: 2.5rem 2rem;
+        border-radius: 20px;
+        margin: 1rem;
+    }
+
+    .doctor-input {
+        height: 55px;
+        font-size: 0.95rem;
+    }
+
+    .doctor-auth-btn, .doctor-register-btn {
+        height: 55px;
+        font-size: 1rem;
+    }
+
+    .medical-icon {
+        font-size: 3rem;
+    }
+
+    .auth-title {
+        font-size: 2rem;
+    }
+
+    .doctor-logo-circle {
+        width: 80px;
+        height: 80px;
+        font-size: 2.2rem;
+    }
+
+    .logo-pulse {
+        width: 100px;
+        height: 100px;
+    }
+}
+
+@media (max-width: 576px) {
+    .doctor-auth-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .tab-btn {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+    }
+
+    .doctor-input {
+        height: 50px;
+        font-size: 0.9rem;
+        padding-left: 45px;
+        padding-right: 45px;
+    }
+
+    .input-icon {
+        font-size: 1.1rem;
+        left: 15px;
+    }
+
+    .password-toggle {
+        right: 15px;
+        font-size: 1.1rem;
+    }
+
+    .doctor-auth-btn, .doctor-register-btn {
+        height: 50px;
+        font-size: 0.95rem;
+    }
+
+    .medical-icon {
+        font-size: 2.5rem;
+    }
+}
+
+/* Loading State */
+.doctor-auth-btn.loading .btn-content,
+.doctor-register-btn.loading .btn-content {
+    opacity: 0;
+}
+
+.doctor-auth-btn.loading .btn-loader,
+.doctor-register-btn.loading .btn-loader {
+    opacity: 1;
+}
+
+/* Form Validation */
+.doctor-input.is-invalid {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25) !important;
+}
+
+.doctor-input.is-valid {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.25) !important;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const authContainer = document.getElementById('auth-container');
+    
+    // Tab switching functionality
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const tabIndicator = document.querySelector('.tab-indicator');
+
+    tabButtons.forEach((button, index) => {
+        button.addEventListener('click', () => {
+            switchTab(index);
+        });
+    });
+
+    function switchTab(index) {
+        // Remove active class from all buttons and contents
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+
+        // Add active class to clicked button and corresponding content
+        tabButtons[index].classList.add('active');
+        const tabId = tabButtons[index].getAttribute('data-tab');
+        document.getElementById(tabId + '-tab').classList.add('active');
+
+        // Move indicator
+        if (index === 1) {
+            tabIndicator.classList.add('move-right');
+            // Expand container for registration
+            authContainer.classList.remove('login-mode');
+            authContainer.classList.add('registration-mode');
+        } else {
+            tabIndicator.classList.remove('move-right');
+            // Shrink container for login
+            authContainer.classList.remove('registration-mode');
+            authContainer.classList.add('login-mode');
+        }
+    }
+
+    // Initialize with login mode
+    authContainer.classList.add('login-mode');
+
+    // Switch functions for links
+    window.switchToLogin = function() {
+        switchTab(0);
+    };
+
+    // Phone number formatting
+    const phoneInputs = document.querySelectorAll('input[name="mobile_number"]');
+    phoneInputs.forEach(input => {
+        input.addEventListener('input', function(e) {
+            // Only keep digits
+            let value = e.target.value.replace(/\D/g, '');
+            // Limit to 10 digits
+            if (value.length > 10) {
+                value = value.substring(0, 10);
+            }
+            e.target.value = value;
+        });
+    });
+
+    // Form validation
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        const submitBtn = form.querySelector('.doctor-auth-btn, .doctor-register-btn');
+        
+        form.addEventListener('submit', function(e) {
+            const inputs = form.querySelectorAll('input[required], select[required]');
+            let isValid = true;
+
+            // Clear previous error messages
+            document.querySelectorAll('.error-message').forEach(error => error.remove());
+
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    isValid = false;
+                    input.classList.add('is-invalid');
+                } else {
+                    input.classList.remove('is-invalid');
+                    input.classList.add('is-valid');
+                }
+            });
+
+            // Validate mobile number
+            const mobileInput = form.querySelector('input[name="mobile_number"]');
+            if (mobileInput && mobileInput.value.replace(/\D/g, '').length < 10) {
+                isValid = false;
+                mobileInput.classList.add('is-invalid');
+                showError(mobileInput, 'Mobile number must be 10 digits');
+            }
+
+            // Validate experience years
+            const experienceInput = form.querySelector('input[name="experience_years"]');
+            if (experienceInput && experienceInput.value) {
+                const years = parseInt(experienceInput.value);
+                if (years < 0 || years > 50) {
+                    isValid = false;
+                    experienceInput.classList.add('is-invalid');
+                    showError(experienceInput, 'Experience must be between 0 and 50 years');
+                }
+            }
+
+            // Password validation for signup
+            if (form.querySelector('input[name="confirm_password"]')) {
+                const passwordInput = form.querySelector('input[name="password"]');
+                const confirmPasswordInput = form.querySelector('input[name="confirm_password"]');
+
+                if (passwordInput.value !== confirmPasswordInput.value) {
+                    isValid = false;
+                    confirmPasswordInput.classList.add('is-invalid');
+                    showError(confirmPasswordInput, 'Passwords do not match');
+                }
+
+                // Password strength validation
+                if (passwordInput.value.length < 6) {
+                    isValid = false;
+                    passwordInput.classList.add('is-invalid');
+                    showError(passwordInput, 'Password must be at least 6 characters');
+                }
+            }
+
+            // Terms checkbox validation
+            const termsCheckbox = form.querySelector('#terms');
+            if (termsCheckbox && !termsCheckbox.checked) {
+                isValid = false;
+                showError(termsCheckbox, 'You must agree to the terms and conditions');
+            }
+
+            if (isValid) {
+                // Add loading state
+                submitBtn.classList.add('loading');
+                submitBtn.disabled = true;
+            } else {
+                e.preventDefault();
+            }
+        });
+    });
+
+    function showError(input, message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message text-danger small mt-1';
+        errorDiv.textContent = message;
+        input.closest('.input-container, .custom-checkbox-container').appendChild(errorDiv);
+    }
+
+    // Auto-focus first input
+    const firstInput = document.querySelector('.doctor-input');
+    if (firstInput) {
+        firstInput.focus();
+    }
+
+    // Enhanced animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    // Observe form sections
+    document.querySelectorAll('.form-section').forEach((element, index) => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(20px)';
+        element.style.transition = `all 0.6s ease ${index * 0.1}s`;
+        observer.observe(element);
+    });
+});
+
+// Password toggle functionality
+function toggleDoctorPassword(element) {
+    const input = element.parentElement.querySelector('input');
+    const icon = element.querySelector('i');
+
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+        element.style.color = '#3282b8';
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+        element.style.color = '#94a3b8';
+    }
+}
+</script>
+{% endblock %}
