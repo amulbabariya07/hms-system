@@ -92,9 +92,9 @@
                     </div>
                     <h4 class="fw-bold text-primary mb-3">My Profile</h4>
                     <p class="text-muted mb-4">View and update your personal information and medical history.</p>
-                    <button class="btn btn-outline-primary rounded-pill px-4" disabled>
-                        Coming Soon
-                    </button>
+                    <a href="{{ url_for('patient.book_appointment') }}" class="btn btn-outline-primary rounded-pill px-4">
+                        Book Appointment
+                    </a>
                 </div>
             </div>
             <div class="col-lg-4 col-md-6">
@@ -104,9 +104,9 @@
                     </div>
                     <h4 class="fw-bold text-success mb-3">Appointments</h4>
                     <p class="text-muted mb-4">Schedule, view, and manage your medical appointments.</p>
-                    <button class="btn btn-outline-success rounded-pill px-4" disabled>
-                        Coming Soon
-                    </button>
+                    <a href="{{ url_for('patient.my_appointments') }}" class="btn btn-outline-success rounded-pill px-4">
+                        View Appointments
+                    </a>
                 </div>
             </div>
             <div class="col-lg-4 col-md-6">

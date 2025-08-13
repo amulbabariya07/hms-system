@@ -12,6 +12,9 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
     
+    # Relationship with appointments
+    appointments = db.relationship('Appointment', backref='patient', lazy=True)
+    
     def __repr__(self):
         return f'<User {self.full_name}>'
 
@@ -32,5 +35,25 @@ class Doctor(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     is_verified = db.Column(db.Boolean, default=False)
     
+    # Relationship with appointments
+    appointments = db.relationship('Appointment', backref='doctor', lazy=True)
+    
     def __repr__(self):
         return f'<Doctor {self.full_name}>'
+
+class Appointment(db.Model):
+    __tablename__ = 'appointments'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False)
+    patient_name = db.Column(db.String(100), nullable=False)
+    appointment_date = db.Column(db.Date, nullable=False)
+    appointment_time = db.Column(db.Time, nullable=False)
+    reason = db.Column(db.Text, nullable=True)
+    status = db.Column(db.String(20), default='scheduled')  # scheduled, completed, cancelled
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<Appointment {self.patient_name} with Dr. {self.doctor.full_name}>'

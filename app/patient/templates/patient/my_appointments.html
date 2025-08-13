@@ -1,0 +1,497 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Navigation Menu -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary fs-3" href="/">
+            <i class="fas fa-hospital-alt me-2"></i>
+            HMS
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="{{ url_for('patient.patient_home') }}">
+                        <i class="fas fa-home me-1"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="{{ url_for('patient.book_appointment') }}">
+                        <i class="fas fa-calendar-plus me-1"></i>Book Appointment
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <span class="nav-link fw-semibold text-success">
+                        <i class="fas fa-user me-1"></i>{{ user_name }}
+                    </span>
+                </li>
+                <li class="nav-item ms-2">
+                    <a href="{{ url_for('patient.logout') }}" class="btn btn-outline-danger rounded-pill px-4">
+                        <i class="fas fa-sign-out-alt me-1"></i>Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- My Appointments Section -->
+<div class="appointments-section py-5 bg-light">
+    <div class="container">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <div class="appointments-icon mb-4">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <h2 class="display-5 fw-bold text-primary mb-3">My Appointments</h2>
+            <p class="lead text-muted">View and manage your scheduled appointments</p>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show custom-alert" role="alert">
+            <i class="fas fa-{{ 'exclamation-triangle' if category == 'danger' else ('check-circle' if category == 'success' else 'info-circle') }} me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- Quick Actions -->
+        <div class="row mb-5">
+            <div class="col-lg-12">
+                <div class="quick-actions bg-white rounded-4 shadow-sm p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="fw-bold mb-2">Need to schedule a new appointment?</h5>
+                            <p class="text-muted mb-0">Book your next consultation with our expert doctors</p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <a href="{{ url_for('patient.book_appointment') }}" class="btn btn-primary rounded-pill px-4 py-2">
+                                <i class="fas fa-calendar-plus me-2"></i>
+                                Book New Appointment
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointments List -->
+        <div class="row">
+            <div class="col-lg-12">
+                {% if appointments %}
+                <div class="appointments-container">
+                    {% for appointment in appointments %}
+                    <div class="appointment-card bg-white rounded-4 shadow-sm mb-4">
+                        <div class="appointment-header">
+                            <div class="appointment-status">
+                                {% if appointment.status == 'scheduled' %}
+                                <span class="status-badge status-scheduled">
+                                    <i class="fas fa-clock me-1"></i>Scheduled
+                                </span>
+                                {% elif appointment.status == 'completed' %}
+                                <span class="status-badge status-completed">
+                                    <i class="fas fa-check-circle me-1"></i>Completed
+                                </span>
+                                {% elif appointment.status == 'cancelled' %}
+                                <span class="status-badge status-cancelled">
+                                    <i class="fas fa-times-circle me-1"></i>Cancelled
+                                </span>
+                                {% endif %}
+                            </div>
+                            <div class="appointment-id">
+                                <small class="text-muted">Appointment #{{ appointment.id }}</small>
+                            </div>
+                        </div>
+                        
+                        <div class="appointment-body">
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <div class="appointment-info">
+                                        <div class="doctor-info mb-3">
+                                            <div class="doctor-avatar">
+                                                <i class="fas fa-user-md"></i>
+                                            </div>
+                                            <div class="doctor-details">
+                                                <h5 class="doctor-name">Dr. {{ appointment.doctor.full_name }}</h5>
+                                                <p class="doctor-specialization">{{ appointment.doctor.specialization }}</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="appointment-details">
+                                            <div class="detail-item">
+                                                <i class="fas fa-calendar text-primary me-2"></i>
+                                                <span class="detail-label">Date:</span>
+                                                <span class="detail-value">{{ appointment.appointment_date.strftime('%B %d, %Y') }}</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <i class="fas fa-clock text-primary me-2"></i>
+                                                <span class="detail-label">Time:</span>
+                                                <span class="detail-value">{{ appointment.appointment_time.strftime('%I:%M %p') }}</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <i class="fas fa-user text-primary me-2"></i>
+                                                <span class="detail-label">Patient:</span>
+                                                <span class="detail-value">{{ appointment.patient_name }}</span>
+                                            </div>
+                                            {% if appointment.reason %}
+                                            <div class="detail-item">
+                                                <i class="fas fa-notes-medical text-primary me-2"></i>
+                                                <span class="detail-label">Reason:</span>
+                                                <span class="detail-value">{{ appointment.reason }}</span>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-4">
+                                    <div class="appointment-actions">
+                                        <div class="booking-info mb-3">
+                                            <small class="text-muted">
+                                                <i class="fas fa-calendar-plus me-1"></i>
+                                                Booked on {{ appointment.created_at.strftime('%b %d, %Y') }}
+                                            </small>
+                                        </div>
+                                        
+                                        {% if appointment.status == 'scheduled' %}
+                                        <div class="action-buttons">
+                                            <button class="btn btn-outline-danger btn-sm rounded-pill px-3" 
+                                                    onclick="cancelAppointment({{ appointment.id }})">
+                                                <i class="fas fa-times me-1"></i>
+                                                Cancel
+                                            </button>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if appointment.doctor.hospital_affiliation %}
+                                        <div class="hospital-info mt-3">
+                                            <small class="text-muted">
+                                                <i class="fas fa-hospital me-1"></i>
+                                                {{ appointment.doctor.hospital_affiliation }}
+                                            </small>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="no-appointments-message text-center py-5">
+                    <div class="no-appointments-icon mb-4">
+                        <i class="fas fa-calendar-times"></i>
+                    </div>
+                    <h4 class="fw-bold text-muted mb-3">No Appointments Found</h4>
+                    <p class="text-muted mb-4">You haven't booked any appointments yet. Schedule your first consultation with our expert doctors.</p>
+                    <a href="{{ url_for('patient.book_appointment') }}" class="btn btn-primary btn-lg rounded-pill px-5">
+                        <i class="fas fa-calendar-plus me-2"></i>
+                        Book Your First Appointment
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Confirmation Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold" id="cancelModalLabel">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Cancel Appointment
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">Are you sure you want to cancel this appointment? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                    Keep Appointment
+                </button>
+                <a href="#" id="confirmCancelBtn" class="btn btn-danger rounded-pill px-4">
+                    <i class="fas fa-times me-1"></i>
+                    Yes, Cancel
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.appointments-section {
+    min-height: 100vh;
+}
+
+.appointments-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+    margin: 0 auto;
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.quick-actions {
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.appointment-card {
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.appointment-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+.appointment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 1.5rem 0;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.status-scheduled {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+}
+
+.status-completed {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.status-cancelled {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+.appointment-body {
+    padding: 1.5rem;
+}
+
+.doctor-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.doctor-avatar {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.doctor-name {
+    color: #1f2937;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+}
+
+.doctor-specialization {
+    color: #667eea;
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+.appointment-details {
+    margin-top: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #374151;
+    margin-right: 0.5rem;
+    min-width: 80px;
+}
+
+.detail-value {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.appointment-actions {
+    text-align: right;
+}
+
+.booking-info {
+    background: #f8fafc;
+    padding: 0.75rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.hospital-info {
+    background: #f0f9ff;
+    padding: 0.5rem;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.no-appointments-message {
+    background: white;
+    border-radius: 20px;
+    padding: 4rem 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.no-appointments-icon {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    font-size: 4rem;
+    margin: 0 auto;
+}
+
+.custom-alert {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.navbar {
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.nav-link {
+    color: #495057 !important;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #667eea !important;
+    transform: translateY(-1px);
+}
+
+.modal-content {
+    border: none;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+@media (max-width: 768px) {
+    .appointments-icon {
+        width: 80px;
+        height: 80px;
+        font-size: 2.5rem;
+    }
+    
+    .appointment-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .appointment-actions {
+        text-align: left;
+        margin-top: 1rem;
+    }
+    
+    .detail-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .detail-label {
+        min-width: auto;
+        margin-bottom: 0.25rem;
+    }
+    
+    .quick-actions .row {
+        text-align: center;
+    }
+    
+    .quick-actions .col-md-4 {
+        margin-top: 1rem;
+    }
+}
+</style>
+
+<script>
+function cancelAppointment(appointmentId) {
+    const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
+    const confirmBtn = document.getElementById('confirmCancelBtn');
+    confirmBtn.href = `/patient/cancel-appointment/${appointmentId}`;
+    modal.show();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Add smooth animations to appointment cards
+    const appointmentCards = document.querySelectorAll('.appointment-card');
+    appointmentCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = 'all 0.6s ease';
+        
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+    
+    // Enhanced hover effects
+    appointmentCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

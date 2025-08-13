@@ -1,0 +1,581 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Navigation Menu -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary fs-3" href="/">
+            <i class="fas fa-hospital-alt me-2"></i>
+            HMS
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="{{ url_for('patient.patient_home') }}">
+                        <i class="fas fa-home me-1"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="{{ url_for('patient.my_appointments') }}">
+                        <i class="fas fa-calendar-alt me-1"></i>My Appointments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <span class="nav-link fw-semibold text-success">
+                        <i class="fas fa-user me-1"></i>{{ user_name }}
+                    </span>
+                </li>
+                <li class="nav-item ms-2">
+                    <a href="{{ url_for('patient.logout') }}" class="btn btn-outline-danger rounded-pill px-4">
+                        <i class="fas fa-sign-out-alt me-1"></i>Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Book Appointment Section -->
+<div class="appointment-booking-section py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Header -->
+                <div class="text-center mb-5">
+                    <div class="appointment-icon mb-4">
+                        <i class="fas fa-calendar-plus"></i>
+                    </div>
+                    <h2 class="display-5 fw-bold text-primary mb-3">Book an Appointment</h2>
+                    <p class="lead text-muted">Schedule your consultation with our expert doctors</p>
+                </div>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show custom-alert" role="alert">
+                    <i class="fas fa-{{ 'exclamation-triangle' if category == 'danger' else ('check-circle' if category == 'success' else 'info-circle') }} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                <!-- Appointment Form -->
+                <div class="appointment-form-card bg-white rounded-4 shadow-sm p-4">
+                    <form method="POST" action="{{ url_for('patient.book_appointment_post') }}" class="appointment-form">
+                        <!-- Patient Information -->
+                        <div class="form-section mb-4">
+                            <h4 class="section-title mb-3">
+                                <i class="fas fa-user me-2 text-primary"></i>
+                                Patient Information
+                            </h4>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label class="form-label">Patient Name</label>
+                                        <div class="input-container">
+                                            <div class="input-icon">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            <input type="text" class="form-control custom-input" value="{{ user_name }}" readonly>
+                                            <div class="input-border"></div>
+                                        </div>
+                                        <small class="form-text text-muted">This is automatically filled from your profile</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Doctor Selection -->
+                        <div class="form-section mb-4">
+                            <h4 class="section-title mb-3">
+                                <i class="fas fa-user-md me-2 text-primary"></i>
+                                Select Doctor
+                            </h4>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label class="form-label required">Choose Doctor</label>
+                                        <div class="doctor-selection">
+                                            {% if doctors %}
+                                            {% for doctor in doctors %}
+                                            <div class="doctor-card">
+                                                <input type="radio" id="doctor_{{ doctor.id }}" name="doctor_id" value="{{ doctor.id }}" class="doctor-radio" required>
+                                                <label for="doctor_{{ doctor.id }}" class="doctor-label">
+                                                    <div class="doctor-info">
+                                                        <div class="doctor-avatar">
+                                                            <i class="fas fa-user-md"></i>
+                                                        </div>
+                                                        <div class="doctor-details">
+                                                            <h5 class="doctor-name">Dr. {{ doctor.full_name }}</h5>
+                                                            <p class="doctor-specialization">{{ doctor.specialization }}</p>
+                                                            <div class="doctor-meta">
+                                                                <span class="experience">
+                                                                    <i class="fas fa-calendar-alt me-1"></i>
+                                                                    {{ doctor.experience_years }} years exp.
+                                                                </span>
+                                                                <span class="qualification">
+                                                                    <i class="fas fa-graduation-cap me-1"></i>
+                                                                    {{ doctor.qualification }}
+                                                                </span>
+                                                            </div>
+                                                            {% if doctor.hospital_affiliation %}
+                                                            <p class="hospital-affiliation">
+                                                                <i class="fas fa-hospital me-1"></i>
+                                                                {{ doctor.hospital_affiliation }}
+                                                            </p>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="selection-indicator">
+                                                        <i class="fas fa-check"></i>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                            {% endfor %}
+                                            {% else %}
+                                            <div class="no-doctors-message text-center py-4">
+                                                <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
+                                                <h5 class="text-muted">No doctors available</h5>
+                                                <p class="text-muted">Please check back later or contact support.</p>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Appointment Details -->
+                        <div class="form-section mb-4">
+                            <h4 class="section-title mb-3">
+                                <i class="fas fa-calendar-alt me-2 text-primary"></i>
+                                Appointment Details
+                            </h4>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label required">Appointment Date</label>
+                                        <div class="input-container">
+                                            <div class="input-icon">
+                                                <i class="fas fa-calendar"></i>
+                                            </div>
+                                            <input type="date" class="form-control custom-input" name="appointment_date" required min="{{ today }}">
+                                            <div class="input-border"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label required">Appointment Time</label>
+                                        <div class="input-container">
+                                            <div class="input-icon">
+                                                <i class="fas fa-clock"></i>
+                                            </div>
+                                            <select class="form-control custom-input" name="appointment_time" required>
+                                                <option value="">Select Time</option>
+                                                <option value="09:00">09:00 AM</option>
+                                                <option value="09:30">09:30 AM</option>
+                                                <option value="10:00">10:00 AM</option>
+                                                <option value="10:30">10:30 AM</option>
+                                                <option value="11:00">11:00 AM</option>
+                                                <option value="11:30">11:30 AM</option>
+                                                <option value="12:00">12:00 PM</option>
+                                                <option value="14:00">02:00 PM</option>
+                                                <option value="14:30">02:30 PM</option>
+                                                <option value="15:00">03:00 PM</option>
+                                                <option value="15:30">03:30 PM</option>
+                                                <option value="16:00">04:00 PM</option>
+                                                <option value="16:30">04:30 PM</option>
+                                                <option value="17:00">05:00 PM</option>
+                                            </select>
+                                            <div class="input-border"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label class="form-label">Reason for Visit</label>
+                                        <div class="input-container">
+                                            <div class="input-icon">
+                                                <i class="fas fa-notes-medical"></i>
+                                            </div>
+                                            <textarea class="form-control custom-input" name="reason" rows="3" placeholder="Describe your symptoms or reason for the appointment (optional)"></textarea>
+                                            <div class="input-border"></div>
+                                        </div>
+                                        <small class="form-text text-muted">Optional - Help the doctor prepare for your visit</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-lg">
+                                <i class="fas fa-calendar-check me-2"></i>
+                                Book Appointment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.appointment-booking-section {
+    min-height: 100vh;
+}
+
+.appointment-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+    margin: 0 auto;
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.appointment-form-card {
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.form-section {
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 2rem;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.section-title {
+    color: #495057;
+    font-weight: 700;
+    font-size: 1.3rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.form-label.required::after {
+    content: ' *';
+    color: #ef4444;
+    font-weight: bold;
+}
+
+.input-container {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #667eea;
+    font-size: 1.2rem;
+    z-index: 2;
+}
+
+.custom-input {
+    height: 55px;
+    padding-left: 50px;
+    padding-right: 15px;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.custom-input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    background: white;
+    outline: none;
+}
+
+.custom-input[readonly] {
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+.input-border {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 0;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    transition: width 0.3s ease;
+    border-radius: 0 0 12px 12px;
+}
+
+.custom-input:focus ~ .input-border {
+    width: 100%;
+}
+
+/* Doctor Selection Styles */
+.doctor-selection {
+    display: grid;
+    gap: 1rem;
+}
+
+.doctor-card {
+    position: relative;
+}
+
+.doctor-radio {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.doctor-label {
+    display: block;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 15px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    margin-bottom: 0;
+}
+
+.doctor-label:hover {
+    border-color: #667eea;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+    transform: translateY(-2px);
+}
+
+.doctor-radio:checked + .doctor-label {
+    border-color: #667eea;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+}
+
+.doctor-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.doctor-avatar {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.doctor-details {
+    flex: 1;
+}
+
+.doctor-name {
+    color: #1f2937;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+}
+
+.doctor-specialization {
+    color: #667eea;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.doctor-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.doctor-meta span {
+    color: #6b7280;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.hospital-affiliation {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
+
+.selection-indicator {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 30px;
+    height: 30px;
+    background: #667eea;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.3s ease;
+}
+
+.doctor-radio:checked + .doctor-label .selection-indicator {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.no-doctors-message {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 3rem 2rem;
+}
+
+.form-text {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.custom-alert {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.navbar {
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.nav-link {
+    color: #495057 !important;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #667eea !important;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .appointment-icon {
+        width: 80px;
+        height: 80px;
+        font-size: 2.5rem;
+    }
+    
+    .doctor-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .doctor-avatar {
+        margin: 0 auto;
+    }
+    
+    .doctor-meta {
+        justify-content: center;
+    }
+    
+    .selection-indicator {
+        position: static;
+        margin: 1rem auto 0;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set minimum date to today
+    const dateInput = document.querySelector('input[name="appointment_date"]');
+    if (dateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', today);
+    }
+    
+    // Form validation
+    const form = document.querySelector('.appointment-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const doctorSelected = document.querySelector('input[name="doctor_id"]:checked');
+            const appointmentDate = document.querySelector('input[name="appointment_date"]').value;
+            const appointmentTime = document.querySelector('select[name="appointment_time"]').value;
+            
+            if (!doctorSelected) {
+                e.preventDefault();
+                alert('Please select a doctor.');
+                return;
+            }
+            
+            if (!appointmentDate) {
+                e.preventDefault();
+                alert('Please select an appointment date.');
+                return;
+            }
+            
+            if (!appointmentTime) {
+                e.preventDefault();
+                alert('Please select an appointment time.');
+                return;
+            }
+            
+            // Check if selected date is not in the past
+            const selectedDate = new Date(appointmentDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (selectedDate < today) {
+                e.preventDefault();
+                alert('Please select a future date for your appointment.');
+                return;
+            }
+        });
+    }
+    
+    // Enhanced doctor card interactions
+    const doctorCards = document.querySelectorAll('.doctor-label');
+    doctorCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            if (!this.previousElementSibling.checked) {
+                this.style.transform = 'translateY(0)';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
