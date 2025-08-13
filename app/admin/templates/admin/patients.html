@@ -1,0 +1,357 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Patients - Admin Panel{% endblock %}
+{% block page_title %}Patients Management{% endblock %}
+
+{% block content %}
+<div class="patients-content">
+    <!-- Header with Stats -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-users fa-2x text-primary me-3"></i>
+                <div>
+                    <h4 class="mb-0">Registered Patients</h4>
+                    <p class="text-muted mb-0">Manage all registered patients in the system</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="stat-badge">
+                <span class="badge bg-primary fs-6 px-3 py-2">
+                    <i class="fas fa-users me-2"></i>
+                    Total: {{ patients|length }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" class="form-control" id="searchPatients" placeholder="Search patients by name, mobile, or email...">
+            </div>
+        </div>
+        <div class="col-md-6 text-end">
+            <button class="btn btn-outline-secondary" onclick="exportPatients()">
+                <i class="fas fa-download me-2"></i>Export
+            </button>
+        </div>
+    </div>
+
+    <!-- Patients Table -->
+    <div class="admin-card">
+        <div class="admin-card-body p-0">
+            {% if patients %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="patientsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Patient Name</th>
+                            <th>Contact Info</th>
+                            <th>Age/Gender</th>
+                            <th>Registration Date</th>
+                            <th>Appointments</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for patient in patients %}
+                        <tr>
+                            <td>
+                                <span class="badge bg-light text-dark">#{{ patient.id }}</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-circle me-3">
+                                        {{ patient.full_name[0].upper() }}
+                                    </div>
+                                    <div>
+                                        <strong>{{ patient.full_name }}</strong>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="contact-info">
+                                    <div>
+                                        <i class="fas fa-phone text-primary me-2"></i>
+                                        {{ patient.mobile_number }}
+                                    </div>
+                                    {% if patient.email %}
+                                    <div class="text-muted small">
+                                        <i class="fas fa-envelope me-2"></i>
+                                        {{ patient.email }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    {% if patient.age %}
+                                    <span class="badge bg-info">{{ patient.age }} years</span>
+                                    {% endif %}
+                                    {% if patient.gender %}
+                                    <br><small class="text-muted">{{ patient.gender.title() }}</small>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <strong>{{ patient.created_at.strftime('%d %b %Y') }}</strong>
+                                    <br><small class="text-muted">{{ patient.created_at.strftime('%I:%M %p') }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-success">
+                                    {{ patient.appointments|length }} appointments
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-success">Active</span>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" 
+                                            onclick="viewPatientDetails({{ patient.id }})" 
+                                            title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-info" 
+                                            onclick="viewPatientAppointments({{ patient.id }})" 
+                                            title="View Appointments">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-users fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">No Patients Found</h5>
+                <p class="text-muted">No patients have registered in the system yet.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Patient Details Modal -->
+<div class="modal fade" id="patientDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-user me-2"></i>
+                    Patient Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="patientDetailsContent">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.patients-content {
+    padding: 0;
+}
+
+.admin-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: none;
+}
+
+.admin-card-body {
+    padding: 0;
+}
+
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.contact-info {
+    line-height: 1.4;
+}
+
+.stat-badge .badge {
+    font-size: 0.9rem;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+    background-color: #f8f9fa !important;
+}
+
+.table td {
+    vertical-align: middle;
+    border-color: #e9ecef;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.btn-group .btn {
+    border-radius: 4px;
+    margin-right: 2px;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-color: #ced4da;
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+</style>
+
+<script>
+// Search functionality
+document.getElementById('searchPatients').addEventListener('keyup', function() {
+    const searchTerm = this.value.toLowerCase();
+    const tableRows = document.querySelectorAll('#patientsTable tbody tr');
+    
+    tableRows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+});
+
+// View patient details
+function viewPatientDetails(patientId) {
+    const modal = new bootstrap.Modal(document.getElementById('patientDetailsModal'));
+    const content = document.getElementById('patientDetailsContent');
+    
+    // Show loading
+    content.innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    `;
+    
+    modal.show();
+    
+    // Fetch patient details (you'll need to implement this endpoint)
+    fetch(`/admin/patients/details/${patientId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const patient = data.patient;
+                content.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3">Personal Information</h6>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Full Name:</strong></td>
+                                    <td>${patient.full_name}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Mobile:</strong></td>
+                                    <td>${patient.mobile_number}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Email:</strong></td>
+                                    <td>${patient.email || 'Not provided'}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Age:</strong></td>
+                                    <td>${patient.age || 'Not provided'}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Gender:</strong></td>
+                                    <td>${patient.gender || 'Not provided'}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3">Account Information</h6>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Patient ID:</strong></td>
+                                    <td>#${patient.id}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Registration Date:</strong></td>
+                                    <td>${patient.created_at}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Total Appointments:</strong></td>
+                                    <td>${patient.appointment_count || 0}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Status:</strong></td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } else {
+                content.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Error loading patient details: ${data.message}
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            content.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Error loading patient details. Please try again.
+                </div>
+            `;
+        });
+}
+
+// View patient appointments
+function viewPatientAppointments(patientId) {
+    window.location.href = `/admin/appointments?patient_id=${patientId}`;
+}
+
+// Export patients
+function exportPatients() {
+    // Implement export functionality
+    alert('Export functionality will be implemented');
+}
+</script>
+{% endblock %}

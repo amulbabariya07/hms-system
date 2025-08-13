@@ -51,7 +51,27 @@ def admin_dashboard():
     if 'admin_logged_in' not in session:
         flash('Please login to access dashboard.', 'warning')
         return redirect(url_for('admin.admin_login'))
-    return render_template('admin/dashboard.html')
+    
+    from app.models import User, Appointment
+    from datetime import date
+    
+    # Get statistics
+    today = date.today()
+    today_appointments = Appointment.query.filter(Appointment.appointment_date == today).count()
+    total_appointments = Appointment.query.count()
+    total_doctors = Doctor.query.filter_by(is_verified=True).count()
+    pending_doctors = Doctor.query.filter_by(is_verified=False).count()
+    total_patients = User.query.count()
+    
+    stats = {
+        'today_appointments': today_appointments,
+        'total_appointments': total_appointments,
+        'total_doctors': total_doctors,
+        'pending_doctors': pending_doctors,
+        'total_patients': total_patients
+    }
+    
+    return render_template('admin/dashboard.html', stats=stats)
 
 @admin_bp.route('/configuration')
 def admin_configuration():
@@ -193,5 +213,68 @@ def admin_doctor_details(doctor_id):
             'hospital_affiliation': doctor.hospital_affiliation,
             'created_at': doctor.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'is_verified': doctor.is_verified
+        }
+    })
+
+@admin_bp.route('/patients')
+def admin_patients():
+    if 'admin_logged_in' not in session:
+        flash('Please login to access patients.', 'warning')
+        return redirect(url_for('admin.admin_login'))
+    
+    from app.models import User
+    patients = User.query.all()
+    return render_template('admin/patients.html', patients=patients)
+
+@admin_bp.route('/appointments')
+def admin_appointments():
+    if 'admin_logged_in' not in session:
+        flash('Please login to access appointments.', 'warning')
+        return redirect(url_for('admin.admin_login'))
+    
+    from app.models import Appointment
+    appointments = Appointment.query.order_by(Appointment.created_at.desc()).all()
+    return render_template('admin/appointments.html', appointments=appointments)
+
+@admin_bp.route('/appointments/update-status/<int:appointment_id>', methods=['POST'])
+def admin_update_appointment_status(appointment_id):
+    if 'admin_logged_in' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    try:
+        from app.models import Appointment
+        appointment = Appointment.query.get_or_404(appointment_id)
+        new_status = request.json.get('status')
+        
+        if new_status not in ['scheduled', 'completed', 'cancelled']:
+            return jsonify({'success': False, 'message': 'Invalid status'})
+        
+        appointment.status = new_status
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': f'Appointment status updated to {new_status}'})
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': 'An error occurred while updating the appointment.'})
+
+@admin_bp.route('/patients/details/<int:patient_id>')
+def admin_patient_details(patient_id):
+    if 'admin_logged_in' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    from app.models import User
+    patient = User.query.get_or_404(patient_id)
+    return jsonify({
+        'success': True,
+        'patient': {
+            'id': patient.id,
+            'full_name': patient.full_name,
+            'mobile_number': patient.mobile_number,
+            'email': patient.email,
+            'age': patient.age,
+            'gender': patient.gender,
+            'created_at': patient.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'appointment_count': len(patient.appointments) if hasattr(patient, 'appointments') else 0
         }
     })

@@ -54,6 +54,8 @@ class Appointment(db.Model):
     status = db.Column(db.String(20), default='scheduled')  # scheduled, completed, cancelled
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = db.relationship('User', foreign_keys=[patient_id])
     
     def __repr__(self):
         return f'<Appointment {self.patient_name} with Dr. {self.doctor.full_name}>'

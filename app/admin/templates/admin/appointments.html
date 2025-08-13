@@ -1,0 +1,497 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Appointments - Admin Panel{% endblock %}
+{% block page_title %}Appointments Management{% endblock %}
+
+{% block content %}
+<div class="appointments-content">
+    <!-- Header with Stats -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-calendar-alt fa-2x text-primary me-3"></i>
+                <div>
+                    <h4 class="mb-0">All Appointments</h4>
+                    <p class="text-muted mb-0">Manage all booked appointments in the system</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="stat-badge">
+                <span class="badge bg-primary fs-6 px-3 py-2">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    Total: {{ appointments|length }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <select class="form-select" id="statusFilter">
+                <option value="">All Status</option>
+                <option value="scheduled">Scheduled</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="date" class="form-control" id="dateFilter" placeholder="Filter by date">
+        </div>
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" class="form-control" id="searchAppointments" placeholder="Search by patient or doctor name...">
+            </div>
+        </div>
+        <div class="col-md-2 text-end">
+            <button class="btn btn-outline-secondary" onclick="exportAppointments()">
+                <i class="fas fa-download me-2"></i>Export
+            </button>
+        </div>
+    </div>
+
+    <!-- Status Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="status-card status-scheduled">
+                <div class="status-card-body">
+                    <div class="status-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="status-content">
+                        <h4 class="status-number">{{ appointments|selectattr("status", "equalto", "scheduled")|list|length }}</h4>
+                        <p class="status-label">Scheduled</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="status-card status-completed">
+                <div class="status-card-body">
+                    <div class="status-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="status-content">
+                        <h4 class="status-number">{{ appointments|selectattr("status", "equalto", "completed")|list|length }}</h4>
+                        <p class="status-label">Completed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="status-card status-cancelled">
+                <div class="status-card-body">
+                    <div class="status-icon">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="status-content">
+                        <h4 class="status-number">{{ appointments|selectattr("status", "equalto", "cancelled")|list|length }}</h4>
+                        <p class="status-label">Cancelled</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="status-card status-today">
+                <div class="status-card-body">
+                    <div class="status-icon">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <div class="status-content">
+                        <h4 class="status-number">{{ appointments|selectattr("appointment_date", "equalto", today)|list|length }}</h4>
+                        <p class="status-label">Today</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointments Table -->
+    <div class="admin-card">
+        <div class="admin-card-body p-0">
+            {% if appointments %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="appointmentsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Date & Time</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Booked On</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in appointments %}
+                        <tr data-status="{{ appointment.status }}" data-date="{{ appointment.appointment_date }}">
+                            <td>
+                                <span class="badge bg-light text-dark">#{{ appointment.id }}</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-circle me-3">
+                                        {{ appointment.user.full_name[0].upper() }}
+                                    </div>
+                                    <div>
+                                        <strong>{{ appointment.user.full_name }}</strong>
+                                        <br><small class="text-muted">{{ appointment.user.mobile_number }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <strong>Dr. {{ appointment.doctor.full_name }}</strong>
+                                    <br><small class="text-muted">{{ appointment.doctor.specialization }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <strong>{{ appointment.appointment_date.strftime('%d %b %Y') }}</strong>
+                                    <br><small class="text-primary">{{ appointment.appointment_time.strftime('%I:%M %p') }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="reason-text">{{ appointment.reason[:50] }}{% if appointment.reason|length > 50 %}...{% endif %}</span>
+                            </td>
+                            <td>
+                                {% if appointment.status == 'scheduled' %}
+                                    <span class="badge bg-warning">Scheduled</span>
+                                {% elif appointment.status == 'completed' %}
+                                    <span class="badge bg-success">Completed</span>
+                                {% elif appointment.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ appointment.status.title() }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div>
+                                    <strong>{{ appointment.created_at.strftime('%d %b %Y') }}</strong>
+                                    <br><small class="text-muted">{{ appointment.created_at.strftime('%I:%M %p') }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    {% if appointment.status == 'scheduled' %}
+                                    <button type="button" class="btn btn-sm btn-outline-success" 
+                                            onclick="updateAppointmentStatus({{ appointment.id }}, 'completed')" 
+                                            title="Mark as Completed">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                            onclick="updateAppointmentStatus({{ appointment.id }}, 'cancelled')" 
+                                            title="Cancel Appointment">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    {% endif %}
+                                    <button type="button" class="btn btn-sm btn-outline-primary" 
+                                            onclick="viewAppointmentDetails({{ appointment.id }})" 
+                                            title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-alt fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">No Appointments Found</h5>
+                <p class="text-muted">No appointments have been booked yet.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Appointment Details Modal -->
+<div class="modal fade" id="appointmentDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    Appointment Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="appointmentDetailsContent">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.appointments-content {
+    padding: 0;
+}
+
+.admin-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: none;
+}
+
+.admin-card-body {
+    padding: 0;
+}
+
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.status-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.status-card:hover {
+    transform: translateY(-2px);
+}
+
+.status-card-body {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.status-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-right: 1rem;
+}
+
+.status-content {
+    flex: 1;
+}
+
+.status-number {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin: 0;
+    line-height: 1;
+}
+
+.status-label {
+    font-size: 0.875rem;
+    margin: 0;
+    opacity: 0.8;
+}
+
+.status-scheduled .status-icon {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-scheduled .status-number {
+    color: #856404;
+}
+
+.status-completed .status-icon {
+    background: #d1edff;
+    color: #0c5460;
+}
+
+.status-completed .status-number {
+    color: #0c5460;
+}
+
+.status-cancelled .status-icon {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-cancelled .status-number {
+    color: #721c24;
+}
+
+.status-today .status-icon {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+.status-today .status-number {
+    color: #383d41;
+}
+
+.reason-text {
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+    background-color: #f8f9fa !important;
+}
+
+.table td {
+    vertical-align: middle;
+    border-color: #e9ecef;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.btn-group .btn {
+    border-radius: 4px;
+    margin-right: 2px;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+</style>
+
+<script>
+// Filter functionality
+document.getElementById('statusFilter').addEventListener('change', filterAppointments);
+document.getElementById('dateFilter').addEventListener('change', filterAppointments);
+document.getElementById('searchAppointments').addEventListener('keyup', filterAppointments);
+
+function filterAppointments() {
+    const statusFilter = document.getElementById('statusFilter').value;
+    const dateFilter = document.getElementById('dateFilter').value;
+    const searchTerm = document.getElementById('searchAppointments').value.toLowerCase();
+    const tableRows = document.querySelectorAll('#appointmentsTable tbody tr');
+    
+    tableRows.forEach(row => {
+        let showRow = true;
+        
+        // Status filter
+        if (statusFilter && row.dataset.status !== statusFilter) {
+            showRow = false;
+        }
+        
+        // Date filter
+        if (dateFilter && row.dataset.date !== dateFilter) {
+            showRow = false;
+        }
+        
+        // Search filter
+        if (searchTerm && !row.textContent.toLowerCase().includes(searchTerm)) {
+            showRow = false;
+        }
+        
+        row.style.display = showRow ? '' : 'none';
+    });
+}
+
+// Update appointment status
+function updateAppointmentStatus(appointmentId, status) {
+    if (!confirm(`Are you sure you want to mark this appointment as ${status}?`)) {
+        return;
+    }
+    
+    fetch(`/admin/appointments/update-status/${appointmentId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: status })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            showAlert('success', data.message);
+            // Reload page to reflect changes
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showAlert('danger', data.message);
+        }
+    })
+    .catch(error => {
+        showAlert('danger', 'Error updating appointment status');
+    });
+}
+
+// View appointment details
+function viewAppointmentDetails(appointmentId) {
+    const modal = new bootstrap.Modal(document.getElementById('appointmentDetailsModal'));
+    const content = document.getElementById('appointmentDetailsContent');
+    
+    // Show loading
+    content.innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    `;
+    
+    modal.show();
+    
+    // For now, show basic info (you can implement detailed endpoint later)
+    setTimeout(() => {
+        content.innerHTML = `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Detailed appointment view will be implemented. Appointment ID: ${appointmentId}
+            </div>
+        `;
+    }, 1000);
+}
+
+// Export appointments
+function exportAppointments() {
+    alert('Export functionality will be implemented');
+}
+
+// Show alert messages
+function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.parentNode.removeChild(alertDiv);
+        }
+    }, 5000);
+}
+</script>
+{% endblock %}
