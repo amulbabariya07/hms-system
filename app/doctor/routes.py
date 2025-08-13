@@ -27,6 +27,11 @@ def doctor_login_post():
     doctor = Doctor.query.filter_by(mobile_number=mobile_number).first()
 
     if doctor and check_password_hash(doctor.password, password):
+        # Check if doctor is verified
+        if not doctor.is_verified:
+            flash('Your account is pending approval. Please wait for admin approval before logging in.', 'warning')
+            return render_template('doctor/auth.html')
+        
         session['doctor_logged_in'] = True
         session['doctor_id'] = doctor.id
         session['doctor_name'] = doctor.full_name
@@ -95,13 +100,14 @@ def doctor_signup():
         experience_years=experience_years,
         qualification=qualification,
         hospital_affiliation=hospital_affiliation if hospital_affiliation else None,
-        password=hashed_password
+        password=hashed_password,
+        is_verified=False  # Set to False by default, requires admin approval
     )
 
     db.session.add(new_doctor)
     db.session.commit()
 
-    flash('Doctor account created successfully! Please login.', 'success')
+    flash('Doctor account created successfully! Your account is pending admin approval. You will be able to login once approved.', 'success')
     return render_template('doctor/auth.html')
 
 @doctor_bp.route('/dashboard')

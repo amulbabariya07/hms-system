@@ -1,0 +1,391 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Doctors - Admin Panel{% endblock %}
+{% block page_title %}Doctors Management{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Doctors</li>
+{% endblock %}
+
+{% block content %}
+<div class="admin-card">
+    <div class="admin-card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">
+            <i class="fas fa-user-md me-2"></i>
+            All Doctors ({{ doctors|length }})
+        </h4>
+        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#addDoctorModal">
+            <i class="fas fa-plus me-2"></i>
+            Add New Doctor
+        </button>
+    </div>
+    <div class="admin-card-body">
+        {% if doctors %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Specialization</th>
+                        <th>Mobile</th>
+                        <th>Experience</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doctor in doctors %}
+                    <tr>
+                        <td>{{ doctor.id }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle me-3">
+                                    <i class="fas fa-user-md"></i>
+                                </div>
+                                <div>
+                                    <strong>Dr. {{ doctor.full_name }}</strong>
+                                    {% if doctor.email %}
+                                    <br><small class="text-muted">{{ doctor.email }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-primary">{{ doctor.specialization }}</span>
+                        </td>
+                        <td>{{ doctor.mobile_number }}</td>
+                        <td>{{ doctor.experience_years }} years</td>
+                        <td>
+                            {% if doctor.is_verified %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle me-1"></i>Verified
+                                </span>
+                            {% else %}
+                                <span class="badge bg-warning">
+                                    <i class="fas fa-clock me-1"></i>Pending
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>{{ doctor.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="viewDoctor({{ doctor.id }})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="editDoctor({{ doctor.id }})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                {% if not doctor.is_verified %}
+                                <button type="button" class="btn btn-sm btn-outline-success" onclick="approveDoctor({{ doctor.id }})">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No doctors found</h5>
+            <p class="text-muted">Start by adding your first doctor to the system.</p>
+            <button type="button" class="btn btn-admin-primary" data-bs-toggle="modal" data-bs-target="#addDoctorModal">
+                <i class="fas fa-plus me-2"></i>
+                Add First Doctor
+            </button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add Doctor Modal -->
+<div class="modal fade" id="addDoctorModal" tabindex="-1" aria-labelledby="addDoctorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="addDoctorModalLabel">
+                    <i class="fas fa-user-plus me-2"></i>
+                    Add New Doctor
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addDoctorForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="full_name" class="form-label">Full Name *</label>
+                            <input type="text" class="form-control" id="full_name" name="full_name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="mobile_number" class="form-label">Mobile Number *</label>
+                            <input type="tel" class="form-control" id="mobile_number" name="mobile_number" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="specialization" class="form-label">Specialization *</label>
+                            <select class="form-control" id="specialization" name="specialization" required>
+                                <option value="">Choose specialization</option>
+                                <option value="Cardiology">Cardiology</option>
+                                <option value="Neurology">Neurology</option>
+                                <option value="Orthopedics">Orthopedics</option>
+                                <option value="Pediatrics">Pediatrics</option>
+                                <option value="Dermatology">Dermatology</option>
+                                <option value="Ophthalmology">Ophthalmology</option>
+                                <option value="Psychiatry">Psychiatry</option>
+                                <option value="General Medicine">General Medicine</option>
+                                <option value="Surgery">Surgery</option>
+                                <option value="Gynecology">Gynecology</option>
+                                <option value="Radiology">Radiology</option>
+                                <option value="Anesthesiology">Anesthesiology</option>
+                                <option value="Emergency Medicine">Emergency Medicine</option>
+                                <option value="Oncology">Oncology</option>
+                                <option value="Pulmonology">Pulmonology</option>
+                                <option value="Gastroenterology">Gastroenterology</option>
+                                <option value="Endocrinology">Endocrinology</option>
+                                <option value="Nephrology">Nephrology</option>
+                                <option value="Rheumatology">Rheumatology</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="license_number" class="form-label">License Number *</label>
+                            <input type="text" class="form-control" id="license_number" name="license_number" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="experience_years" class="form-label">Experience (Years) *</label>
+                            <input type="number" class="form-control" id="experience_years" name="experience_years" min="0" max="50" required>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="qualification" class="form-label">Qualification *</label>
+                            <input type="text" class="form-control" id="qualification" name="qualification" placeholder="e.g., MBBS, MD, MS" required>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="hospital_affiliation" class="form-label">Hospital/Clinic Affiliation</label>
+                            <input type="text" class="form-control" id="hospital_affiliation" name="hospital_affiliation">
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="password" class="form-label">Password *</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitAddDoctor()">
+                    <i class="fas fa-save me-2"></i>
+                    Add Doctor
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Doctor Details Modal -->
+<div class="modal fade" id="doctorDetailsModal" tabindex="-1" aria-labelledby="doctorDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="doctorDetailsModalLabel">
+                    <i class="fas fa-user-md me-2"></i>
+                    Doctor Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="doctorDetailsContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.table th {
+    font-weight: 600;
+    color: #2c3e50;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.btn-group .btn {
+    margin-right: 2px;
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+</style>
+
+<script>
+function submitAddDoctor() {
+    const form = document.getElementById('addDoctorForm');
+    const formData = new FormData(form);
+    
+    // Show loading state
+    const submitBtn = document.querySelector('#addDoctorModal .btn-primary');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding...';
+    submitBtn.disabled = true;
+    
+    fetch('{{ url_for("admin.admin_add_doctor") }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            showAlert('success', data.message);
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addDoctorModal'));
+            modal.hide();
+            // Reset form
+            form.reset();
+            // Reload page to show new doctor
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showAlert('danger', data.message);
+        }
+    })
+    .catch(error => {
+        showAlert('danger', 'An error occurred while adding the doctor.');
+    })
+    .finally(() => {
+        // Reset button
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+}
+
+function viewDoctor(doctorId) {
+    fetch(`{{ url_for("admin.admin_doctor_details", doctor_id=0) }}`.replace('0', doctorId))
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const doctor = data.doctor;
+            const content = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Personal Information</h6>
+                        <p><strong>Name:</strong> Dr. ${doctor.full_name}</p>
+                        <p><strong>Mobile:</strong> ${doctor.mobile_number}</p>
+                        <p><strong>Email:</strong> ${doctor.email || 'Not provided'}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Professional Information</h6>
+                        <p><strong>Specialization:</strong> ${doctor.specialization}</p>
+                        <p><strong>License Number:</strong> ${doctor.license_number}</p>
+                        <p><strong>Experience:</strong> ${doctor.experience_years} years</p>
+                        <p><strong>Qualification:</strong> ${doctor.qualification}</p>
+                        <p><strong>Hospital:</strong> ${doctor.hospital_affiliation || 'Not provided'}</p>
+                    </div>
+                    <div class="col-12">
+                        <h6 class="text-primary">Account Information</h6>
+                        <p><strong>Status:</strong> 
+                            ${doctor.is_verified ? 
+                                '<span class="badge bg-success">Verified</span>' : 
+                                '<span class="badge bg-warning">Pending Approval</span>'
+                            }
+                        </p>
+                        <p><strong>Joined:</strong> ${doctor.created_at}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('doctorDetailsContent').innerHTML = content;
+            const modal = new bootstrap.Modal(document.getElementById('doctorDetailsModal'));
+            modal.show();
+        }
+    });
+}
+
+function editDoctor(doctorId) {
+    // Implement edit functionality
+    showAlert('info', 'Edit functionality will be implemented soon.');
+}
+
+function approveDoctor(doctorId) {
+    if (confirm('Are you sure you want to approve this doctor?')) {
+        fetch(`{{ url_for("admin.admin_approve_doctor", doctor_id=0) }}`.replace('0', doctorId), {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('success', data.message);
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            } else {
+                showAlert('danger', data.message);
+            }
+        });
+    }
+}
+
+function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : (type === 'danger' ? 'exclamation-triangle' : 'info-circle')} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const container = document.querySelector('.admin-content');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 5000);
+}
+
+// Phone number formatting
+document.getElementById('mobile_number').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length > 10) {
+        value = value.substring(0, 10);
+    }
+    e.target.value = value;
+});
+</script>
+{% endblock %}

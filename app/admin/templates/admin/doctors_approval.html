@@ -1,0 +1,372 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Doctors Approval - Admin Panel{% endblock %}
+{% block page_title %}Doctors Approval{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Doctors Approval</li>
+{% endblock %}
+
+{% block content %}
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h4 class="mb-0">
+            <i class="fas fa-user-check me-2"></i>
+            Pending Doctor Approvals ({{ pending_doctors|length }})
+        </h4>
+    </div>
+    <div class="admin-card-body">
+        {% if pending_doctors %}
+        <div class="row">
+            {% for doctor in pending_doctors %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="kanban-card" onclick="showDoctorDetails({{ doctor.id }})">
+                    <div class="kanban-header">
+                        <div class="doctor-avatar">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div class="doctor-info">
+                            <h6 class="doctor-name">Dr. {{ doctor.full_name }}</h6>
+                            <p class="doctor-specialization">{{ doctor.specialization }}</p>
+                        </div>
+                    </div>
+                    <div class="kanban-body">
+                        <div class="info-item">
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>{{ doctor.mobile_number }}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>{{ doctor.experience_years }} years exp.</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <span>{{ doctor.created_at.strftime('%Y-%m-%d') }}</span>
+                        </div>
+                    </div>
+                    <div class="kanban-footer">
+                        <button type="button" class="btn btn-success btn-sm" onclick="event.stopPropagation(); approveDoctor({{ doctor.id }})">
+                            <i class="fas fa-check me-1"></i>
+                            Approve
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="event.stopPropagation(); rejectDoctor({{ doctor.id }})">
+                            <i class="fas fa-times me-1"></i>
+                            Reject
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-user-check fa-3x text-success mb-3"></i>
+            <h5 class="text-muted">No pending approvals</h5>
+            <p class="text-muted">All doctors have been approved. Great job!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Doctor Details Modal -->
+<div class="modal fade" id="doctorApprovalModal" tabindex="-1" aria-labelledby="doctorApprovalModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="doctorApprovalModalLabel">
+                    <i class="fas fa-user-md me-2"></i>
+                    Doctor Approval Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="doctorApprovalContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" id="rejectBtn" onclick="rejectDoctorFromModal()">
+                    <i class="fas fa-times me-2"></i>
+                    Reject
+                </button>
+                <button type="button" class="btn btn-success" id="approveBtn" onclick="approveDoctorFromModal()">
+                    <i class="fas fa-check me-2"></i>
+                    Approve
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.kanban-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    border: 2px solid #f8f9fa;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.kanban-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    border-color: #3498db;
+}
+
+.kanban-header {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.doctor-avatar {
+    width: 50px;
+    height: 50px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.doctor-info {
+    flex: 1;
+}
+
+.doctor-name {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.doctor-specialization {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.kanban-body {
+    padding: 1.5rem;
+    flex: 1;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.info-item i {
+    width: 16px;
+    color: #3498db;
+}
+
+.kanban-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #f8f9fa;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.kanban-footer .btn {
+    flex: 1;
+    font-weight: 600;
+}
+
+.pending-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #f39c12;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.modal-header.bg-warning {
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+@media (max-width: 768px) {
+    .kanban-footer {
+        flex-direction: column;
+    }
+    
+    .kanban-footer .btn {
+        margin-bottom: 0.5rem;
+    }
+}
+</style>
+
+<script>
+let currentDoctorId = null;
+
+function showDoctorDetails(doctorId) {
+    currentDoctorId = doctorId;
+    
+    fetch(`{{ url_for("admin.admin_doctor_details", doctor_id=0) }}`.replace('0', doctorId))
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const doctor = data.doctor;
+            const content = `
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Pending Approval:</strong> This doctor is waiting for your approval to access the system.
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-user me-2"></i>
+                            Personal Information
+                        </h6>
+                        <div class="info-group">
+                            <p><strong>Full Name:</strong> Dr. ${doctor.full_name}</p>
+                            <p><strong>Mobile Number:</strong> ${doctor.mobile_number}</p>
+                            <p><strong>Email:</strong> ${doctor.email || 'Not provided'}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-stethoscope me-2"></i>
+                            Professional Information
+                        </h6>
+                        <div class="info-group">
+                            <p><strong>Specialization:</strong> ${doctor.specialization}</p>
+                            <p><strong>License Number:</strong> ${doctor.license_number}</p>
+                            <p><strong>Experience:</strong> ${doctor.experience_years} years</p>
+                            <p><strong>Qualification:</strong> ${doctor.qualification}</p>
+                            <p><strong>Hospital/Clinic:</strong> ${doctor.hospital_affiliation || 'Not provided'}</p>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Registration Information
+                        </h6>
+                        <div class="info-group">
+                            <p><strong>Registration Date:</strong> ${doctor.created_at}</p>
+                            <p><strong>Current Status:</strong> 
+                                <span class="badge bg-warning">
+                                    <i class="fas fa-clock me-1"></i>Pending Approval
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('doctorApprovalContent').innerHTML = content;
+            const modal = new bootstrap.Modal(document.getElementById('doctorApprovalModal'));
+            modal.show();
+        }
+    });
+}
+
+function approveDoctor(doctorId) {
+    if (confirm('Are you sure you want to approve this doctor? They will be able to login and access the system.')) {
+        performApproval(doctorId);
+    }
+}
+
+function rejectDoctor(doctorId) {
+    if (confirm('Are you sure you want to reject this doctor? This action will permanently remove their account.')) {
+        performRejection(doctorId);
+    }
+}
+
+function approveDoctorFromModal() {
+    if (currentDoctorId && confirm('Are you sure you want to approve this doctor? They will be able to login and access the system.')) {
+        performApproval(currentDoctorId);
+        const modal = bootstrap.Modal.getInstance(document.getElementById('doctorApprovalModal'));
+        modal.hide();
+    }
+}
+
+function rejectDoctorFromModal() {
+    if (currentDoctorId && confirm('Are you sure you want to reject this doctor? This action will permanently remove their account.')) {
+        performRejection(currentDoctorId);
+        const modal = bootstrap.Modal.getInstance(document.getElementById('doctorApprovalModal'));
+        modal.hide();
+    }
+}
+
+function performApproval(doctorId) {
+    fetch(`{{ url_for("admin.admin_approve_doctor", doctor_id=0) }}`.replace('0', doctorId), {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showAlert('danger', data.message);
+        }
+    })
+    .catch(error => {
+        showAlert('danger', 'An error occurred while approving the doctor.');
+    });
+}
+
+function performRejection(doctorId) {
+    fetch(`{{ url_for("admin.admin_reject_doctor", doctor_id=0) }}`.replace('0', doctorId), {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showAlert('danger', data.message);
+        }
+    })
+    .catch(error => {
+        showAlert('danger', 'An error occurred while rejecting the doctor.');
+    });
+}
+
+function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : (type === 'danger' ? 'exclamation-triangle' : 'info-circle')} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const container = document.querySelector('.admin-content');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 5000);
+}
+</script>
+{% endblock %}
