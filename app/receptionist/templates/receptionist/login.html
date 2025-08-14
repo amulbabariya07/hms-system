@@ -1,0 +1,791 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="receptionist-login-container">
+    <!-- Animated Medical Background -->
+    <div class="medical-background">
+        <!-- Enhanced floating reception icons with more hospital receptionist activities -->
+        <div class="floating-medical-icons">
+            <div class="medical-icon icon-1">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="medical-icon icon-2">
+                <i class="fas fa-phone"></i>
+            </div>
+            <div class="medical-icon icon-3">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="medical-icon icon-4">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+            <div class="medical-icon icon-5">
+                <i class="fas fa-user-friends"></i>
+            </div>
+            <div class="medical-icon icon-6">
+                <i class="fas fa-desktop"></i>
+            </div>
+            <div class="medical-icon icon-7">
+                <i class="fas fa-id-card"></i>
+            </div>
+            <div class="medical-icon icon-8">
+                <i class="fas fa-file-medical"></i>
+            </div>
+            <div class="medical-icon icon-9">
+                <i class="fas fa-headset"></i>
+            </div>
+            <div class="medical-icon icon-10">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="medical-icon icon-11">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <div class="medical-icon icon-12">
+                <i class="fas fa-calendar-plus"></i>
+            </div>
+            <!-- Added more receptionist-specific icons -->
+            <div class="medical-icon icon-13">
+                <i class="fas fa-clipboard-check"></i>
+            </div>
+            <div class="medical-icon icon-14">
+                <i class="fas fa-phone-volume"></i>
+            </div>
+            <div class="medical-icon icon-15">
+                <i class="fas fa-address-book"></i>
+            </div>
+            <div class="medical-icon icon-16">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="medical-icon icon-17">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="medical-icon icon-18">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+        </div>
+        
+        <!-- Animated Grid Pattern -->
+        <div class="grid-pattern">
+            <div class="grid-line horizontal" style="top: 20%;"></div>
+            <div class="grid-line horizontal" style="top: 40%;"></div>
+            <div class="grid-line horizontal" style="top: 60%;"></div>
+            <div class="grid-line horizontal" style="top: 80%;"></div>
+            <div class="grid-line vertical" style="left: 20%;"></div>
+            <div class="grid-line vertical" style="left: 40%;"></div>
+            <div class="grid-line vertical" style="left: 60%;"></div>
+            <div class="grid-line vertical" style="left: 80%;"></div>
+        </div>
+        
+        <!-- Pulse Circles -->
+        <div class="pulse-circles">
+            <div class="pulse-circle circle-1"></div>
+            <div class="pulse-circle circle-2"></div>
+            <div class="pulse-circle circle-3"></div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="receptionist-content">
+        <div class="container-fluid h-100">
+            <div class="row h-100 align-items-center justify-content-center">
+                <div class="col-xl-4 col-lg-5 col-md-6 col-sm-8 col-10">
+                    {% if logged_in %}
+                    <!-- Success State -->
+                    <div class="login-form-container success-state">
+                        <div class="success-content text-center">
+                            <div class="success-icon mb-4">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h2 class="success-title mb-3">Welcome, {{ session.get('receptionist_username', 'Amul') }}!</h2>
+                            <p class="success-message mb-4">
+                                You have successfully logged into the Receptionist Panel. Ready to assist patients and manage appointments.
+                            </p>
+                            <div class="success-actions">
+                                <a href="{{ url_for('receptionist.receptionist_dashboard') }}" class="btn btn-primary me-3">
+                                    <i class="fas fa-tachometer-alt me-2"></i>
+                                    Go to Dashboard
+                                </a>
+                                <a href="{{ url_for('receptionist.receptionist_logout') }}" class="btn btn-outline-primary me-3">
+                                    <i class="fas fa-sign-out-alt me-2"></i>
+                                    Logout
+                                </a>
+                                <a href="/" class="btn btn-outline-secondary">
+                                    <i class="fas fa-home me-2"></i>
+                                    Main Site
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- Login Form -->
+                    <div class="login-form-container">
+                        <!-- Header -->
+                        <div class="login-header text-center mb-5">
+                            <div class="receptionist-logo-circle mb-4">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <h5 class="login-title">Receptionist Access</h5>
+                            <p class="login-subtitle">Welcome to the front desk portal</p>
+                        </div>
+                        
+                        <!-- Flash Messages -->
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show receptionist-alert" role="alert">
+                            <i class="fas fa-{{ 'exclamation-triangle' if category == 'danger' else ('check-circle' if category == 'success' else 'info-circle') }} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+                        
+                        <!-- Login Form -->
+                        <form method="POST" action="{{ url_for('receptionist.receptionist_login_post') }}" class="receptionist-login-form">
+                            <div class="form-group mb-4">
+                                <label class="form-label">Receptionist Username</label>
+                                <div class="input-container">
+                                    <div class="input-icon">
+                                        <i class="fas fa-user-tie"></i>
+                                    </div>
+                                    <input type="text" 
+                                           class="form-control receptionist-input" 
+                                           name="username" 
+                                           placeholder="Enter your username" 
+                                           required
+                                           autocomplete="username">
+                                    <div class="input-border"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group mb-4">
+                                <label class="form-label">Password</label>
+                                <div class="input-container">
+                                    <div class="input-icon">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+                                    <input type="password" 
+                                           class="form-control receptionist-input" 
+                                           name="password" 
+                                           placeholder="Enter your password" 
+                                           required
+                                           autocomplete="current-password">
+                                    <div class="input-border"></div>
+                                    <div class="password-toggle" onclick="toggleReceptionistPassword(this)">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group mb-4">
+                                <div class="security-notice">
+                                    <i class="fas fa-shield-alt me-2"></i>
+                                    <span>Secure receptionist portal - Patient data protected</span>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn receptionist-login-btn w-100 mb-4">
+                                <span class="btn-content">
+                                    <i class="fas fa-sign-in-alt me-2"></i>
+                                    <span class="btn-text">Access Reception Desk</span>
+                                </span>
+                                <div class="btn-loader">
+                                    <div class="spinner"></div>
+                                </div>
+                            </button>
+                        </form>
+                        
+                        <!-- Footer -->
+                        <div class="login-footer text-center">
+                            <div class="back-to-home">
+                                <a href="/" class="text-decoration-none">
+                                    <i class="fas fa-arrow-left me-2"></i>
+                                    Back to Main Site
+                                </a>
+                            </div>
+                            <div class="security-info mt-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-lock me-1"></i>
+                                    HIPAA compliant and secure
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Updated color scheme from teal/green to dark blue/navy theme */
+/* Receptionist Login Styles */
+.receptionist-login-container {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 25%, #2563eb 50%, #3b82f6 75%, #60a5fa 100%);
+}
+
+/* Medical Background Animation */
+.medical-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.floating-medical-icons {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.medical-icon {
+    position: absolute;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 3.5rem;
+    animation: floatMedical 20s ease-in-out infinite;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+}
+
+.icon-1 { top: 10%; left: 5%; animation-delay: 0s; }
+.icon-2 { top: 20%; right: 10%; animation-delay: 3s; }
+.icon-3 { top: 60%; left: 8%; animation-delay: 6s; }
+.icon-4 { top: 70%; right: 15%; animation-delay: 9s; }
+.icon-5 { top: 30%; left: 85%; animation-delay: 12s; }
+.icon-6 { top: 80%; left: 50%; animation-delay: 15s; }
+.icon-7 { top: 15%; left: 75%; animation-delay: 18s; }
+.icon-8 { top: 45%; right: 5%; animation-delay: 21s; }
+.icon-9 { top: 85%; left: 20%; animation-delay: 24s; }
+.icon-10 { top: 25%; left: 45%; animation-delay: 27s; }
+.icon-11 { top: 55%; right: 25%; animation-delay: 30s; }
+.icon-12 { top: 75%; right: 45%; animation-delay: 33s; }
+.icon-13 { top: 35%; left: 15%; animation-delay: 36s; }
+.icon-14 { top: 90%; right: 35%; animation-delay: 39s; }
+.icon-15 { top: 5%; left: 60%; animation-delay: 42s; }
+.icon-16 { top: 65%; left: 70%; animation-delay: 45s; }
+.icon-17 { top: 40%; right: 60%; animation-delay: 48s; }
+.icon-18 { top: 95%; left: 80%; animation-delay: 51s; }
+
+@keyframes floatMedical {
+    0%, 100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.4; }
+    25% { transform: translateY(-30px) rotate(5deg) scale(1.1); opacity: 0.6; }
+    50% { transform: translateY(-15px) rotate(-3deg) scale(0.9); opacity: 0.5; }
+    75% { transform: translateY(-35px) rotate(8deg) scale(1.2); opacity: 0.7; }
+}
+
+/* Grid Pattern */
+.grid-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.grid-line {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.15);
+    animation: gridPulse 8s ease-in-out infinite;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+}
+
+@keyframes gridPulse {
+    0%, 100% { opacity: 0.15; }
+    50% { opacity: 0.3; }
+}
+
+/* Pulse Circles */
+.pulse-circles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.pulse-circle {
+    position: absolute;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    animation: pulse 6s ease-in-out infinite;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.25; }
+    50% { transform: scale(1.2); opacity: 0.5; }
+}
+
+/* Main Content */
+.receptionist-content {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+}
+
+.login-form-container {
+    width: 100%;
+    max-width: 550px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 25px;
+    padding: 3rem 2.5rem;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    margin: 0 auto;
+}
+
+/* Receptionist Logo */
+.receptionist-logo-circle {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2.5rem;
+    margin: 0 auto;
+    box-shadow: 0 15px 30px rgba(30, 58, 138, 0.4);
+    animation: logoFloat 6s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-10px) scale(1.05); }
+}
+
+/* Login Header */
+.login-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #1e3a8a;
+    margin-bottom: 0.5rem;
+}
+
+.login-subtitle {
+    color: #2563eb;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Form Styles */
+.form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.input-container {
+    position: relative;
+    margin-bottom: 0.5rem;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #1e3a8a;
+    font-size: 1.2rem;
+    z-index: 2;
+}
+
+.receptionist-input {
+    height: 60px;
+    padding-left: 50px;
+    padding-right: 50px;
+    border-radius: 15px;
+    border: 2px solid #e5e7eb;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+}
+
+.receptionist-input:focus {
+    border-color: #1e3a8a;
+    box-shadow: 0 0 0 0.2rem rgba(30, 58, 138, 0.25);
+    background: white;
+    outline: none;
+}
+
+.input-border {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 0;
+    background: linear-gradient(90deg, #1e3a8a, #2563eb);
+    transition: width 0.3s ease;
+    border-radius: 0 0 15px 15px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+    z-index: 2;
+}
+
+.password-toggle:hover {
+    color: #1e3a8a;
+}
+
+/* Security Notice */
+.security-notice {
+    background: rgba(30, 58, 138, 0.1);
+    border: 1px solid rgba(30, 58, 138, 0.2);
+    border-radius: 10px;
+    padding: 1rem;
+    color: #1e3a8a;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* Login Button */
+.receptionist-login-btn {
+    height: 60px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: none;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.receptionist-login-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(30, 58, 138, 0.4);
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+}
+
+.receptionist-login-btn:active {
+    transform: translateY(-1px);
+}
+
+.btn-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.btn-loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Success State */
+.success-state {
+    text-align: center;
+}
+
+.success-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+    margin: 0 auto;
+    animation: successPulse 2s ease-in-out infinite;
+}
+
+@keyframes successPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.success-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1e3a8a;
+}
+
+.success-message {
+    color: #374151;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.success-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Footer */
+.login-footer {
+    margin-top: 2rem;
+}
+
+.back-to-home a {
+    color: #1e3a8a;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.back-to-home a:hover {
+    color: #1e40af;
+    transform: translateX(-5px);
+}
+
+.security-info {
+    color: #9ca3af;
+}
+
+/* Alert Styles */
+.receptionist-alert {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-weight: 500;
+}
+
+.receptionist-alert.alert-success {
+    background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    color: white;
+    border: none;
+}
+
+.receptionist-alert.alert-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    border: none;
+}
+
+.receptionist-alert.alert-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    border: none;
+}
+
+.receptionist-alert.alert-info {
+    background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    color: white;
+    border: none;
+}
+
+/* Responsive Design */
+@media (max-width: 576px) {
+    .receptionist-login-container {
+        padding: 1rem 0;
+    }
+    
+    .login-form-container {
+        padding: 2rem 1.5rem;
+        border-radius: 20px;
+        margin: 1rem;
+    }
+    
+    .receptionist-input {
+        height: 55px;
+        font-size: 0.95rem;
+    }
+    
+    .receptionist-login-btn {
+        height: 55px;
+        font-size: 1rem;
+    }
+    
+    .medical-icon {
+        font-size: 2.5rem;
+    }
+    
+    .login-title {
+        font-size: 1.8rem;
+    }
+    
+    .success-actions {
+        flex-direction: column;
+    }
+    
+    .success-actions .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Loading State */
+.receptionist-login-btn.loading .btn-content {
+    opacity: 0;
+}
+
+.receptionist-login-btn.loading .btn-loader {
+    opacity: 1;
+}
+
+/* Form Validation */
+.receptionist-input.is-invalid {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25) !important;
+}
+
+.receptionist-input.is-valid {
+    border-color: #1e3a8a !important;
+    box-shadow: 0 0 0 0.2rem rgba(30, 58, 138, 0.25) !important;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.querySelector('.receptionist-login-form');
+    if (form) {
+        const inputs = form.querySelectorAll('.receptionist-input');
+        const submitBtn = form.querySelector('.receptionist-login-btn');
+        
+        // Real-time validation
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                validateInput(this);
+            });
+            
+            input.addEventListener('blur', function() {
+                validateInput(this);
+            });
+        });
+        
+        function validateInput(input) {
+            const value = input.value.trim();
+            
+            if (value === '') {
+                input.classList.remove('is-valid');
+                input.classList.add('is-invalid');
+                return false;
+            } else {
+                input.classList.remove('is-invalid');
+                input.classList.add('is-valid');
+                return true;
+            }
+        }
+        
+        // Form submission with loading state
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            
+            inputs.forEach(input => {
+                if (!validateInput(input)) {
+                    isValid = false;
+                }
+            });
+            
+            if (isValid) {
+                // Add loading state
+                submitBtn.classList.add('loading');
+                submitBtn.disabled = true;
+                
+                // Simulate processing time (remove in production)
+                setTimeout(() => {
+                    // Form will submit naturally
+                }, 500);
+            } else {
+                e.preventDefault();
+            }
+        });
+        
+        // Auto-focus first input
+        const firstInput = form.querySelector('.receptionist-input');
+        if (firstInput) {
+            firstInput.focus();
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Alt + R to focus username field
+            if (e.altKey && e.key === 'r') {
+                e.preventDefault();
+                document.querySelector('input[name="username"]').focus();
+            }
+            
+            // Alt + P to focus password field
+            if (e.altKey && e.key === 'p') {
+                e.preventDefault();
+                document.querySelector('input[name="password"]').focus();
+            }
+        });
+    }
+    
+    // Enhanced security notice
+    const securityNotice = document.querySelector('.security-notice');
+    if (securityNotice) {
+        securityNotice.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.02)';
+            this.style.background = 'rgba(30, 58, 138, 0.15)';
+        });
+        
+        securityNotice.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+            this.style.background = 'rgba(30, 58, 138, 0.1)';
+        });
+    }
+});
+
+// Password toggle functionality
+function toggleReceptionistPassword(element) {
+    const input = element.parentElement.querySelector('input');
+    const icon = element.querySelector('i');
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+        element.style.color = '#1e3a8a';
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+        element.style.color = '#9ca3af';
+    }
+}
+</script>
+{% endblock %}

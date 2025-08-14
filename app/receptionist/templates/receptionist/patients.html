@@ -1,0 +1,132 @@
+{% extends "receptionist/base_receptionist.html" %}
+
+{% block title %}Patients - Receptionist Panel{% endblock %}
+{% block page_title %}Patients{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Patients</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="receptionist-card">
+            <div class="receptionist-card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-users me-2"></i>
+                    All Patients
+                </h4>
+                <a href="{{ url_for('receptionist.add_patient') }}" class="btn btn-light">
+                    <i class="fas fa-user-plus me-2"></i>
+                    Add New Patient
+                </a>
+            </div>
+            <div class="receptionist-card-body">
+                {% if patients %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Patient Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for patient in patients %}
+                            <tr>
+                                <td><span class="badge bg-primary">#{{ patient.id }}</span></td>
+                                <!-- Enhanced patient name display with proper full_name field -->
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="patient-avatar me-3">
+                                            <i class="fas fa-user-circle text-primary fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <strong>{{ patient.full_name }}</strong>
+                                            <br>
+                                            <small class="text-muted">Patient ID: {{ patient.id }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <i class="fas fa-envelope me-2 text-muted"></i>
+                                    {{ patient.email }}
+                                </td>
+                                <td>
+                                    <i class="fas fa-phone me-2 text-muted"></i>
+                                    {{ patient.mobile_number or 'Not provided' }}
+                                </td>
+                                <td>
+                                    <i class="fas fa-birthday-cake me-2 text-muted"></i>
+                                    {{ patient.age or 'Not provided' }}
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'info' if patient.gender == 'Male' else 'warning' if patient.gender == 'Female' else 'secondary' }}">
+                                        {{ patient.gender or 'Not specified' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-sm btn-outline-primary" title="View Patient">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-success" title="Create Appointment">
+                                            <i class="fas fa-calendar-plus"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <div class="empty-state">
+                        <i class="fas fa-users fa-4x text-muted mb-3"></i>
+                        <h4 class="text-muted">No Patients Found</h4>
+                        <p class="text-muted">Start by adding your first patient to the system.</p>
+                        <a href="{{ url_for('receptionist.add_patient') }}" class="btn btn-receptionist-primary">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Add First Patient
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.patient-avatar {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-state {
+    padding: 3rem 2rem;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.btn-group .btn {
+    margin-right: 0.25rem;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,217 @@
+{% extends "receptionist/base_receptionist.html" %}
+
+{% block title %}Create Appointment - Receptionist Panel{% endblock %}
+{% block page_title %}Create New Appointment{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('receptionist.receptionist_appointments') }}">Appointments</a></li>
+<li class="breadcrumb-item active" aria-current="page">Create Appointment</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="receptionist-card">
+            <div class="receptionist-card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-calendar-plus me-2"></i>
+                    Appointment Booking Form
+                </h4>
+            </div>
+            <div class="receptionist-card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="patient_id" class="form-label">
+                                <i class="fas fa-user me-2"></i>Patient
+                            </label>
+                            <select class="form-control form-select" id="patient_id" name="patient_id" required>
+                                <option value="">Select Patient</option>
+                                {% for patient in patients %}
+                                <!-- Enhanced patient display with full_name and mobile_number -->
+                                <option value="{{ patient.id }}">
+                                    {{ patient.full_name }} 
+                                    {% if patient.mobile_number %}({{ patient.mobile_number }}){% endif %} 
+                                    - {{ patient.email }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Select the patient for this appointment
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="doctor_id" class="form-label">
+                                <i class="fas fa-user-md me-2"></i>Doctor
+                            </label>
+                            <select class="form-control form-select" id="doctor_id" name="doctor_id" required>
+                                <option value="">Select Doctor</option>
+                                {% for doctor in doctors %}
+                                <!-- Enhanced doctor display with full_name and specialization -->
+                                <option value="{{ doctor.id }}">
+                                    Dr. {{ doctor.full_name }} 
+                                    {% if doctor.specialization %}({{ doctor.specialization }}){% endif %}
+                                    {% if doctor.mobile_number %} - {{ doctor.mobile_number }}{% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Choose the attending doctor
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="appointment_date" class="form-label">
+                                <i class="fas fa-calendar me-2"></i>Appointment Date
+                            </label>
+                            <input type="date" class="form-control" id="appointment_date" name="appointment_date" required min="{{ today }}">
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Select a future date for the appointment
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="appointment_time" class="form-label">
+                                <i class="fas fa-clock me-2"></i>Appointment Time
+                            </label>
+                            <select class="form-control form-select" id="appointment_time" name="appointment_time" required>
+                                <option value="">Select Time</option>
+                                <option value="09:00">09:00 AM</option>
+                                <option value="09:30">09:30 AM</option>
+                                <option value="10:00">10:00 AM</option>
+                                <option value="10:30">10:30 AM</option>
+                                <option value="11:00">11:00 AM</option>
+                                <option value="11:30">11:30 AM</option>
+                                <option value="12:00">12:00 PM</option>
+                                <option value="14:00">02:00 PM</option>
+                                <option value="14:30">02:30 PM</option>
+                                <option value="15:00">03:00 PM</option>
+                                <option value="15:30">03:30 PM</option>
+                                <option value="16:00">04:00 PM</option>
+                                <option value="16:30">04:30 PM</option>
+                                <option value="17:00">05:00 PM</option>
+                            </select>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Choose available time slot
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="reason" class="form-label">
+                            <i class="fas fa-clipboard-list me-2"></i>Reason for Visit
+                        </label>
+                        <textarea class="form-control" id="reason" name="reason" rows="4" required placeholder="Describe the reason for this appointment in detail..."></textarea>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Provide detailed information about the patient's concern or the purpose of the visit
+                        </div>
+                    </div>
+                    
+                    <!-- Updated appointment summary styling to match dark blue theme -->
+                    <div class="appointment-summary mb-4 p-3 bg-light rounded">
+                        <h6 class="mb-2">
+                            <i class="fas fa-clipboard-check me-2"></i>Appointment Summary
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <small class="text-muted">Patient:</small>
+                                <div id="selected-patient" class="fw-bold">Not selected</div>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted">Doctor:</small>
+                                <div id="selected-doctor" class="fw-bold">Not selected</div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <small class="text-muted">Date:</small>
+                                <div id="selected-date" class="fw-bold">Not selected</div>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted">Time:</small>
+                                <div id="selected-time" class="fw-bold">Not selected</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-receptionist-primary">
+                            <i class="fas fa-calendar-check me-2"></i>
+                            Create Appointment
+                        </button>
+                        <a href="{{ url_for('receptionist.receptionist_appointments') }}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Updated appointment summary styling to match dark blue theme */
+.appointment-summary {
+    border-left: 4px solid var(--receptionist-primary);
+    background: rgba(30, 58, 138, 0.05) !important;
+}
+
+.form-text {
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.form-select:focus,
+.form-control:focus {
+    border-color: var(--receptionist-primary);
+    box-shadow: 0 0 0 0.2rem rgba(30, 58, 138, 0.25);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set minimum date to today
+    const dateInput = document.getElementById('appointment_date');
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.setAttribute('min', today);
+    
+    // Update appointment summary
+    function updateSummary() {
+        const patientSelect = document.getElementById('patient_id');
+        const doctorSelect = document.getElementById('doctor_id');
+        const dateInput = document.getElementById('appointment_date');
+        const timeSelect = document.getElementById('appointment_time');
+        
+        document.getElementById('selected-patient').textContent = 
+            patientSelect.selectedOptions[0]?.text || 'Not selected';
+        document.getElementById('selected-doctor').textContent = 
+            doctorSelect.selectedOptions[0]?.text || 'Not selected';
+        document.getElementById('selected-date').textContent = 
+            dateInput.value ? new Date(dateInput.value).toLocaleDateString() : 'Not selected';
+        document.getElementById('selected-time').textContent = 
+            timeSelect.selectedOptions[0]?.text || 'Not selected';
+    }
+    
+    // Add event listeners
+    document.getElementById('patient_id').addEventListener('change', updateSummary);
+    document.getElementById('doctor_id').addEventListener('change', updateSummary);
+    document.getElementById('appointment_date').addEventListener('change', updateSummary);
+    document.getElementById('appointment_time').addEventListener('change', updateSummary);
+    
+    // Initial summary update
+    updateSummary();
+});
+</script>
+{% endblock %}

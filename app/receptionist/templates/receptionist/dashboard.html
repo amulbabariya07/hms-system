@@ -1,0 +1,102 @@
+{% extends "receptionist/base_receptionist.html" %}
+
+{% block title %}Receptionist Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Statistics Cards -->
+    <div class="col-md-4 mb-4">
+        <div class="receptionist-card">
+            <div class="receptionist-card-body text-center">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h3 class="text-primary mb-1">{{ total_patients }}</h3>
+                        <p class="text-muted mb-0">Total Patients</p>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
+                        <i class="fas fa-users text-primary fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="receptionist-card">
+            <div class="receptionist-card-body text-center">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h3 class="text-success mb-1">{{ total_appointments }}</h3>
+                        <p class="text-muted mb-0">Total Appointments</p>
+                    </div>
+                    <div class="bg-success bg-opacity-10 p-3 rounded-circle">
+                        <i class="fas fa-calendar-check text-success fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="receptionist-card">
+            <div class="receptionist-card-body text-center">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h3 class="text-warning mb-1">{{ today_appointments }}</h3>
+                        <p class="text-muted mb-0">Today's Appointments</p>
+                    </div>
+                    <div class="bg-warning bg-opacity-10 p-3 rounded-circle">
+                        <i class="fas fa-clock text-warning fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="receptionist-card">
+            <div class="receptionist-card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>
+                    Quick Actions
+                </h4>
+            </div>
+            <div class="receptionist-card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <a href="{{ url_for('receptionist.add_patient') }}" class="btn btn-receptionist-primary w-100 py-3">
+                            <i class="fas fa-user-plus fa-2x d-block mb-2"></i>
+                            <strong>Add New Patient</strong>
+                            <small class="d-block">Register a new patient in the system</small>
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="{{ url_for('receptionist.create_appointment') }}" class="btn btn-receptionist-primary w-100 py-3">
+                            <i class="fas fa-calendar-plus fa-2x d-block mb-2"></i>
+                            <strong>Schedule Appointment</strong>
+                            <small class="d-block">Book a new appointment for patients</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Welcome Message -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="receptionist-card">
+            <div class="receptionist-card-body text-center py-5">
+                <i class="fas fa-user-tie fa-4x text-primary mb-3"></i>
+                <h2 class="text-primary mb-3">Welcome to Receptionist Panel</h2>
+                <p class="text-muted mb-0">Manage patients and appointments efficiently from your dashboard.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -80,6 +80,44 @@ def admin_configuration():
         return redirect(url_for('admin.admin_login'))
     return render_template('admin/configuration.html')
 
+@admin_bp.route('/configuration/theme', methods=['POST'])
+def update_receptionist_theme():
+    if 'admin_logged_in' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    try:
+        primary_color = request.json.get('primary_color')
+        accent_color = request.json.get('accent_color')
+        
+        # In production, save to database. For now, using session
+        session['receptionist_theme'] = {
+            'primary_color': primary_color,
+            'accent_color': accent_color
+        }
+        
+        return jsonify({'success': True, 'message': 'Theme updated successfully!'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': 'Error updating theme'})
+
+@admin_bp.route('/configuration/receptionist-auth', methods=['POST'])
+def update_receptionist_auth():
+    if 'admin_logged_in' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    try:
+        username = request.json.get('username')
+        password = request.json.get('password')
+        
+        # In production, save to database. For now, using session
+        session['receptionist_credentials'] = {
+            'username': username,
+            'password': password
+        }
+        
+        return jsonify({'success': True, 'message': 'Credentials updated successfully!'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': 'Error updating credentials'})
+
 @admin_bp.route('/doctors')
 def admin_doctors():
     if 'admin_logged_in' not in session:

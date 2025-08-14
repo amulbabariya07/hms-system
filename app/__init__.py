@@ -24,6 +24,9 @@ def create_app():
     from app.doctor.routes import doctor_bp
     app.register_blueprint(doctor_bp, url_prefix='/doctor')
 
+    from app.receptionist.routes import receptionist_bp
+    app.register_blueprint(receptionist_bp, url_prefix='/receptionist')
+
     from app import models
     with app.app_context():
         db.create_all()
