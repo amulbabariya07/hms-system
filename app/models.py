@@ -8,11 +8,21 @@ class ContactQuery(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
+    query_type = db.Column(db.String(50), nullable=True, default='general')  # appointment, medical_inquiry, billing, complaint, emergency, general, partnership
+    priority = db.Column(db.String(20), nullable=True, default='low')  # low, medium, high
+    subject = db.Column(db.String(200), nullable=True)
+    status = db.Column(db.String(20), nullable=False, default='new')  # new, in_progress, resolved, closed
+    assigned_to = db.Column(db.String(100), nullable=True)  # staff member handling the query
+    response = db.Column(db.Text, nullable=True)  # response from staff
+    resolved_at = db.Column(db.DateTime, nullable=True)
     message = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-from app import db
-from datetime import datetime
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<ContactQuery {self.name} - {self.query_type}>'
 
+# User model for patient information
 class User(db.Model):
     __tablename__ = 'users'
     
@@ -30,6 +40,7 @@ class User(db.Model):
     def __repr__(self):
         return f'<User {self.full_name}>'
 
+# Doctor model for doctor information
 class Doctor(db.Model):
     __tablename__ = 'doctors'
     
@@ -53,6 +64,7 @@ class Doctor(db.Model):
     def __repr__(self):
         return f'<Doctor {self.full_name}>'
 
+# Appointment model for managing appointments
 class Appointment(db.Model):
     __tablename__ = 'appointments'
     
