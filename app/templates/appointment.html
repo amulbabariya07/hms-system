@@ -1,162 +1,164 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<!-- Completely new appointment booking content with enhanced design -->
 <!-- Hero Section -->
-<div class="container-fluid py-5" style="background: linear-gradient(135deg, #2e8b57, #1e90ff); color: #fff;">
-  <div class="container text-center">
-    <h1 class="fw-bold">Book Your <span style="color: #bdf5ff;">Appointment</span></h1>
-    <p class="lead">Schedule your visit with our expert medical professionals. Follow our simple booking process and manage your appointments with ease.</p>
-  </div>
-</div>
-
-<!-- How to Book Section -->
-<div class="container py-5">
-  <div class="text-center mb-5">
-    <h2 class="fw-bold text-primary">How to Book & Manage Your Appointments</h2>
-    <p class="text-muted">Our streamlined process makes it easy to schedule and manage your healthcare appointments.</p>
-  </div>
-
-  <div class="row g-4">
-    <div class="col-md-4">
-      <div class="card shadow border-0 h-100">
-        <div class="card-body text-center">
-          <h5 class="fw-bold text-success">1. Choose Your Service</h5>
-          <p class="text-muted">Select the department and doctor you’d like to see. Browse our available specialists and their expertise.</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card shadow border-0 h-100">
-        <div class="card-body text-center">
-          <h5 class="fw-bold text-info">2. Pick Date & Time</h5>
-          <p class="text-muted">Select your preferred date and time from available slots. Our calendar shows real-time availability for easy scheduling.</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card shadow border-0 h-100">
-        <div class="card-body text-center">
-          <h5 class="fw-bold text-primary">3. Confirm & Manage</h5>
-          <p class="text-muted">Submit your request and receive confirmation. Use your patient portal to reschedule, cancel, or view appointment details.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tips Section -->
-  <div class="row mt-5">
-    <div class="col-md-6">
-      <div class="card shadow-sm border-0 bg-light">
-        <div class="card-body">
-          <h6 class="fw-bold text-primary">Before Your Appointment</h6>
-          <ul class="mb-0 text-muted">
-            <li>Arrive 15 minutes early for check-in</li>
-            <li>Bring your insurance card and ID</li>
-            <li>List current medications and allergies</li>
-            <li>Prepare questions for your doctor</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div class="card shadow-sm border-0 bg-light">
-        <div class="card-body">
-          <h6 class="fw-bold text-success">Managing Your Appointments</h6>
-          <ul class="mb-0 text-muted">
-            <li>Cancel at least 24 hours in advance</li>
-            <li>Reschedule through portal or call us</li>
-            <li>Receive reminders via SMS/email</li>
-            <li>Access history in your patient portal</li>
-          </ul>
+<div class="appointment-hero-section position-relative overflow-hidden">
+  <div class="hero-overlay"></div>
+  <div class="container py-5">
+    <div class="row align-items-center min-vh-50">
+      <div class="col-lg-8 mx-auto text-center">
+        <h1 class="display-4 fw-bold text-white mb-4 animate__animated animate__fadeInUp">
+          Book Your <span class="text-accent">Medical Appointment</span>
+        </h1>
+        <p class="lead text-white-75 mb-4 animate__animated animate__fadeInUp animate__delay-1s">
+          Experience world-class healthcare with our expert medical professionals. Schedule your consultation today and take the first step towards better health.
+        </p>
+        <div class="hero-stats d-flex justify-content-center gap-4 flex-wrap animate__animated animate__fadeInUp animate__delay-2s">
+          <div class="stat-item text-center">
+            <h4 class="fw-bold text-accent mb-1">24/7</h4>
+            <p class="text-white-75 small mb-0">Emergency Care</p>
+          </div>
+          <div class="stat-item text-center">
+            <h4 class="fw-bold text-accent mb-1">150+</h4>
+            <p class="text-white-75 small mb-0">Expert Doctors</p>
+          </div>
+          <div class="stat-item text-center">
+            <h4 class="fw-bold text-accent mb-1">Same Day</h4>
+            <p class="text-white-75 small mb-0">Appointments</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Appointment Form Section -->
-<div class="container-fluid py-5" style="background: #f8fcff;">
+<!-- Appointment Booking Process -->
+<div class="booking-process py-5">
   <div class="container">
     <div class="text-center mb-5">
-      <h2 class="fw-bold text-success">Schedule Your Appointment</h2>
-      <p class="text-muted">Fill out the form below to request your appointment. This form is for <b>display only</b>.</p>
+      <h2 class="display-5 fw-bold text-primary mb-3">Easy Appointment Booking</h2>
+      <p class="lead text-muted">Follow our simple 3-step process to schedule your healthcare appointment</p>
     </div>
 
-    <div class="card shadow border-0">
-      <div class="card-body p-4">
-        <ul class="nav nav-tabs mb-4" id="apptTabs" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="new-tab" data-bs-toggle="tab" data-bs-target="#new" type="button" role="tab">Book New Appointment</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="manage-tab" data-bs-toggle="tab" data-bs-target="#manage" type="button" role="tab">Manage Existing</button>
-          </li>
-        </ul>
-
-        <div class="tab-content">
-          <!-- Book New Appointment Form (Disabled) -->
-          <div class="tab-pane fade show active" id="new" role="tabpanel">
-            <form>
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <label class="form-label">First Name *</label>
-                  <input type="text" class="form-control" placeholder="Enter your first name" disabled>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Last Name *</label>
-                  <input type="text" class="form-control" placeholder="Enter your last name" disabled>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Email Address *</label>
-                  <input type="email" class="form-control" placeholder="your.email@example.com" disabled>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Phone Number *</label>
-                  <input type="tel" class="form-control" placeholder="(123) 456-7890" disabled>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Department *</label>
-                  <select class="form-select" disabled>
-                    <option>Select department</option>
-                    <option>Cardiology</option>
-                    <option>Dermatology</option>
-                    <option>Pediatrics</option>
-                  </select>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Preferred Doctor</label>
-                  <select class="form-select" disabled>
-                    <option>Select doctor</option>
-                    <option>Dr. John Doe</option>
-                    <option>Dr. Jane Smith</option>
-                  </select>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Preferred Date *</label>
-                  <input type="date" class="form-control" disabled>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Preferred Time *</label>
-                  <input type="time" class="form-control" disabled>
-                </div>
-                <div class="col-12">
-                  <label class="form-label">Reason for Visit</label>
-                  <textarea class="form-control" rows="2" placeholder="Optional" disabled></textarea>
-                </div>
-                <div class="col-12">
-                  <label class="form-label">Insurance Provider</label>
-                  <input type="text" class="form-control" placeholder="Optional" disabled>
-                </div>
-              </div>
-              <div class="text-center mt-4">
-                <button type="button" class="btn btn-secondary px-5 py-2" disabled>Request Appointment</button>
-              </div>
-            </form>
+    <div class="row g-4">
+      <div class="col-lg-4 col-md-6">
+        <div class="booking-step-card h-100">
+          <div class="step-number">1</div>
+          <div class="step-icon">
+            <i class="fas fa-user-md"></i>
           </div>
+          <h5 class="fw-bold mb-3">Choose Your Doctor</h5>
+          <p class="text-muted mb-3">Select from our team of experienced specialists across 25+ medical departments. View doctor profiles and availability.</p>
+          <ul class="step-features">
+            <li><i class="fas fa-check text-accent me-2"></i>Expert Specialists</li>
+            <li><i class="fas fa-check text-accent me-2"></i>Real-time Availability</li>
+            <li><i class="fas fa-check text-accent me-2"></i>Doctor Profiles</li>
+          </ul>
+        </div>
+      </div>
 
-          <!-- Manage Existing -->
-          <div class="tab-pane fade" id="manage" role="tabpanel">
-            <p class="text-muted">Log in to your <a href="/patient/login" class="text-success">Patient Portal</a> to view, reschedule, or cancel your appointments.</p>
+      <div class="col-lg-4 col-md-6">
+        <div class="booking-step-card h-100">
+          <div class="step-number">2</div>
+          <div class="step-icon">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Select Date & Time</h5>
+          <p class="text-muted mb-3">Choose your preferred appointment date and time from available slots. We offer flexible scheduling including same-day appointments.</p>
+          <ul class="step-features">
+            <li><i class="fas fa-check text-accent me-2"></i>Flexible Scheduling</li>
+            <li><i class="fas fa-check text-accent me-2"></i>Same-day Booking</li>
+            <li><i class="fas fa-check text-accent me-2"></i>Multiple Time Slots</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="booking-step-card h-100">
+          <div class="step-number">3</div>
+          <div class="step-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Confirm & Prepare</h5>
+          <p class="text-muted mb-3">Receive instant confirmation with appointment details. Get reminders and preparation instructions via SMS and email.</p>
+          <ul class="step-features">
+            <li><i class="fas fa-check text-accent me-2"></i>Instant Confirmation</li>
+            <li><i class="fas fa-check text-accent me-2"></i>SMS Reminders</li>
+            <li><i class="fas fa-check text-accent me-2"></i>Prep Instructions</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Appointment Types -->
+<div class="appointment-types py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="display-5 fw-bold text-primary mb-3">Appointment Types</h2>
+      <p class="lead text-muted">Choose the type of appointment that best suits your healthcare needs</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-3 col-md-6">
+        <div class="appointment-type-card">
+          <div class="type-icon">
+            <i class="fas fa-stethoscope"></i>
+          </div>
+          <h5 class="fw-bold mb-3">General Consultation</h5>
+          <p class="text-muted mb-3">Comprehensive health check-ups and general medical consultations with our experienced physicians.</p>
+          <div class="type-features">
+            <span class="badge bg-primary me-2 mb-2">Health Check-up</span>
+            <span class="badge bg-primary me-2 mb-2">Preventive Care</span>
+            <span class="badge bg-primary me-2 mb-2">Medical Advice</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="appointment-type-card">
+          <div class="type-icon">
+            <i class="fas fa-user-md"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Specialist Consultation</h5>
+          <p class="text-muted mb-3">Expert care from our specialized doctors in cardiology, neurology, orthopedics, and other medical fields.</p>
+          <div class="type-features">
+            <span class="badge bg-accent me-2 mb-2">Expert Care</span>
+            <span class="badge bg-accent me-2 mb-2">Advanced Treatment</span>
+            <span class="badge bg-accent me-2 mb-2">Specialized Tests</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="appointment-type-card">
+          <div class="type-icon">
+            <i class="fas fa-redo"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Follow-up Visit</h5>
+          <p class="text-muted mb-3">Continue your treatment journey with follow-up appointments to monitor progress and adjust treatment plans.</p>
+          <div class="type-features">
+            <span class="badge bg-success me-2 mb-2">Progress Review</span>
+            <span class="badge bg-success me-2 mb-2">Treatment Adjustment</span>
+            <span class="badge bg-success me-2 mb-2">Recovery Monitoring</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="appointment-type-card featured">
+          <div class="featured-badge">Popular</div>
+          <div class="type-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Urgent Care</h5>
+          <p class="text-muted mb-3">Same-day appointments for urgent medical needs that require immediate attention but are not life-threatening.</p>
+          <div class="type-features">
+            <span class="badge bg-warning me-2 mb-2">Same-day Care</span>
+            <span class="badge bg-warning me-2 mb-2">Walk-in Available</span>
+            <span class="badge bg-warning me-2 mb-2">Quick Treatment</span>
           </div>
         </div>
       </div>
@@ -164,109 +166,321 @@
   </div>
 </div>
 
-<!-- Contact Section -->
-<div class="container py-5">
-  <div class="row text-center g-4">
-    <div class="col-md-4">
-      <div class="card shadow border-0 h-100">
-        <div class="card-body">
-          <h5 class="fw-bold text-success"><i class="bi bi-telephone-fill me-2"></i> Call Us</h5>
-          <p class="text-muted mb-0">(123) 456-7890 <br> Mon–Fri: 8AM–6PM</p>
+<!-- Contact for Booking -->
+<div class="booking-contact py-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6 mb-4 mb-lg-0">
+        <h2 class="display-5 fw-bold text-primary mb-4">Ready to Book Your Appointment?</h2>
+        <p class="lead text-muted mb-4">Our friendly staff is here to help you schedule your appointment and answer any questions about our services.</p>
+        
+        <div class="contact-methods">
+          <div class="contact-method">
+            <div class="method-icon">
+              <i class="fas fa-phone text-success"></i>
+            </div>
+            <div class="method-content">
+              <h6 class="fw-bold mb-1">Call Us Now</h6>
+              <p class="text-muted mb-1">(555) 123-4567</p>
+              <small class="text-muted">Available 24/7 for appointments</small>
+            </div>
+          </div>
+          
+          <div class="contact-method">
+            <div class="method-icon">
+              <i class="fas fa-envelope text-info"></i>
+            </div>
+            <div class="method-content">
+              <h6 class="fw-bold mb-1">Email Us</h6>
+              <p class="text-muted mb-1">appointments@healthcare.com</p>
+              <small class="text-muted">Response within 2 hours</small>
+            </div>
+          </div>
+          
+          <div class="contact-method">
+            <div class="method-icon">
+              <i class="fas fa-map-marker-alt text-danger"></i>
+            </div>
+            <div class="method-content">
+              <h6 class="fw-bold mb-1">Visit Us</h6>
+              <p class="text-muted mb-1">123 Healthcare Ave, Medical City</p>
+              <small class="text-muted">Walk-in appointments available</small>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card shadow border-0 h-100">
-        <div class="card-body">
-          <h5 class="fw-bold text-info"><i class="bi bi-envelope-fill me-2"></i> Email Us</h5>
-          <p class="text-muted mb-0">appointments@hms.com <br> Response within 24 hours</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card shadow border-0 h-100">
-        <div class="card-body">
-          <h5 class="fw-bold text-primary"><i class="bi bi-geo-alt-fill me-2"></i> Visit Us</h5>
-          <p class="text-muted mb-0">123 Healthcare Ave <br> Medical City, MC 12345</p>
+      
+      <div class="col-lg-6">
+        <div class="booking-image">
+          <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80" class="img-fluid rounded-3 shadow-lg" alt="Medical Consultation">
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<footer class="bg-dark text-white py-5">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-lg-4">
-                <div class="footer-brand mb-4">
-                    <h4 class="fw-bold">
-                        <i class="fas fa-hospital-alt me-2"></i>
-                        HealthCare+
-                    </h4>
-                    <p class="text-light opacity-75">Providing exceptional healthcare services with advanced technology and compassionate care for over a decade.</p>
-                </div>
-                <div class="social-links">
-                    <a href="#" class="social-link me-3">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" class="social-link me-3">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a href="#" class="social-link me-3">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="#" class="social-link">
-                        <i class="fab fa-linkedin-in"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="col-lg-2">
-                <h6 class="fw-bold mb-4">Quick Links</h6>
-                <ul class="footer-links">
-                    <li><a href="#services">Services</a></li>
-                    <li><a href="#about">About Us</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                    <li><a href="/patient/login">Patient Portal</a></li>
-                </ul>
-            </div>
-            <div class="col-lg-3">
-                <h6 class="fw-bold mb-4">Services</h6>
-                <ul class="footer-links">
-                    <li><a href="#">Emergency Care</a></li>
-                    <li><a href="#">Cardiology</a></li>
-                    <li><a href="#">Neurology</a></li>
-                    <li><a href="#">Pediatrics</a></li>
-                </ul>
-            </div>
-            <div class="col-lg-3">
-                <h6 class="fw-bold mb-4">Contact Info</h6>
-                <div class="contact-info">
-                    <p class="text-light opacity-75 mb-2">
-                        <i class="fas fa-map-marker-alt me-2"></i>
-                        123 Healthcare St, Medical City
-                    </p>
-                    <p class="text-light opacity-75 mb-2">
-                        <i class="fas fa-phone me-2"></i>
-                        +1 (555) 123-4567
-                    </p>
-                    <p class="text-light opacity-75 mb-2">
-                        <i class="fas fa-envelope me-2"></i>
-                        info@healthcare.com
-                    </p>
-                </div>
-            </div>
-        </div>
-        <hr class="my-4 opacity-25">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <p class="text-light opacity-75 mb-0">&copy; 2024 HealthCare+. All rights reserved.</p>
-            </div>
-            <div class="col-md-6 text-md-end">
-                <a href="#" class="text-light opacity-75 text-decoration-none me-3">Privacy Policy</a>
-                <a href="#" class="text-light opacity-75 text-decoration-none">Terms of Service</a>
-            </div>
-        </div>
+<!-- Emergency Information -->
+<div class="emergency-info py-5 bg-danger text-white">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <h3 class="fw-bold mb-3">
+          <i class="fas fa-exclamation-triangle me-2"></i>Medical Emergency?
+        </h3>
+        <p class="lead mb-0">If you are experiencing a life-threatening emergency, do not wait for an appointment. Seek immediate medical attention.</p>
+      </div>
+      <div class="col-lg-4 text-lg-end">
+        <a href="tel:911" class="btn btn-light btn-lg me-3">
+          <i class="fas fa-phone me-2"></i>Call 911
+        </a>
+        <a href="tel:5551234567" class="btn btn-outline-light btn-lg">
+          <i class="fas fa-hospital me-2"></i>Emergency Room
+        </a>
+      </div>
     </div>
-</footer>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+<style>
+/* Color scheme */
+:root {
+  --primary-color: #164e63;
+  --accent-color: #84cc16;
+  --light-bg: #ecfeff;
+  --text-muted: #475569;
+}
+
+/* Hero Section */
+.appointment-hero-section {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #0891b2 100%);
+  min-height: 60vh;
+  position: relative;
+}
+
+.hero-overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('https://images.unsplash.com/photo-1538108149393-fbbd81895907?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600&q=80') center/cover;
+  opacity: 0.1;
+  z-index: -1;
+}
+
+.text-accent {
+  color: var(--accent-color) !important;
+}
+
+.text-white-75 {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.min-vh-50 {
+  min-height: 50vh;
+}
+
+/* Booking Step Cards */
+.booking-step-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.booking-step-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+}
+
+.booking-step-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.step-number {
+  position: absolute;
+  top: -15px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: var(--accent-color);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.step-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+.step-icon i {
+  font-size: 2rem;
+  color: white;
+}
+
+.booking-step-card:hover .step-icon {
+  transform: scale(1.1);
+}
+
+.step-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.step-features li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.step-features li:last-child {
+  border-bottom: none;
+}
+
+/* Appointment Type Cards */
+.appointment-type-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  height: 100%;
+}
+
+.appointment-type-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.appointment-type-card.featured {
+  border: 2px solid var(--accent-color);
+}
+
+.featured-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--accent-color);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.type-icon {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.type-icon i {
+  font-size: 1.8rem;
+  color: white;
+}
+
+/* Contact Methods */
+.contact-method {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.contact-method:hover {
+  transform: translateX(10px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.method-icon {
+  width: 50px;
+  height: 50px;
+  background: rgba(132, 204, 22, 0.1);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.method-icon i {
+  font-size: 1.5rem;
+}
+
+/* Buttons */
+.btn-accent {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-accent:hover {
+  background: #65a30d;
+  border-color: #65a30d;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(132, 204, 22, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .appointment-hero-section {
+    min-height: 70vh;
+  }
+  
+  .display-4 {
+    font-size: 2rem;
+  }
+  
+  .booking-step-card {
+    padding: 2rem 1.5rem;
+  }
+  
+  .appointment-type-card {
+    padding: 1.5rem;
+  }
+  
+  .contact-method {
+    padding: 1rem;
+  }
+}
+</style>
 
 {% endblock %}
