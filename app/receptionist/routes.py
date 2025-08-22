@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app import db
-from app.models import User, Doctor, Appointment
+from app.models import User, Doctor, Appointment, ContactQuery
 from datetime import datetime
 
 receptionist_bp = Blueprint('receptionist', __name__, template_folder='templates')
@@ -56,15 +56,31 @@ def receptionist_dashboard():
         today_appointments = Appointment.query.filter(
             Appointment.appointment_date == datetime.now().date()
         ).count() if Appointment else 0
+        
+        # Get statistics for queries
+        total_queries = ContactQuery.query.count()
+        new_queries = ContactQuery.query.filter_by(status='new').count()
+        in_progress_queries = ContactQuery.query.filter_by(status='in_progress').count()
+        resolved_queries = ContactQuery.query.filter_by(status='resolved').count()
+        
+        stats = {
+            'total': total_queries,
+            'new': new_queries,
+            'in_progress': in_progress_queries,
+            'resolved': resolved_queries
+        }
+        
     except:
         total_patients = 0
         total_appointments = 0
         today_appointments = 0
+        stats = {'total': 0, 'new': 0, 'in_progress': 0, 'resolved': 0}
     
     return render_template('receptionist/dashboard.html', 
                          total_patients=total_patients,
                          total_appointments=total_appointments,
-                         today_appointments=today_appointments)
+                         today_appointments=today_appointments,
+                         stats=stats)
 
 @receptionist_bp.route('/patients')
 @login_required
@@ -155,3 +171,115 @@ def create_appointment():
         doctors = []
     
     return render_template('receptionist/create_appointment.html', patients=patients, doctors=doctors)
+
+# New routes for patients queries management
+@receptionist_bp.route('/queries')
+@login_required
+def patients_queries():
+    """Display all patient queries with filtering and sorting options"""
+    try:
+        # Get filter parameters
+        status_filter = request.args.get('status', 'all')
+        priority_filter = request.args.get('priority', 'all')
+        query_type_filter = request.args.get('query_type', 'all')
+        view_type = request.args.get('view', 'list')  # list or kanban
+        
+        # Base query
+        queries = ContactQuery.query
+        
+        # Apply filters
+        if status_filter != 'all':
+            queries = queries.filter(ContactQuery.status == status_filter)
+        if priority_filter != 'all':
+            queries = queries.filter(ContactQuery.priority == priority_filter)
+        if query_type_filter != 'all':
+            queries = queries.filter(ContactQuery.query_type == query_type_filter)
+        
+        # Order by created_at descending (newest first)
+        queries = queries.order_by(ContactQuery.created_at.desc()).all()
+        
+        # Get statistics for dashboard
+        total_queries = ContactQuery.query.count()
+        new_queries = ContactQuery.query.filter_by(status='new').count()
+        in_progress_queries = ContactQuery.query.filter_by(status='in_progress').count()
+        resolved_queries = ContactQuery.query.filter_by(status='resolved').count()
+        
+        stats = {
+            'total': total_queries,
+            'new': new_queries,
+            'in_progress': in_progress_queries,
+            'resolved': resolved_queries
+        }
+        
+    except Exception as e:
+        flash(f'Error loading queries: {str(e)}', 'danger')
+        queries = []
+        stats = {'total': 0, 'new': 0, 'in_progress': 0, 'resolved': 0}
+    
+    return render_template('receptionist/patients_queries.html', 
+                         queries=queries, 
+                         stats=stats,
+                         current_status=status_filter,
+                         current_priority=priority_filter,
+                         current_query_type=query_type_filter,
+                         view_type=view_type)
+
+@receptionist_bp.route('/queries/<int:query_id>')
+@login_required
+def view_query(query_id):
+    """View individual query details"""
+    try:
+        query = ContactQuery.query.get_or_404(query_id)
+    except:
+        flash('Query not found.', 'danger')
+        return redirect(url_for('receptionist.patients_queries'))
+    
+    return render_template('receptionist/view_query.html', query=query)
+
+@receptionist_bp.route('/queries/<int:query_id>/update', methods=['POST'])
+@login_required
+def update_query(query_id):
+    """Update query status, priority, or add response"""
+    try:
+        query = ContactQuery.query.get_or_404(query_id)
+        
+        # Update fields from form
+        if 'status' in request.form:
+            query.status = request.form.get('status')
+        if 'priority' in request.form:
+            query.priority = request.form.get('priority')
+        if 'assigned_to' in request.form:
+            query.assigned_to = request.form.get('assigned_to')
+        if 'response' in request.form:
+            query.response = request.form.get('response')
+        
+        # Set resolved_at if status is resolved
+        if query.status == 'resolved' and not query.resolved_at:
+            query.resolved_at = datetime.utcnow()
+        
+        query.updated_at = datetime.utcnow()
+        
+        db.session.commit()
+        flash('Query updated successfully!', 'success')
+        
+    except Exception as e:
+        flash(f'Error updating query: {str(e)}', 'danger')
+        db.session.rollback()
+    
+    return redirect(url_for('receptionist.view_query', query_id=query_id))
+
+@receptionist_bp.route('/queries/<int:query_id>/delete', methods=['POST'])
+@login_required
+def delete_query(query_id):
+    """Delete a query (admin action)"""
+    try:
+        query = ContactQuery.query.get_or_404(query_id)
+        db.session.delete(query)
+        db.session.commit()
+        flash('Query deleted successfully!', 'success')
+        
+    except Exception as e:
+        flash(f'Error deleting query: {str(e)}', 'danger')
+        db.session.rollback()
+    
+    return redirect(url_for('receptionist.patients_queries'))

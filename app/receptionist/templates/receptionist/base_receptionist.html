@@ -261,6 +261,13 @@
                                 Create Appointment
                             </a>
                         </li>
+                        <!-- Added new Patients Query menu item after Create Appointment -->
+                        <li class="nav-item mb-2">
+                            <a class="nav-link d-flex align-items-center gap-2 {% if request.endpoint == 'receptionist.patients_queries' %}active{% endif %}" href="{{ url_for('receptionist.patients_queries') }}">
+                                <i class="fas fa-comments"></i>
+                                Patients Queries
+                            </a>
+                        </li>
                     </ul>
                 </nav>
 

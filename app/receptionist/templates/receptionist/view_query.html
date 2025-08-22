@@ -1,0 +1,363 @@
+{% extends 'receptionist/base_receptionist.html' %}
+
+{% block title %}Query #{{ query.id }} - Receptionist Panel{% endblock %}
+
+{% block page_title %}Query Details - #{{ query.id }}{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('receptionist.receptionist_dashboard') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('receptionist.patients_queries') }}">Patients Queries</a></li>
+<li class="breadcrumb-item active" aria-current="page">Query #{{ query.id }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Query Details -->
+    <div class="col-lg-8">
+        <div class="receptionist-card mb-4">
+            <div class="receptionist-card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-comment-alt me-2"></i>Query Information
+                    </h5>
+                    <div class="query-badges">
+                        <span class="badge bg-{{ 'warning' if query.status == 'new' else ('info' if query.status == 'in_progress' else ('success' if query.status == 'resolved' else 'secondary')) }} me-2">
+                            {{ query.status.replace('_', ' ').title() }}
+                        </span>
+                        <span class="badge bg-{{ 'danger' if query.priority == 'high' else ('warning' if query.priority == 'medium' else 'success') }}">
+                            {{ query.priority.title() }} Priority
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="receptionist-card-body">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="info-group">
+                            <label class="info-label">Patient Name</label>
+                            <p class="info-value">
+                                <i class="fas fa-user me-2 text-primary"></i>{{ query.name }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-group">
+                            <label class="info-label">Query Type</label>
+                            <p class="info-value">
+                                <i class="fas fa-tag me-2 text-info"></i>{{ query.query_type.replace('_', ' ').title() }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-group">
+                            <label class="info-label">Email Address</label>
+                            <p class="info-value">
+                                <i class="fas fa-envelope me-2 text-success"></i>
+                                <a href="mailto:{{ query.email }}" class="text-decoration-none">{{ query.email }}</a>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-group">
+                            <label class="info-label">Phone Number</label>
+                            <p class="info-value">
+                                <i class="fas fa-phone me-2 text-warning"></i>
+                                <a href="tel:{{ query.phone }}" class="text-decoration-none">{{ query.phone }}</a>
+                            </p>
+                        </div>
+                    </div>
+                    {% if query.subject %}
+                    <div class="col-12">
+                        <div class="info-group">
+                            <label class="info-label">Subject</label>
+                            <p class="info-value">{{ query.subject }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="col-12">
+                        <div class="info-group">
+                            <label class="info-label">Message</label>
+                            <div class="message-content">
+                                {{ query.message|nl2br }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Response Section -->
+        {% if query.response %}
+        <div class="receptionist-card mb-4">
+            <div class="receptionist-card-header bg-success">
+                <h5 class="mb-0 text-white">
+                    <i class="fas fa-reply me-2"></i>Response
+                </h5>
+            </div>
+            <div class="receptionist-card-body">
+                <div class="response-content">
+                    {{ query.response|nl2br }}
+                </div>
+                {% if query.assigned_to %}
+                <div class="mt-3 pt-3 border-top">
+                    <small class="text-muted">
+                        <i class="fas fa-user me-1"></i>Responded by: <strong>{{ query.assigned_to }}</strong>
+                        {% if query.resolved_at %}
+                        on {{ query.resolved_at.strftime('%B %d, %Y at %I:%M %p') }}
+                        {% endif %}
+                    </small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Update Query Form -->
+        <div class="receptionist-card">
+            <div class="receptionist-card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-edit me-2"></i>Update Query
+                </h5>
+            </div>
+            <div class="receptionist-card-body">
+                <form method="POST" action="{{ url_for('receptionist.update_query', query_id=query.id) }}">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Status</label>
+                            <select name="status" class="form-select">
+                                <option value="new" {% if query.status == 'new' %}selected{% endif %}>New</option>
+                                <option value="in_progress" {% if query.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                <option value="resolved" {% if query.status == 'resolved' %}selected{% endif %}>Resolved</option>
+                                <option value="closed" {% if query.status == 'closed' %}selected{% endif %}>Closed</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Priority</label>
+                            <select name="priority" class="form-select">
+                                <option value="low" {% if query.priority == 'low' %}selected{% endif %}>Low</option>
+                                <option value="medium" {% if query.priority == 'medium' %}selected{% endif %}>Medium</option>
+                                <option value="high" {% if query.priority == 'high' %}selected{% endif %}>High</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Assign To</label>
+                            <input type="text" name="assigned_to" class="form-control" value="{{ query.assigned_to or '' }}" placeholder="Staff member name">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Response/Notes</label>
+                            <textarea name="response" class="form-control" rows="4" placeholder="Add your response or internal notes...">{{ query.response or '' }}</textarea>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex gap-3">
+                                <button type="submit" class="btn btn-receptionist-primary">
+                                    <i class="fas fa-save me-2"></i>Update Query
+                                </button>
+                                <a href="{{ url_for('receptionist.patients_queries') }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Back to Queries
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Query Timeline -->
+        <div class="receptionist-card mb-4">
+            <div class="receptionist-card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i>Timeline
+                </h5>
+            </div>
+            <div class="receptionist-card-body">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-primary"></div>
+                        <div class="timeline-content">
+                            <h6 class="timeline-title">Query Created</h6>
+                            <p class="timeline-text">{{ query.created_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                        </div>
+                    </div>
+                    {% if query.updated_at != query.created_at %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-info"></div>
+                        <div class="timeline-content">
+                            <h6 class="timeline-title">Last Updated</h6>
+                            <p class="timeline-text">{{ query.updated_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if query.resolved_at %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-success"></div>
+                        <div class="timeline-content">
+                            <h6 class="timeline-title">Resolved</h6>
+                            <p class="timeline-text">{{ query.resolved_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="receptionist-card mb-4">
+            <div class="receptionist-card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>Quick Actions
+                </h5>
+            </div>
+            <div class="receptionist-card-body">
+                <div class="d-grid gap-2">
+                    {% if query.status == 'new' %}
+                    <form method="POST" action="{{ url_for('receptionist.update_query', query_id=query.id) }}" class="d-inline">
+                        <input type="hidden" name="status" value="in_progress">
+                        <input type="hidden" name="assigned_to" value="{{ session.get('receptionist_username', 'Receptionist') }}">
+                        <button type="submit" class="btn btn-info w-100">
+                            <i class="fas fa-play me-2"></i>Start Working
+                        </button>
+                    </form>
+                    {% endif %}
+                    
+                    {% if query.status in ['new', 'in_progress'] %}
+                    <form method="POST" action="{{ url_for('receptionist.update_query', query_id=query.id) }}" class="d-inline">
+                        <input type="hidden" name="status" value="resolved">
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-check me-2"></i>Mark Resolved
+                        </button>
+                    </form>
+                    {% endif %}
+                    
+                    <a href="mailto:{{ query.email }}?subject=Re: {{ query.subject or 'Your inquiry' }}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-envelope me-2"></i>Send Email
+                    </a>
+                    
+                    <a href="tel:{{ query.phone }}" class="btn btn-outline-success w-100">
+                        <i class="fas fa-phone me-2"></i>Call Patient
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="receptionist-card border-danger">
+            <div class="receptionist-card-header bg-danger">
+                <h5 class="mb-0 text-white">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Danger Zone
+                </h5>
+            </div>
+            <div class="receptionist-card-body">
+                <p class="text-muted small mb-3">Permanently delete this query. This action cannot be undone.</p>
+                <form method="POST" action="{{ url_for('receptionist.delete_query', query_id=query.id) }}" onsubmit="return confirm('Are you sure you want to delete this query? This action cannot be undone.')">
+                    <button type="submit" class="btn btn-outline-danger w-100">
+                        <i class="fas fa-trash me-2"></i>Delete Query
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Info Groups */
+.info-group {
+    margin-bottom: 1rem;
+}
+
+.info-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.info-value {
+    font-size: 1rem;
+    color: #212529;
+    margin-bottom: 0;
+}
+
+/* Message and Response Content */
+.message-content, .response-content {
+    background: #f8f9fa;
+    border-left: 4px solid var(--receptionist-accent);
+    padding: 1rem;
+    border-radius: 0 8px 8px 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.response-content {
+    border-left-color: #28a745;
+}
+
+/* Timeline */
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #dee2e6;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -2rem;
+    top: 0.25rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px #dee2e6;
+}
+
+.timeline-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.timeline-text {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-bottom: 0;
+}
+
+/* Query Badges */
+.query-badges .badge {
+    font-size: 0.75rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .timeline {
+        padding-left: 1.5rem;
+    }
+    
+    .timeline-marker {
+        left: -1.5rem;
+    }
+    
+    .query-badges {
+        margin-top: 0.5rem;
+    }
+}
+</style>
+
+{% endblock %}

@@ -1,0 +1,462 @@
+{% extends 'receptionist/base_receptionist.html' %}
+
+{% block title %}Patients Queries - Receptionist Panel{% endblock %}
+
+{% block page_title %}Patients Queries Management{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('receptionist.receptionist_dashboard') }}">Dashboard</a></li>
+<li class="breadcrumb-item active" aria-current="page">Patients Queries</li>
+{% endblock %}
+
+{% block content %}
+<!-- Query Statistics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="receptionist-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-3">
+                    <i class="fas fa-comments fa-2x text-primary"></i>
+                </div>
+                <h3 class="fw-bold text-primary mb-1">{{ stats.total }}</h3>
+                <p class="text-muted mb-0">Total Queries</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="receptionist-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-3">
+                    <i class="fas fa-clock fa-2x text-warning"></i>
+                </div>
+                <h3 class="fw-bold text-warning mb-1">{{ stats.new }}</h3>
+                <p class="text-muted mb-0">New Queries</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="receptionist-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-3">
+                    <i class="fas fa-spinner fa-2x text-info"></i>
+                </div>
+                <h3 class="fw-bold text-info mb-1">{{ stats.in_progress }}</h3>
+                <p class="text-muted mb-0">In Progress</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="receptionist-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-3">
+                    <i class="fas fa-check-circle fa-2x text-success"></i>
+                </div>
+                <h3 class="fw-bold text-success mb-1">{{ stats.resolved }}</h3>
+                <p class="text-muted mb-0">Resolved</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and View Toggle -->
+<div class="receptionist-card mb-4">
+    <div class="receptionist-card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-filter me-2"></i>Filters & View Options
+        </h5>
+    </div>
+    <div class="receptionist-card-body">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label fw-semibold">Status</label>
+                <select name="status" class="form-select">
+                    <option value="all" {% if current_status == 'all' %}selected{% endif %}>All Status</option>
+                    <option value="new" {% if current_status == 'new' %}selected{% endif %}>New</option>
+                    <option value="in_progress" {% if current_status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                    <option value="resolved" {% if current_status == 'resolved' %}selected{% endif %}>Resolved</option>
+                    <option value="closed" {% if current_status == 'closed' %}selected{% endif %}>Closed</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold">Priority</label>
+                <select name="priority" class="form-select">
+                    <option value="all" {% if current_priority == 'all' %}selected{% endif %}>All Priority</option>
+                    <option value="high" {% if current_priority == 'high' %}selected{% endif %}>High</option>
+                    <option value="medium" {% if current_priority == 'medium' %}selected{% endif %}>Medium</option>
+                    <option value="low" {% if current_priority == 'low' %}selected{% endif %}>Low</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold">Query Type</label>
+                <select name="query_type" class="form-select">
+                    <option value="all" {% if current_query_type == 'all' %}selected{% endif %}>All Types</option>
+                    <option value="appointment" {% if current_query_type == 'appointment' %}selected{% endif %}>Appointment</option>
+                    <option value="medical_inquiry" {% if current_query_type == 'medical_inquiry' %}selected{% endif %}>Medical Inquiry</option>
+                    <option value="billing" {% if current_query_type == 'billing' %}selected{% endif %}>Billing</option>
+                    <option value="complaint" {% if current_query_type == 'complaint' %}selected{% endif %}>Complaint</option>
+                    <option value="emergency" {% if current_query_type == 'emergency' %}selected{% endif %}>Emergency</option>
+                    <option value="general" {% if current_query_type == 'general' %}selected{% endif %}>General</option>
+                    <option value="partnership" {% if current_query_type == 'partnership' %}selected{% endif %}>Partnership</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold">View</label>
+                <select name="view" class="form-select">
+                    <option value="list" {% if view_type == 'list' %}selected{% endif %}>List View</option>
+                    <option value="kanban" {% if view_type == 'kanban' %}selected{% endif %}>Kanban View</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-receptionist-primary w-100">
+                    <i class="fas fa-search me-2"></i>Apply Filters
+                </button>
+            </div>
+            <div class="col-md-2">
+                <a href="{{ url_for('receptionist.patients_queries') }}" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-redo me-2"></i>Reset
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Queries Display -->
+{% if view_type == 'kanban' %}
+<!-- Kanban View -->
+<div class="kanban-board">
+    <div class="row g-4">
+        <!-- New Queries Column -->
+        <div class="col-lg-3">
+            <div class="kanban-column">
+                <div class="kanban-header bg-warning">
+                    <h6 class="mb-0 text-white">
+                        <i class="fas fa-clock me-2"></i>New ({{ queries|selectattr('status', 'equalto', 'new')|list|length }})
+                    </h6>
+                </div>
+                <div class="kanban-body">
+                    {% for query in queries if query.status == 'new' %}
+                    <div class="kanban-card" onclick="window.location.href='{{ url_for('receptionist.view_query', query_id=query.id) }}'">
+                        <div class="card-header-small">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-{{ 'danger' if query.priority == 'high' else ('warning' if query.priority == 'medium' else 'success') }}">
+                                    {{ query.priority.title() }}
+                                </span>
+                                <small class="text-muted">{{ query.created_at.strftime('%m/%d') }}</small>
+                            </div>
+                        </div>
+                        <div class="card-body-small">
+                            <h6 class="fw-bold mb-2">{{ query.name }}</h6>
+                            <p class="text-muted small mb-2">{{ query.query_type.replace('_', ' ').title() }}</p>
+                            <p class="small mb-0">{{ query.message[:100] }}{% if query.message|length > 100 %}...{% endif %}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- In Progress Column -->
+        <div class="col-lg-3">
+            <div class="kanban-column">
+                <div class="kanban-header bg-info">
+                    <h6 class="mb-0 text-white">
+                        <i class="fas fa-spinner me-2"></i>In Progress ({{ queries|selectattr('status', 'equalto', 'in_progress')|list|length }})
+                    </h6>
+                </div>
+                <div class="kanban-body">
+                    {% for query in queries if query.status == 'in_progress' %}
+                    <div class="kanban-card" onclick="window.location.href='{{ url_for('receptionist.view_query', query_id=query.id) }}'">
+                        <div class="card-header-small">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-{{ 'danger' if query.priority == 'high' else ('warning' if query.priority == 'medium' else 'success') }}">
+                                    {{ query.priority.title() }}
+                                </span>
+                                <small class="text-muted">{{ query.created_at.strftime('%m/%d') }}</small>
+                            </div>
+                        </div>
+                        <div class="card-body-small">
+                            <h6 class="fw-bold mb-2">{{ query.name }}</h6>
+                            <p class="text-muted small mb-2">{{ query.query_type.replace('_', ' ').title() }}</p>
+                            {% if query.assigned_to %}
+                            <p class="small text-primary mb-1">Assigned to: {{ query.assigned_to }}</p>
+                            {% endif %}
+                            <p class="small mb-0">{{ query.message[:100] }}{% if query.message|length > 100 %}...{% endif %}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Resolved Column -->
+        <div class="col-lg-3">
+            <div class="kanban-column">
+                <div class="kanban-header bg-success">
+                    <h6 class="mb-0 text-white">
+                        <i class="fas fa-check-circle me-2"></i>Resolved ({{ queries|selectattr('status', 'equalto', 'resolved')|list|length }})
+                    </h6>
+                </div>
+                <div class="kanban-body">
+                    {% for query in queries if query.status == 'resolved' %}
+                    <div class="kanban-card" onclick="window.location.href='{{ url_for('receptionist.view_query', query_id=query.id) }}'">
+                        <div class="card-header-small">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-{{ 'danger' if query.priority == 'high' else ('warning' if query.priority == 'medium' else 'success') }}">
+                                    {{ query.priority.title() }}
+                                </span>
+                                <small class="text-muted">{{ query.resolved_at.strftime('%m/%d') if query.resolved_at else query.updated_at.strftime('%m/%d') }}</small>
+                            </div>
+                        </div>
+                        <div class="card-body-small">
+                            <h6 class="fw-bold mb-2">{{ query.name }}</h6>
+                            <p class="text-muted small mb-2">{{ query.query_type.replace('_', ' ').title() }}</p>
+                            {% if query.assigned_to %}
+                            <p class="small text-success mb-1">Resolved by: {{ query.assigned_to }}</p>
+                            {% endif %}
+                            <p class="small mb-0">{{ query.message[:100] }}{% if query.message|length > 100 %}...{% endif %}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Closed Column -->
+        <div class="col-lg-3">
+            <div class="kanban-column">
+                <div class="kanban-header bg-secondary">
+                    <h6 class="mb-0 text-white">
+                        <i class="fas fa-archive me-2"></i>Closed ({{ queries|selectattr('status', 'equalto', 'closed')|list|length }})
+                    </h6>
+                </div>
+                <div class="kanban-body">
+                    {% for query in queries if query.status == 'closed' %}
+                    <div class="kanban-card" onclick="window.location.href='{{ url_for('receptionist.view_query', query_id=query.id) }}'">
+                        <div class="card-header-small">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-secondary">Closed</span>
+                                <small class="text-muted">{{ query.updated_at.strftime('%m/%d') }}</small>
+                            </div>
+                        </div>
+                        <div class="card-body-small">
+                            <h6 class="fw-bold mb-2">{{ query.name }}</h6>
+                            <p class="text-muted small mb-2">{{ query.query_type.replace('_', ' ').title() }}</p>
+                            <p class="small mb-0">{{ query.message[:100] }}{% if query.message|length > 100 %}...{% endif %}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<!-- List View -->
+<div class="receptionist-card">
+    <div class="receptionist-card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-list me-2"></i>Queries List ({{ queries|length }} results)
+        </h5>
+    </div>
+    <div class="receptionist-card-body p-0">
+        {% if queries %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Patient Name</th>
+                        <th>Contact</th>
+                        <th>Query Type</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Assigned To</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for query in queries %}
+                    <tr>
+                        <td><strong>#{{ query.id }}</strong></td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-sm me-2">
+                                    <i class="fas fa-user-circle fa-2x text-muted"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">{{ query.name }}</h6>
+                                    <small class="text-muted">{{ query.email }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <small class="d-block">{{ query.phone }}</small>
+                            <small class="text-muted">{{ query.email }}</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark">{{ query.query_type.replace('_', ' ').title() }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ 'danger' if query.priority == 'high' else ('warning' if query.priority == 'medium' else 'success') }}">
+                                {{ query.priority.title() }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ 'warning' if query.status == 'new' else ('info' if query.status == 'in_progress' else ('success' if query.status == 'resolved' else 'secondary')) }}">
+                                {{ query.status.replace('_', ' ').title() }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if query.assigned_to %}
+                                <small class="text-primary">{{ query.assigned_to }}</small>
+                            {% else %}
+                                <small class="text-muted">Unassigned</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small class="d-block">{{ query.created_at.strftime('%m/%d/%Y') }}</small>
+                            <small class="text-muted">{{ query.created_at.strftime('%I:%M %p') }}</small>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('receptionist.view_query', query_id=query.id) }}" class="btn btn-outline-primary" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                {% if query.status != 'closed' %}
+                                <button type="button" class="btn btn-outline-success" onclick="quickUpdate({{ query.id }}, 'resolved')" title="Mark Resolved">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No queries found</h5>
+            <p class="text-muted">Try adjusting your filters or check back later.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<style>
+/* Kanban Board Styles */
+.kanban-board {
+    min-height: 600px;
+}
+
+.kanban-column {
+    background: #f8f9fa;
+    border-radius: 12px;
+    overflow: hidden;
+    height: fit-content;
+    min-height: 500px;
+}
+
+.kanban-header {
+    padding: 1rem;
+    font-weight: 600;
+}
+
+.kanban-body {
+    padding: 1rem;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.kanban-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.kanban-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.card-header-small {
+    padding: 0.75rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.card-body-small {
+    padding: 0.75rem;
+}
+
+/* List View Enhancements */
+.avatar-sm {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.table th {
+    font-weight: 600;
+    color: var(--receptionist-primary);
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Statistics Cards */
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .kanban-board .col-lg-3 {
+        margin-bottom: 1rem;
+    }
+    
+    .kanban-column {
+        min-height: 300px;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+}
+</style>
+
+<script>
+function quickUpdate(queryId, status) {
+    if (confirm('Are you sure you want to mark this query as ' + status + '?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/receptionist/queries/' + queryId + '/update';
+        
+        const statusInput = document.createElement('input');
+        statusInput.type = 'hidden';
+        statusInput.name = 'status';
+        statusInput.value = status;
+        
+        form.appendChild(statusInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+
+{% endblock %}
