@@ -15,6 +15,36 @@ def create_app():
     def home():
         return render_template('home.html')
 
+    @app.route('/about')
+    def about():
+        from app.models import Doctor
+        doctors = Doctor.query.filter_by(is_verified=True).all()
+        return render_template('about.html', doctors=doctors)
+
+    @app.route('/services')
+    def services():
+        return render_template('services.html')
+
+    @app.route('/appointment')
+    def appointment():
+        return render_template('appointment.html')
+
+    @app.route('/contact', methods=['GET', 'POST'])
+    def contact():
+        from app.models import ContactQuery, db
+        from flask import request, flash, redirect, url_for
+        if request.method == 'POST':
+            name = request.form['name']
+            email = request.form['email']
+            phone = request.form['phone']
+            message = request.form['message']
+            query = ContactQuery(name=name, email=email, phone=phone, message=message)
+            db.session.add(query)
+            db.session.commit()
+            flash('Your message has been sent!')
+            return redirect(url_for('contact'))
+        return render_template('contact.html')
+
     from app.patient.routes import patient_bp
     app.register_blueprint(patient_bp, url_prefix='/patient')
 

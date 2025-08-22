@@ -58,9 +58,92 @@
             background-color: #059669;
             border-color: #059669;
         }
+        
+        /* Enhanced navbar styles */
+        .navbar {
+            color: black;
+            box-shadow: 0 4px 24px rgba(102,126,234,0.12);
+            padding: 0.7rem 0;
+        }
+        .navbar .navbar-brand {
+            color: #667eea !important;
+            text-shadow: 0 2px 8px rgba(16,185,129,0.12);
+        }
+        .navbar-nav .nav-link {
+            color: #667eea !important;
+            font-weight: 500;
+            margin-right: 10px;
+            border-radius: 18px;
+            transition: background 0.3s, color 0.3s;
+        }
+        .navbar-nav .nav-link:hover {
+            background: rgba(255,255,255,0.15);
+            color: #10b981 !important;
+        }
+        .navbar-toggler {
+            background: #10b981;
+        }
+        /* Custom hover for Login / Registration button */
+        .navbar-nav .btn.btn-primary.nav-link:hover {
+            background-color: #2d3a5a !important;
+            color: #fff !important;
+            box-shadow: 0 4px 16px rgba(45,58,90,0.18);
+        }
     </style>
 </head>
 <body>
+    {% if not request.path.startswith('/receptionist') and not request.path.startswith('/doctor') and not request.path.startswith('/admin') and not request.path.startswith('/patient') %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold text-primary fs-3" href="/">
+                <div class="logo-container d-flex align-items-center">
+                    <div class="logo-icon me-2">
+                        <i class="fas fa-hospital-alt"></i>
+                    </div>
+                    <span>HealthCare+</span>
+                </div>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home me-2"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">
+                            <i class="fas fa-info-circle me-2"></i>About Us
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/services">
+                            <i class="fas fa-stethoscope me-2"></i>Services & Departments
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/appointment">
+                            <i class="fas fa-calendar-check me-2"></i>Appointment Booking
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">
+                            <i class="fas fa-envelope-open-text me-2"></i>Contact Us
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary px-4 py-2 ms-2" href="/patient/login" style="border-radius: 25px; font-weight: 600; box-shadow: 0 2px 8px rgba(102,126,234,0.15); color: white !important;">
+                            <i class="fas fa-user-plus me-2"></i>Login / Registration
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+    
     {% block content %}{% endblock %}
     
     <!-- Bootstrap JS -->

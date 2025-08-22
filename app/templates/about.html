@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="about-bg-gradient py-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-4 mb-md-0 text-center">
+        <img src="https://cdn.pixabay.com/photo/2017/01/31/13/14/doctor-2027768_1280.png" class="img-fluid rounded shadow-lg animate__animated animate__fadeInLeft" alt="About Us" style="max-height: 400px;">
+      </div>
+      <div class="col-md-6">
+        <h2 class="fw-bold mb-3 text-gradient animate__animated animate__fadeInDown">About Us</h2>
+        <p class="lead animate__animated animate__fadeInUp text-muted">HMS Hospital is dedicated to providing exceptional healthcare with compassion and innovation. Our expert team of doctors, nurses, and staff work together to ensure every patient receives world-class care.</p>
+        <ul class="list-unstyled mt-4 animate__animated animate__fadeInUp">
+          <li><i class="fa fa-check-circle text-success me-2"></i> Modern Facilities</li>
+          <li><i class="fa fa-check-circle text-success me-2"></i> Experienced Team</li>
+          <li><i class="fa fa-check-circle text-success me-2"></i> Patient-Centered Approach</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Why Choose Us Section -->
+    <div class="row mt-5">
+      <div class="col-md-12">
+        <div class="card shadow-lg border-0 p-5 animate__animated animate__fadeInUp gradient-card">
+          <h4 class="fw-bold text-gradient mb-3"><i class="fas fa-star text-warning me-2"></i>Why Choose HMS Hospital?</h4>
+          <ul class="list-unstyled fs-5">
+            <li class="mb-3"><i class="fas fa-user-md text-primary me-2"></i> Highly qualified and compassionate medical staff</li>
+            <li class="mb-3"><i class="fas fa-hospital text-success me-2"></i> State-of-the-art infrastructure and technology</li>
+            <li class="mb-3"><i class="fas fa-ambulance text-danger me-2"></i> 24/7 emergency and ambulance services</li>
+            <li class="mb-3"><i class="fas fa-heart text-danger me-2"></i> Focus on patient safety and comfort</li>
+            <li class="mb-3"><i class="fas fa-thumbs-up text-success me-2"></i> Trusted by thousands of families</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Mission, Vision, Values -->
+<div class="container py-5">
+  <div class="row text-center g-4">
+    <div class="col-md-4">
+      <div class="card h-100 shadow-lg border-0 animate__animated animate__zoomIn gradient-card">
+        <div class="card-body p-4">
+          <i class="fas fa-bullseye fa-2x text-primary mb-3"></i>
+          <h5 class="fw-bold mb-2">Our Mission</h5>
+          <p class="text-muted">To deliver high-quality, affordable healthcare with a focus on innovation and patient satisfaction.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100 shadow-lg border-0 animate__animated animate__zoomIn gradient-card">
+        <div class="card-body p-4">
+          <i class="fas fa-eye fa-2x text-success mb-3"></i>
+          <h5 class="fw-bold mb-2">Our Vision</h5>
+          <p class="text-muted">To be a leader in healthcare, setting standards for excellence and compassion in our community.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100 shadow-lg border-0 animate__animated animate__zoomIn gradient-card">
+        <div class="card-body p-4">
+          <i class="fas fa-heartbeat fa-2x text-danger mb-3"></i>
+          <h5 class="fw-bold mb-2">Our Values</h5>
+          <p class="text-muted">Integrity, empathy, teamwork, and continuous improvement guide everything we do.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Team Section -->
+<div class="container py-5">
+  <h3 class="fw-bold text-center mb-4 text-gradient">Meet Our Team</h3>
+  <div id="doctorCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner p-5">
+      {% for group in doctors|batch(3, '') %}
+      <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
+        <div class="row justify-content-center">
+          {% for doctor in group %}
+          {% if doctor %}
+          <div class="col-md-4 mb-4">
+            <div class="team-card h-100 text-center shadow-sm rounded p-3">
+              <img src="/static/images/doctor_staic.png" class="card-img-top" alt="Doctor Icon">
+              <div class="card-body">
+                <h5 class="card-title mb-1 text-gradient">{{ doctor.full_name }}</h5>
+                <p class="text-muted mb-1 fw-semibold">{{ doctor.specialization }}</p>
+                <p class="small">{{ doctor.qualification }}<br><span class="badge bg-primary">Experience: {{ doctor.experience_years }} years</span></p>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#doctorCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#doctorCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+</div>
+
+<!-- Features Section -->
+<div class="container py-5">
+  <div class="row text-center g-4">
+    <div class="col-md-3">
+      <div class="feature-box animate__animated animate__fadeInUp">
+        <i class="fas fa-user-md fa-2x text-primary mb-2"></i>
+        <h6 class="fw-bold">50+ Doctors</h6>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="feature-box animate__animated animate__fadeInUp">
+        <i class="fas fa-bed fa-2x text-success mb-2"></i>
+        <h6 class="fw-bold">200+ Beds</h6>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="feature-box animate__animated animate__fadeInUp">
+        <i class="fas fa-award fa-2x text-warning mb-2"></i>
+        <h6 class="fw-bold">15+ Awards</h6>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="feature-box animate__animated animate__fadeInUp">
+        <i class="fas fa-users fa-2x text-danger mb-2"></i>
+        <h6 class="fw-bold">10K+ Happy Patients</h6>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-5">
+  <h3 class="fw-bold text-center mb-5 text-gradient">Our Achievements</h3>
+  <div class="row text-center g-4">
+    <div class="col-md-3">
+      <div class="feature-box">
+        <i class="fas fa-trophy fa-2x text-warning mb-2"></i>
+        <h6 class="fw-bold">Best Regional Hospital 2023</h6>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="feature-box">
+        <i class="fas fa-graduation-cap fa-2x text-primary mb-2"></i>
+        <h6 class="fw-bold">500+ Research Publications</h6>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="feature-box">
+        <i class="fas fa-hands-helping fa-2x text-success mb-2"></i>
+        <h6 class="fw-bold">20+ Community Health Programs</h6>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="feature-box">
+        <i class="fas fa-stethoscope fa-2x text-danger mb-2"></i>
+        <h6 class="fw-bold">Specialized Centers of Excellence</h6>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Our Partners -->
+<div class="container py-5">
+  <div class="row align-items-center justify-content-center">
+    <div class="col-md-10">
+      <div class="card shadow-lg border-0 p-5 animate__animated animate__fadeInUp gradient-card">
+        <h4 class="fw-bold text-gradient mb-3"><i class="fas fa-handshake text-success me-2"></i>Our Partners</h4>
+        <p class="text-muted">We collaborate with leading medical institutions, research centers, and technology providers to bring world-class healthcare solutions.</p>
+        <div class="d-flex flex-wrap justify-content-center gap-5 mt-4">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_2013_Stanford_University.png" alt="Stanford" class="partner-logo">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Harvard_shield_wreath.png" alt="Harvard" class="partner-logo">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/2/2e/Johns_Hopkins_University_seal.png" alt="Johns Hopkins" class="partner-logo">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/2/2e/Mayo_Clinic_logo.png" alt="Mayo Clinic" class="partner-logo">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<style>
+.about-bg-gradient {
+  background: linear-gradient(135deg, #eef2ff 0%, #f0fdf4 100%);
+}
+.text-gradient {
+  background: linear-gradient(90deg, #2563eb, #16a34a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.gradient-card {
+  background: linear-gradient(135deg, #f0fdf4 0%, #e0e7ff 100%);
+  border-radius: 1rem;
+}
+.team-card img {
+  height: 150px !important;
+  width: 150px !important;
+  object-fit: contain;
+  margin: 0 auto;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+.team-card:hover img {
+  transform: scale(1.05);
+}
+.feature-box {
+  background: #fff;
+  padding: 2rem 1rem;
+  border-radius: 1rem;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.feature-box:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(37,99,235,0.15);
+}
+.partner-logo {
+  height: 60px;
+  filter: grayscale(100%);
+  transition: filter 0.3s, transform 0.3s;
+}
+.partner-logo:hover {
+  filter: grayscale(0%);
+  transform: scale(1.1);
+}
+.carousel-control-prev, .carousel-control-next {
+  filter: invert(1);
+  background: #222;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  top: 45%;
+}
+</style>
+{% endblock %}

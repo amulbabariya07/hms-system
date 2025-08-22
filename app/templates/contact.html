@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="text-center fw-bold mb-4 text-dark">Contact Us</h2>
+    <p class="text-center text-muted mb-5">We’re here to help with all your healthcare needs. Reach out to us through any method below.</p>
+
+    <div class="row g-4">
+      <!-- Call Us -->
+      <div class="col-md-3">
+        <div class="card shadow-sm border-0 text-center p-4 h-100">
+          <i class="fas fa-phone fa-2x text-primary mb-3"></i>
+          <h6 class="fw-bold">Call Us</h6>
+          <p class="mb-1">Main: (123) 456-7890</p>
+          <p class="text-danger fw-bold">Emergency: (123) 456-7891</p>
+          <small class="text-muted">24/7 Emergency Line</small>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="col-md-3">
+        <div class="card shadow-sm border-0 text-center p-4 h-100">
+          <i class="fas fa-envelope fa-2x text-info mb-3"></i>
+          <h6 class="fw-bold">Email Us</h6>
+          <p class="mb-1">info@hms.com</p>
+          <p class="mb-0">appointments@hms.com</p>
+          <small class="text-muted">Response within 24 hrs</small>
+        </div>
+      </div>
+
+      <!-- Visit -->
+      <div class="col-md-3">
+        <div class="card shadow-sm border-0 text-center p-4 h-100">
+          <i class="fas fa-map-marker-alt fa-2x text-success mb-3"></i>
+          <h6 class="fw-bold">Visit Us</h6>
+          <p class="mb-1">123 Healthcare Avenue</p>
+          <p class="mb-0">Medical City, MC 12345</p>
+          <small class="text-muted">Free parking available</small>
+        </div>
+      </div>
+
+      <!-- Hours -->
+      <div class="col-md-3">
+        <div class="card shadow-sm border-0 text-center p-4 h-100">
+          <i class="fas fa-clock fa-2x text-warning mb-3"></i>
+          <h6 class="fw-bold">Hours</h6>
+          <p class="mb-1">Mon–Fri: 8:00 AM – 6:00 PM</p>
+          <p class="mb-1">Sat: 9:00 AM – 4:00 PM</p>
+          <p class="mb-0 text-danger">Sunday: Emergency Only</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact Form -->
+    <div class="row mt-5">
+      <div class="col-md-7">
+        <div class="card shadow border-0 p-4">
+          <h5 class="fw-bold mb-3">Send Us a Message</h5>
+          <form method="POST" autocomplete="off">
+            <div class="mb-3">
+              <label class="form-label">Full Name</label>
+              <input type="text" name="name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Email Address</label>
+              <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Phone Number</label>
+              <input type="text" name="phone" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Message</label>
+              <textarea name="message" rows="4" class="form-control" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary px-4">Send Message</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Emergency Box -->
+      <div class="col-md-5">
+        <div class="card shadow border-0 p-4 bg-danger text-white">
+          <h5 class="fw-bold mb-3"><i class="fas fa-exclamation-triangle me-2"></i> Emergency</h5>
+          <p>If you are experiencing a life-threatening emergency:</p>
+          <h6 class="fw-bold">Call 911 immediately</h6>
+          <p class="mb-1">Or visit our Emergency Department</p>
+          <p class="fw-bold">Emergency Line: (123) 456-7891</p>
+          <small>Available 24/7, 365 days a year</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-dark text-white py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="footer-brand mb-4">
+                    <h4 class="fw-bold">
+                        <i class="fas fa-hospital-alt me-2"></i>
+                        HealthCare+
+                    </h4>
+                    <p class="text-light opacity-75">Providing exceptional healthcare services with advanced technology and compassionate care for over a decade.</p>
+                </div>
+                <div class="social-links">
+                    <a href="#" class="social-link me-3">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social-link me-3">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="social-link me-3">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="social-link">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                </div>
+{% include 'common_footer.html' %}
+            </div>
+{% include 'common_footer.html' %}
+                <h6 class="fw-bold mb-4">Quick Links</h6>
+                <ul class="footer-links">
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="/patient/login">Patient Portal</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3">
+                <h6 class="fw-bold mb-4">Services</h6>
+                <ul class="footer-links">
+                    <li><a href="#">Emergency Care</a></li>
+                    <li><a href="#">Cardiology</a></li>
+                    <li><a href="#">Neurology</a></li>
+                    <li><a href="#">Pediatrics</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3">
+                <h6 class="fw-bold mb-4">Contact Info</h6>
+                <div class="contact-info">
+                    <p class="text-light opacity-75 mb-2">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        123 Healthcare St, Medical City
+                    </p>
+                    <p class="text-light opacity-75 mb-2">
+                        <i class="fas fa-phone me-2"></i>
+                        +1 (555) 123-4567
+                    </p>
+                    <p class="text-light opacity-75 mb-2">
+                        <i class="fas fa-envelope me-2"></i>
+                        info@healthcare.com
+                    </p>
+                </div>
+            </div>
+        </div>
+        <hr class="my-4 opacity-25">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <p class="text-light opacity-75 mb-0">&copy; 2024 HealthCare+. All rights reserved.</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <a href="#" class="text-light opacity-75 text-decoration-none me-3">Privacy Policy</a>
+                <a href="#" class="text-light opacity-75 text-decoration-none">Terms of Service</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+{% endblock %}
