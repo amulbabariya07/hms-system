@@ -1,173 +1,828 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<section class="py-5 bg-light">
-  <div class="container">
-    <h2 class="text-center fw-bold mb-4 text-dark">Contact Us</h2>
-    <p class="text-center text-muted mb-5">We’re here to help with all your healthcare needs. Reach out to us through any method below.</p>
-
-    <div class="row g-4">
-      <!-- Call Us -->
-      <div class="col-md-3">
-        <div class="card shadow-sm border-0 text-center p-4 h-100">
-          <i class="fas fa-phone fa-2x text-primary mb-3"></i>
-          <h6 class="fw-bold">Call Us</h6>
-          <p class="mb-1">Main: (123) 456-7890</p>
-          <p class="text-danger fw-bold">Emergency: (123) 456-7891</p>
-          <small class="text-muted">24/7 Emergency Line</small>
-        </div>
-      </div>
-
-      <!-- Email -->
-      <div class="col-md-3">
-        <div class="card shadow-sm border-0 text-center p-4 h-100">
-          <i class="fas fa-envelope fa-2x text-info mb-3"></i>
-          <h6 class="fw-bold">Email Us</h6>
-          <p class="mb-1">info@hms.com</p>
-          <p class="mb-0">appointments@hms.com</p>
-          <small class="text-muted">Response within 24 hrs</small>
-        </div>
-      </div>
-
-      <!-- Visit -->
-      <div class="col-md-3">
-        <div class="card shadow-sm border-0 text-center p-4 h-100">
-          <i class="fas fa-map-marker-alt fa-2x text-success mb-3"></i>
-          <h6 class="fw-bold">Visit Us</h6>
-          <p class="mb-1">123 Healthcare Avenue</p>
-          <p class="mb-0">Medical City, MC 12345</p>
-          <small class="text-muted">Free parking available</small>
-        </div>
-      </div>
-
-      <!-- Hours -->
-      <div class="col-md-3">
-        <div class="card shadow-sm border-0 text-center p-4 h-100">
-          <i class="fas fa-clock fa-2x text-warning mb-3"></i>
-          <h6 class="fw-bold">Hours</h6>
-          <p class="mb-1">Mon–Fri: 8:00 AM – 6:00 PM</p>
-          <p class="mb-1">Sat: 9:00 AM – 4:00 PM</p>
-          <p class="mb-0 text-danger">Sunday: Emergency Only</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Contact Form -->
-    <div class="row mt-5">
-      <div class="col-md-7">
-        <div class="card shadow border-0 p-4">
-          <h5 class="fw-bold mb-3">Send Us a Message</h5>
-          <form method="POST" autocomplete="off">
-            <div class="mb-3">
-              <label class="form-label">Full Name</label>
-              <input type="text" name="name" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Email Address</label>
-              <input type="email" name="email" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Phone Number</label>
-              <input type="text" name="phone" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Message</label>
-              <textarea name="message" rows="4" class="form-control" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary px-4">Send Message</button>
-          </form>
-        </div>
-      </div>
-
-      <!-- Emergency Box -->
-      <div class="col-md-5">
-        <div class="card shadow border-0 p-4 bg-danger text-white">
-          <h5 class="fw-bold mb-3"><i class="fas fa-exclamation-triangle me-2"></i> Emergency</h5>
-          <p>If you are experiencing a life-threatening emergency:</p>
-          <h6 class="fw-bold">Call 911 immediately</h6>
-          <p class="mb-1">Or visit our Emergency Department</p>
-          <p class="fw-bold">Emergency Line: (123) 456-7891</p>
-          <small>Available 24/7, 365 days a year</small>
+<!-- Hero Section -->
+<div class="contact-hero-section position-relative overflow-hidden">
+  <div class="hero-overlay"></div>
+  <div class="container py-5">
+    <div class="row align-items-center min-vh-40">
+      <div class="col-lg-8 mx-auto text-center">
+        <h1 class="display-4 fw-bold text-white mb-4 animate__animated animate__fadeInUp">
+          Get in Touch with Us
+        </h1>
+        <p class="lead text-white-75 mb-4 animate__animated animate__fadeInUp animate__delay-1s">
+          We're here to help with all your healthcare needs. Reach out through any of our convenient contact methods or visit us in person.
+        </p>
+        <div class="hero-contact-stats d-flex justify-content-center gap-4 flex-wrap animate__animated animate__fadeInUp animate__delay-2s">
+          <div class="contact-stat text-center">
+            <h4 class="fw-bold text-accent mb-1">24/7</h4>
+            <p class="text-white-75 small mb-0">Emergency Support</p>
+          </div>
+          <div class="contact-stat text-center">
+            <h4 class="fw-bold text-accent mb-1">&lt;1hr</h4>
+            <p class="text-white-75 small mb-0">Response Time</p>
+          </div>
+          <div class="contact-stat text-center">
+            <h4 class="fw-bold text-accent mb-1">15+</h4>
+            <p class="text-white-75 small mb-0">Languages Supported</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<footer class="bg-dark text-white py-5">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-lg-4">
-                <div class="footer-brand mb-4">
-                    <h4 class="fw-bold">
-                        <i class="fas fa-hospital-alt me-2"></i>
-                        HealthCare+
-                    </h4>
-                    <p class="text-light opacity-75">Providing exceptional healthcare services with advanced technology and compassionate care for over a decade.</p>
-                </div>
-                <div class="social-links">
-                    <a href="#" class="social-link me-3">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" class="social-link me-3">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a href="#" class="social-link me-3">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="#" class="social-link">
-                        <i class="fab fa-linkedin-in"></i>
-                    </a>
-                </div>
-{% include 'common_footer.html' %}
-            </div>
-{% include 'common_footer.html' %}
-                <h6 class="fw-bold mb-4">Quick Links</h6>
-                <ul class="footer-links">
-                    <li><a href="#services">Services</a></li>
-                    <li><a href="#about">About Us</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                    <li><a href="/patient/login">Patient Portal</a></li>
-                </ul>
-            </div>
-            <div class="col-lg-3">
-                <h6 class="fw-bold mb-4">Services</h6>
-                <ul class="footer-links">
-                    <li><a href="#">Emergency Care</a></li>
-                    <li><a href="#">Cardiology</a></li>
-                    <li><a href="#">Neurology</a></li>
-                    <li><a href="#">Pediatrics</a></li>
-                </ul>
-            </div>
-            <div class="col-lg-3">
-                <h6 class="fw-bold mb-4">Contact Info</h6>
-                <div class="contact-info">
-                    <p class="text-light opacity-75 mb-2">
-                        <i class="fas fa-map-marker-alt me-2"></i>
-                        123 Healthcare St, Medical City
-                    </p>
-                    <p class="text-light opacity-75 mb-2">
-                        <i class="fas fa-phone me-2"></i>
-                        +1 (555) 123-4567
-                    </p>
-                    <p class="text-light opacity-75 mb-2">
-                        <i class="fas fa-envelope me-2"></i>
-                        info@healthcare.com
-                    </p>
-                </div>
-            </div>
-        </div>
-        <hr class="my-4 opacity-25">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <p class="text-light opacity-75 mb-0">&copy; 2024 HealthCare+. All rights reserved.</p>
-            </div>
-            <div class="col-md-6 text-md-end">
-                <a href="#" class="text-light opacity-75 text-decoration-none me-3">Privacy Policy</a>
-                <a href="#" class="text-light opacity-75 text-decoration-none">Terms of Service</a>
-            </div>
-        </div>
+<!-- Enhanced contact methods section -->
+<div class="contact-methods-section py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="display-5 fw-bold text-primary mb-3">Multiple Ways to Reach Us</h2>
+      <p class="lead text-muted">Choose the most convenient way to connect with our healthcare team</p>
     </div>
-</footer>
+
+    <div class="row g-4">
+      <!-- Phone Contact -->
+      <div class="col-lg-3 col-md-6">
+        <div class="contact-method-card h-100">
+          <div class="contact-icon">
+            <i class="fas fa-phone"></i>
+          </div>
+          <div class="contact-content">
+            <h5 class="fw-bold mb-3">Call Us</h5>
+            <div class="contact-details">
+              <p class="mb-2"><strong>Main Line:</strong><br>(555) 123-4567</p>
+              <p class="mb-2"><strong>Appointments:</strong><br>(555) 123-4568</p>
+              <p class="mb-3 text-danger"><strong>Emergency:</strong><br>(555) 911-HELP</p>
+              <span class="badge bg-success">Available 24/7</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email Contact -->
+      <div class="col-lg-3 col-md-6">
+        <div class="contact-method-card h-100">
+          <div class="contact-icon">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div class="contact-content">
+            <h5 class="fw-bold mb-3">Email Us</h5>
+            <div class="contact-details">
+              <p class="mb-2"><strong>General Inquiries:</strong><br>info@healthcare.com</p>
+              <p class="mb-2"><strong>Appointments:</strong><br>appointments@healthcare.com</p>
+              <p class="mb-3"><strong>Billing:</strong><br>billing@healthcare.com</p>
+              <span class="badge bg-info">Response within 2 hours</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Location -->
+      <div class="col-lg-3 col-md-6">
+        <div class="contact-method-card h-100">
+          <div class="contact-icon">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>
+          <div class="contact-content">
+            <h5 class="fw-bold mb-3">Visit Us</h5>
+            <div class="contact-details">
+              <p class="mb-2"><strong>Main Campus:</strong><br>123 Healthcare Avenue<br>Medical City, MC 12345</p>
+              <p class="mb-3"><strong>Parking:</strong><br>Free valet & self-parking</p>
+              <span class="badge bg-primary">Easy Access</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hours -->
+      <div class="col-lg-3 col-md-6">
+        <div class="contact-method-card h-100">
+          <div class="contact-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="contact-content">
+            <h5 class="fw-bold mb-3">Operating Hours</h5>
+            <div class="contact-details">
+              <p class="mb-1"><strong>Mon-Fri:</strong> 6:00 AM - 10:00 PM</p>
+              <p class="mb-1"><strong>Saturday:</strong> 8:00 AM - 8:00 PM</p>
+              <p class="mb-1"><strong>Sunday:</strong> 10:00 AM - 6:00 PM</p>
+              <p class="mb-3 text-danger"><strong>Emergency:</strong> 24/7</p>
+              <span class="badge bg-warning">Extended Hours</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Enhanced contact form with query categorization -->
+<div class="contact-form-section py-5 bg-light">
+  <div class="container">
+    <div class="row">
+      <!-- Contact Form -->
+      <div class="col-lg-8">
+        <div class="contact-form-card">
+          <div class="form-header">
+            <h3 class="fw-bold text-primary mb-3">Send Us a Message</h3>
+            <p class="text-muted mb-4">Fill out the form below and we'll get back to you as soon as possible. All fields marked with * are required.</p>
+          </div>
+          
+          <!-- Enhanced contact form with query categorization and better validation -->
+          <form method="POST" action="/contact" class="contact-form" autocomplete="off">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Full Name *</label>
+                <input type="text" name="name" class="form-control form-control-lg" placeholder="Enter your full name" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Email Address *</label>
+                <input type="email" name="email" class="form-control form-control-lg" placeholder="your.email@example.com" required>
+              </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Phone Number *</label>
+                <input type="tel" name="phone" class="form-control form-control-lg" placeholder="(555) 123-4567" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Query Type *</label>
+                <select name="query_type" class="form-select form-select-lg" required>
+                  <option value="">Select query type</option>
+                  <option value="appointment">Appointment Booking</option>
+                  <option value="medical_inquiry">Medical Inquiry</option>
+                  <option value="billing">Billing & Insurance</option>
+                  <option value="complaint">Complaint/Feedback</option>
+                  <option value="emergency">Emergency (Non-urgent)</option>
+                  <option value="general">General Information</option>
+                  <option value="partnership">Partnership/Business</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="mt-3">
+              <label class="form-label fw-semibold">Priority Level</label>
+              <div class="priority-options">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="priority" id="priority_low" value="low" checked>
+                  <label class="form-check-label" for="priority_low">
+                    <span class="badge bg-success">Low</span> - General inquiry
+                  </label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="priority" id="priority_medium" value="medium">
+                  <label class="form-check-label" for="priority_medium">
+                    <span class="badge bg-warning">Medium</span> - Needs attention
+                  </label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="priority" id="priority_high" value="high">
+                  <label class="form-check-label" for="priority_high">
+                    <span class="badge bg-danger">High</span> - Urgent matter
+                  </label>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-3">
+              <label class="form-label fw-semibold">Subject *</label>
+              <input type="text" name="subject" class="form-control form-control-lg" placeholder="Brief subject line" required>
+            </div>
+            
+            <div class="mt-3">
+              <label class="form-label fw-semibold">Message *</label>
+              <textarea name="message" rows="5" class="form-control" placeholder="Please provide detailed information about your inquiry..." required></textarea>
+              <div class="form-text">Minimum 10 characters required</div>
+            </div>
+            
+            <div class="mt-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="newsletter" id="newsletter">
+                <label class="form-check-label" for="newsletter">
+                  Subscribe to our health newsletter for tips and updates
+                </label>
+              </div>
+            </div>
+            
+            <div class="mt-4">
+              <button type="submit" class="btn btn-accent btn-lg px-5 py-3">
+                <i class="fas fa-paper-plane me-2"></i>Send Message
+              </button>
+              <button type="reset" class="btn btn-outline-secondary btn-lg px-4 py-3 ms-3">
+                <i class="fas fa-redo me-2"></i>Reset Form
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Enhanced emergency and quick actions sidebar -->
+      <div class="col-lg-4">
+        <!-- Emergency Alert -->
+        <div class="emergency-card mb-4">
+          <div class="emergency-header">
+            <h5 class="fw-bold text-white mb-3">
+              <i class="fas fa-exclamation-triangle me-2"></i>Medical Emergency?
+            </h5>
+          </div>
+          <div class="emergency-content">
+            <p class="text-white mb-3">If you are experiencing a life-threatening emergency:</p>
+            <div class="emergency-actions">
+              <a href="tel:911" class="btn btn-light btn-lg w-100 mb-3">
+                <i class="fas fa-phone me-2"></i>Call 911 Now
+              </a>
+              <div class="text-white-75 text-center">
+                <p class="mb-2"><strong>Or visit our Emergency Department</strong></p>
+                <p class="mb-1">Emergency Line: <a href="tel:5559111234" class="text-white">(555) 911-1234</a></p>
+                <small>Available 24/7, 365 days a year</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions-card">
+          <h5 class="fw-bold text-primary mb-4">Quick Actions</h5>
+          <div class="quick-action-list">
+            <a href="/appointment" class="quick-action-item">
+              <div class="action-icon">
+                <i class="fas fa-calendar-check"></i>
+              </div>
+              <div class="action-content">
+                <h6 class="fw-bold mb-1">Book Appointment</h6>
+                <p class="text-muted small mb-0">Schedule your visit online</p>
+              </div>
+              <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+            
+            <a href="/patient/login" class="quick-action-item">
+              <div class="action-icon">
+                <i class="fas fa-user-circle"></i>
+              </div>
+              <div class="action-content">
+                <h6 class="fw-bold mb-1">Patient Portal</h6>
+                <p class="text-muted small mb-0">Access your medical records</p>
+              </div>
+              <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+            
+            <a href="tel:5551234567" class="quick-action-item">
+              <div class="action-icon">
+                <i class="fas fa-phone"></i>
+              </div>
+              <div class="action-content">
+                <h6 class="fw-bold mb-1">Call Directly</h6>
+                <p class="text-muted small mb-0">Speak with our staff now</p>
+              </div>
+              <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+            
+            <a href="/services" class="quick-action-item">
+              <div class="action-icon">
+                <i class="fas fa-stethoscope"></i>
+              </div>
+              <div class="action-content">
+                <h6 class="fw-bold mb-1">Our Services</h6>
+                <p class="text-muted small mb-0">Explore medical specialties</p>
+              </div>
+              <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Contact Stats -->
+        <div class="contact-stats-card mt-4">
+          <h6 class="fw-bold text-primary mb-3">Response Statistics</h6>
+          <div class="stat-item">
+            <div class="stat-icon">
+              <i class="fas fa-clock text-success"></i>
+            </div>
+            <div class="stat-content">
+              <span class="fw-bold">Average Response Time</span>
+              <p class="text-muted small mb-0">45 minutes during business hours</p>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon">
+              <i class="fas fa-check-circle text-primary"></i>
+            </div>
+            <div class="stat-content">
+              <span class="fw-bold">Resolution Rate</span>
+              <p class="text-muted small mb-0">98% of queries resolved within 24 hours</p>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon">
+              <i class="fas fa-star text-warning"></i>
+            </div>
+            <div class="stat-content">
+              <span class="fw-bold">Satisfaction Score</span>
+              <p class="text-muted small mb-0">4.9/5 based on patient feedback</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Location and Map Section -->
+<div class="location-section py-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6 mb-4 mb-lg-0">
+        <h2 class="display-5 fw-bold text-primary mb-4">Find Us Easily</h2>
+        <div class="location-details">
+          <div class="location-item">
+            <div class="location-icon">
+              <i class="fas fa-map-marker-alt text-accent"></i>
+            </div>
+            <div class="location-content">
+              <h5 class="fw-bold mb-2">Main Hospital Campus</h5>
+              <p class="text-muted mb-2">123 Healthcare Avenue<br>Medical City, MC 12345</p>
+              <p class="text-muted small">Located in the heart of Medical City with easy highway access</p>
+            </div>
+          </div>
+          
+          <div class="location-item">
+            <div class="location-icon">
+              <i class="fas fa-car text-primary"></i>
+            </div>
+            <div class="location-content">
+              <h5 class="fw-bold mb-2">Parking Information</h5>
+              <p class="text-muted mb-2">Free valet parking available<br>Self-parking: 500+ spaces</p>
+              <p class="text-muted small">Covered parking garage with direct hospital access</p>
+            </div>
+          </div>
+          
+          <div class="location-item">
+            <div class="location-icon">
+              <i class="fas fa-bus text-success"></i>
+            </div>
+            <div class="location-content">
+              <h5 class="fw-bold mb-2">Public Transportation</h5>
+              <p class="text-muted mb-2">Bus routes: 15, 22, 45<br>Metro station: Medical Center</p>
+              <p class="text-muted small">Free shuttle service from metro station</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6">
+        <div class="map-container">
+          <div class="map-placeholder">
+            <!-- Updated map placeholder to use online image URL -->
+            <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80" class="img-fluid rounded-3 shadow" alt="Hospital Location Map">
+            <div class="map-overlay">
+              <button class="btn btn-accent btn-lg">
+                <i class="fas fa-directions me-2"></i>Get Directions
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ Section -->
+<div class="faq-section py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="display-5 fw-bold text-primary mb-3">Frequently Asked Questions</h2>
+      <p class="lead text-muted">Quick answers to common questions about contacting us</p>
+    </div>
+    
+    <div class="row">
+      <div class="col-lg-8 mx-auto">
+        <div class="accordion" id="contactFAQ">
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                How quickly will I receive a response to my inquiry?
+              </button>
+            </h2>
+            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#contactFAQ">
+              <div class="accordion-body">
+                We typically respond to all inquiries within 2 hours during business hours (6 AM - 10 PM). For urgent medical matters, please call our main line directly at (555) 123-4567.
+              </div>
+            </div>
+          </div>
+          
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                Can I schedule appointments through the contact form?
+              </button>
+            </h2>
+            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#contactFAQ">
+              <div class="accordion-body">
+                While you can request appointments through our contact form, we recommend using our dedicated appointment booking system or calling our appointments line at (555) 123-4568 for faster scheduling.
+              </div>
+            </div>
+          </div>
+          
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                Do you offer language interpretation services?
+              </button>
+            </h2>
+            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#contactFAQ">
+              <div class="accordion-body">
+                Yes, we provide interpretation services in over 15 languages. Please mention your language preference when contacting us, and we'll arrange for an interpreter during your visit or call.
+              </div>
+            </div>
+          </div>
+          
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                What information should I include in my message?
+              </button>
+            </h2>
+            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#contactFAQ">
+              <div class="accordion-body">
+                Please include your full name, contact information, the nature of your inquiry, and any relevant details. For medical questions, mention if you're a current patient and include your patient ID if available.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+<style>
+/* Updated color scheme and enhanced styling */
+:root {
+  --primary-color: #164e63;
+  --accent-color: #84cc16;
+  --light-bg: #ecfeff;
+  --text-muted: #475569;
+}
+
+/* Hero Section */
+.contact-hero-section {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #0891b2 100%);
+  min-height: 50vh;
+  position: relative;
+}
+
+.hero-overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=400&q=80') center/cover;
+  opacity: 0.1;
+  z-index: -1;
+}
+
+.text-accent {
+  color: var(--accent-color) !important;
+}
+
+.text-white-75 {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.min-vh-40 {
+  min-height: 40vh;
+}
+
+.hero-contact-stats .contact-stat {
+  padding: 1rem;
+}
+
+/* Contact Method Cards */
+.contact-method-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-method-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+}
+
+.contact-method-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.contact-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+.contact-icon i {
+  font-size: 2rem;
+  color: white;
+}
+
+.contact-method-card:hover .contact-icon {
+  transform: scale(1.1);
+}
+
+.contact-details p {
+  margin-bottom: 0.5rem;
+}
+
+/* Enhanced Contact Form */
+.contact-form-card {
+  background: white;
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+.form-header {
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.form-control-lg, .form-select-lg {
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  padding: 1rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.form-control-lg:focus, .form-select-lg:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 0.2rem rgba(132, 204, 22, 0.25);
+}
+
+.priority-options {
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  margin-top: 0.5rem;
+}
+
+.form-check-label {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.form-check-label:hover {
+  background-color: rgba(132, 204, 22, 0.1);
+}
+
+/* Emergency Card */
+.emergency-card {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(220, 38, 38, 0.3);
+}
+
+.emergency-header {
+  padding: 2rem 2rem 1rem;
+}
+
+.emergency-content {
+  padding: 0 2rem 2rem;
+}
+
+.emergency-actions .btn-light:hover {
+  background: #f8fafc;
+  transform: translateY(-2px);
+}
+
+/* Quick Actions Card */
+.quick-actions-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.quick-action-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-radius: 15px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+  border: 1px solid #f1f5f9;
+  margin-bottom: 1rem;
+}
+
+.quick-action-item:hover {
+  background: #f8fafc;
+  transform: translateX(5px);
+  color: inherit;
+  border-color: var(--accent-color);
+}
+
+.action-icon {
+  width: 50px;
+  height: 50px;
+  background: rgba(132, 204, 22, 0.1);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.action-icon i {
+  font-size: 1.5rem;
+  color: var(--accent-color);
+}
+
+.action-content {
+  flex-grow: 1;
+}
+
+/* Contact Stats Card */
+.contact-stats-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.stat-item:last-child {
+  border-bottom: none;
+}
+
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon i {
+  font-size: 1.25rem;
+}
+
+/* Location Section */
+.location-item {
+  display: flex;
+  align-items: start;
+  gap: 1.5rem;
+  padding: 2rem;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.location-item:hover {
+  transform: translateX(10px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.location-icon {
+  width: 60px;
+  height: 60px;
+  background: rgba(132, 204, 22, 0.1);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.location-icon i {
+  font-size: 1.5rem;
+}
+
+/* Map Container */
+.map-container {
+  position: relative;
+}
+
+.map-placeholder {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.map-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Buttons */
+.btn-accent {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-accent:hover {
+  background: #65a30d;
+  border-color: #65a30d;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(132, 204, 22, 0.3);
+}
+
+/* FAQ Section */
+.accordion-item {
+  border: none;
+  margin-bottom: 1rem;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.accordion-button {
+  background: white;
+  border: none;
+  padding: 1.5rem 2rem;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.accordion-button:not(.collapsed) {
+  background: var(--light-bg);
+  color: var(--primary-color);
+  box-shadow: none;
+}
+
+.accordion-body {
+  padding: 1.5rem 2rem;
+  background: #f8fafc;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .contact-hero-section {
+    min-height: 60vh;
+  }
+  
+  .display-4 {
+    font-size: 2rem;
+  }
+  
+  .hero-contact-stats {
+    gap: 1rem !important;
+  }
+  
+  .contact-method-card {
+    padding: 1.5rem;
+  }
+  
+  .contact-form-card {
+    padding: 2rem;
+  }
+  
+  .quick-actions-card {
+    padding: 1.5rem;
+  }
+  
+  .location-item {
+    padding: 1.5rem;
+  }
+}
+</style>
 
 {% endblock %}
