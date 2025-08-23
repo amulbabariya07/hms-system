@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
+<!-- Lottie Animation Loader -->
+<div id="lottie-loader" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;background:#fff;display:flex;align-items:center;justify-content:center;opacity:1;">
+    <div id="lottie-animation" style="width:400px;height:400px;"></div>
+</div>
+
 <!-- Navigation Menu -->
 <!-- <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
     <div class="container">
@@ -1122,4 +1127,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.10.2/lottie.min.js"></script>
+<script src="{{ url_for('static', filename='lottie_loader.js') }}"></script>
 {% endblock %}
