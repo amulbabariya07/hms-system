@@ -171,7 +171,9 @@ def doctor_appointments():
                          view_type=view_type,
                          selected_date=selected_date,
                          search_query=search_query,
-                         filter_date=filter_date)
+                         filter_date=filter_date,
+                         datetime=datetime,
+                         date=date)
 
 @doctor_bp.route('/appointments/update-status/<int:appointment_id>', methods=['POST'])
 def doctor_update_appointment_status(appointment_id):
@@ -243,3 +245,65 @@ def doctor_logout():
     session.pop('doctor_name', None)
     flash('You have been logged out successfully.', 'info')
     return redirect(url_for('doctor.doctor_login'))
+
+@doctor_bp.route('/edit-profile', methods=['POST'])
+def doctor_edit_profile():
+    if 'doctor_logged_in' not in session:
+        flash('Please login to edit your profile.', 'warning')
+        return redirect(url_for('doctor.doctor_login'))
+
+    doctor = Doctor.query.get(session['doctor_id'])
+    doctor.full_name = request.form.get('full_name')
+    doctor.mobile_number = request.form.get('mobile_number')
+    doctor.email = request.form.get('email')
+    doctor.specialization = request.form.get('specialization')
+    doctor.license_number = request.form.get('license_number')
+    doctor.experience_years = request.form.get('experience_years')
+    doctor.qualification = request.form.get('qualification')
+    doctor.hospital_affiliation = request.form.get('hospital_affiliation')
+    db.session.commit()
+    flash('Profile updated successfully!', 'success')
+    return redirect(url_for('doctor.doctor_profile'))
+
+
+@doctor_bp.route('/change-password', methods=['GET', 'POST'])
+def doctor_change_password():
+    if 'doctor_logged_in' not in session:
+        flash('Please login to change your password.', 'warning')
+        return redirect(url_for('doctor.doctor_login'))
+
+    if request.method == 'GET':
+        return render_template('doctor/change_password.html')
+
+    doctor = Doctor.query.get(session['doctor_id'])
+    current_password = request.form.get('current_password')
+    new_password = request.form.get('new_password')
+    confirm_password = request.form.get('confirm_password')
+
+    if not check_password_hash(doctor.password, current_password):
+        flash('Current password is incorrect.', 'danger')
+        return redirect(url_for('doctor.doctor_change_password'))
+
+    if new_password != confirm_password:
+        flash('New passwords do not match.', 'danger')
+        return redirect(url_for('doctor.doctor_change_password'))
+
+    if len(new_password) < 6:
+        flash('New password must be at least 6 characters.', 'danger')
+        return redirect(url_for('doctor.doctor_change_password'))
+
+    doctor.password = generate_password_hash(new_password)
+    db.session.commit()
+    flash('Password changed successfully!', 'success')
+    return redirect(url_for('doctor.doctor_profile'))
+
+@doctor_bp.route('/patients')
+def patients():
+    if 'doctor_logged_in' not in session:
+        flash('Please login to view your patients.', 'warning')
+        return redirect(url_for('doctor.doctor_login'))
+
+    doctor = Doctor.query.get(session['doctor_id'])
+    # Assuming User model has doctor_id or appointments are linked to doctor
+    patients = User.query.join(Appointment).filter(Appointment.doctor_id == doctor.id).distinct().all()
+    return render_template('doctor/patients.html', patients=patients)

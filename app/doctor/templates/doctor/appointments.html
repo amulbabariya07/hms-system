@@ -202,8 +202,8 @@
                                     </td>
                                     <td>
                                         <div class="symptoms">
-                                            {{ appointment.symptoms[:50] if hasattr(appointment, 'symptoms') and appointment.symptoms else 'N/A' }}
-                                            {% if hasattr(appointment, 'symptoms') and appointment.symptoms and appointment.symptoms|length > 50 %}...{% endif %}
+                                            {{ appointment.symptoms[:50] if appointment.symptoms is defined and appointment.symptoms else 'N/A' }}
+                                            {% if appointment.symptoms is defined and appointment.symptoms and appointment.symptoms|length > 50 %}...{% endif %}
                                         </div>
                                     </td>
                                     <td>
@@ -265,7 +265,7 @@
                                         <p class="text-muted small mb-2">
                                             <i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}
                                         </p>
-                                        <p class="small mb-0">{{ appointment.symptoms[:60] if hasattr(appointment, 'symptoms') and appointment.symptoms else 'N/A' }}{% if hasattr(appointment, 'symptoms') and appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
+                                        <p class="small mb-0">{{ appointment.symptoms[:60] if appointment.symptoms is defined and appointment.symptoms else 'N/A' }}{% if appointment.symptoms is defined and appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
                                     </div>
                                     {% endfor %}
                                 </div>
@@ -345,13 +345,13 @@
                     <i class="fas fa-calendar-times fa-4x text-muted mb-4"></i>
                     <h4 class="text-muted mb-3">No Appointments Found</h4>
                     <p class="text-muted mb-4">
-                        {% if selected_date == datetime.date.today().strftime('%Y-%m-%d') %}
+                        {% if selected_date == date.today().strftime('%Y-%m-%d') %}
                             You don't have any appointments scheduled for today.
                         {% else %}
                             No appointments found for {{ filter_date.strftime('%B %d, %Y') }}.
                         {% endif %}
                     </p>
-                    <a href="?date={{ datetime.date.today().strftime('%Y-%m-%d') }}&view={{ view_type }}" class="btn btn-primary">
+                    <a href="?date={{ date.today().strftime('%Y-%m-%d') }}&view={{ view_type }}" class="btn btn-primary">
                         <i class="fas fa-calendar-day me-2"></i>View Today's Appointments
                     </a>
                 </div>
