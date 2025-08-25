@@ -207,6 +207,108 @@
     </div>
 </div>
 
+<!-- Edit Doctor Modal -->
+<div class="modal fade" id="editDoctorModal" tabindex="-1" aria-labelledby="editDoctorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="editDoctorModalLabel">
+                    <i class="fas fa-edit me-2"></i>
+                    Edit Doctor
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editDoctorForm">
+                    <input type="hidden" id="editDoctorId" name="doctor_id">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="editFullName" class="form-label">Full Name *</label>
+                            <input type="text" class="form-control" id="editFullName" name="full_name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editMobileNumber" class="form-label">Mobile Number *</label>
+                            <input type="tel" class="form-control" id="editMobileNumber" name="mobile_number" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editEmail" name="email">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editSpecialization" class="form-label">Specialization *</label>
+                            <select class="form-control" id="editSpecialization" name="specialization" required>
+                                <option value="">Choose specialization</option>
+                                <option value="Cardiology">Cardiology</option>
+                                <option value="Neurology">Neurology</option>
+                                <option value="Orthopedics">Orthopedics</option>
+                                <option value="Pediatrics">Pediatrics</option>
+                                <option value="Dermatology">Dermatology</option>
+                                <option value="Ophthalmology">Ophthalmology</option>
+                                <option value="Psychiatry">Psychiatry</option>
+                                <option value="General Medicine">General Medicine</option>
+                                <option value="Surgery">Surgery</option>
+                                <option value="Gynecology">Gynecology</option>
+                                <option value="Radiology">Radiology</option>
+                                <option value="Anesthesiology">Anesthesiology</option>
+                                <option value="Emergency Medicine">Emergency Medicine</option>
+                                <option value="Oncology">Oncology</option>
+                                <option value="Pulmonology">Pulmonology</option>
+                                <option value="Gastroenterology">Gastroenterology</option>
+                                <option value="Endocrinology">Endocrinology</option>
+                                <option value="Nephrology">Nephrology</option>
+                                <option value="Rheumatology">Rheumatology</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editLicenseNumber" class="form-label">License Number *</label>
+                            <input type="text" class="form-control" id="editLicenseNumber" name="license_number" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editExperienceYears" class="form-label">Experience (Years) *</label>
+                            <input type="number" class="form-control" id="editExperienceYears" name="experience_years" min="0" max="50" required>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="editQualification" class="form-label">Qualification *</label>
+                            <input type="text" class="form-control" id="editQualification" name="qualification" placeholder="e.g., MBBS, MD, MS" required>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="editHospitalAffiliation" class="form-label">Hospital/Clinic Affiliation</label>
+                            <input type="text" class="form-control" id="editHospitalAffiliation" name="hospital_affiliation">
+                        </div>
+                        <div class="col-12 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="changePassword" onchange="togglePasswordFields()">
+                                <label class="form-check-label" for="changePassword">
+                                    <strong>Change Password</strong>
+                                </label>
+                            </div>
+                        </div>
+                        <div id="passwordFields" style="display: none;">
+                            <div class="col-12 mb-3">
+                                <label for="editPassword" class="form-label">New Password *</label>
+                                <input type="password" class="form-control" id="editPassword" name="password" minlength="6">
+                                <small class="form-text text-muted">Leave blank to keep current password</small>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label for="editConfirmPassword" class="form-label">Confirm New Password *</label>
+                                <input type="password" class="form-control" id="editConfirmPassword" name="confirm_password" minlength="6">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitEditDoctor()">
+                    <i class="fas fa-save me-2"></i>
+                    Update Doctor
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
 .avatar-circle {
     width: 40px;
@@ -338,8 +440,26 @@ function viewDoctor(doctorId) {
 }
 
 function editDoctor(doctorId) {
-    // Implement edit functionality
-    showAlert('info', 'Edit functionality will be implemented soon.');
+    fetch(`{{ url_for("admin.admin_doctor_details", doctor_id=0) }}`.replace('0', doctorId))
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const doctor = data.doctor;
+            // Populate edit modal with doctor data
+            document.getElementById('editDoctorId').value = doctor.id;
+            document.getElementById('editFullName').value = doctor.full_name;
+            document.getElementById('editMobileNumber').value = doctor.mobile_number;
+            document.getElementById('editEmail').value = doctor.email || '';
+            document.getElementById('editSpecialization').value = doctor.specialization;
+            document.getElementById('editLicenseNumber').value = doctor.license_number;
+            document.getElementById('editExperienceYears').value = doctor.experience_years;
+            document.getElementById('editQualification').value = doctor.qualification;
+            document.getElementById('editHospitalAffiliation').value = doctor.hospital_affiliation || '';
+            
+            const modal = new bootstrap.Modal(document.getElementById('editDoctorModal'));
+            modal.show();
+        }
+    });
 }
 
 function approveDoctor(doctorId) {
@@ -359,6 +479,59 @@ function approveDoctor(doctorId) {
             }
         });
     }
+}
+
+function submitEditDoctor() {
+    const form = document.getElementById('editDoctorForm');
+    const formData = new FormData(form);
+    const doctorId = document.getElementById('editDoctorId').value;
+    
+    const changePassword = document.getElementById('changePassword').checked;
+    if (changePassword) {
+        const password = document.getElementById('editPassword').value;
+        const confirmPassword = document.getElementById('editConfirmPassword').value;
+        
+        if (password !== confirmPassword) {
+            showAlert('danger', 'Passwords do not match.');
+            return;
+        }
+        
+        if (password.length < 6) {
+            showAlert('danger', 'Password must be at least 6 characters long.');
+            return;
+        }
+    }
+    
+    // Show loading state
+    const submitBtn = document.querySelector('#editDoctorModal .btn-primary');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
+    submitBtn.disabled = true;
+    
+    fetch(`{{ url_for("admin.admin_edit_doctor", doctor_id=0) }}`.replace('0', doctorId), {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editDoctorModal'));
+            modal.hide();
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showAlert('danger', data.message);
+        }
+    })
+    .catch(error => {
+        showAlert('danger', 'An error occurred while updating the doctor.');
+    })
+    .finally(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
 }
 
 function showAlert(type, message) {
@@ -387,5 +560,24 @@ document.getElementById('mobile_number').addEventListener('input', function(e) {
     }
     e.target.value = value;
 });
+
+function togglePasswordFields() {
+    const checkbox = document.getElementById('changePassword');
+    const passwordFields = document.getElementById('passwordFields');
+    const passwordInput = document.getElementById('editPassword');
+    const confirmPasswordInput = document.getElementById('editConfirmPassword');
+    
+    if (checkbox.checked) {
+        passwordFields.style.display = 'block';
+        passwordInput.required = true;
+        confirmPasswordInput.required = true;
+    } else {
+        passwordFields.style.display = 'none';
+        passwordInput.required = false;
+        confirmPasswordInput.required = false;
+        passwordInput.value = '';
+        confirmPasswordInput.value = '';
+    }
+}
 </script>
 {% endblock %}

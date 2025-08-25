@@ -1,13 +1,20 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from app import db
 from app.models import User, Doctor, Appointment, ContactQuery
 from datetime import datetime
+import re
 
 receptionist_bp = Blueprint('receptionist', __name__, template_folder='templates')
 
-# Receptionist credentials
-RECEPTIONIST_USERNAME = "amul"
-RECEPTIONIST_PASSWORD = "amul"
+# Receptionist credentials - Updated to use session-based credentials from admin panel
+def get_receptionist_credentials():
+    """Get receptionist credentials from session or use defaults"""
+    if 'receptionist_credentials' in session:
+        return session['receptionist_credentials']['username'], session['receptionist_credentials']['password']
+    return "amul", "amul"  # Default credentials
+
+def clean_mobile_number(number):
+    return re.sub(r'\D', '', number)
 
 def login_required(f):
     """Decorator to require login for receptionist routes"""
@@ -30,10 +37,12 @@ def receptionist_login():
 def receptionist_login_post():
     username = request.form.get('username', '').strip()
     password = request.form.get('password', '')
+    
+    receptionist_username, receptionist_password = get_receptionist_credentials()
 
-    if username == RECEPTIONIST_USERNAME and password == RECEPTIONIST_PASSWORD:
+    if username == receptionist_username and password == receptionist_password:
         session['receptionist_logged_in'] = True
-        session['receptionist_username'] = RECEPTIONIST_USERNAME
+        session['receptionist_username'] = receptionist_username
         flash('Login successful. Welcome to Receptionist Panel!', 'success')
         return redirect(url_for('receptionist.receptionist_dashboard'))
     else:
@@ -121,6 +130,72 @@ def add_patient():
     
     return render_template('receptionist/add_patient.html')
 
+@receptionist_bp.route('/patients/details/<int:patient_id>')
+@login_required
+def receptionist_patient_details(patient_id):
+    try:
+        patient = User.query.get_or_404(patient_id)
+        return jsonify({
+            'success': True,
+            'patient': {
+                'id': patient.id,
+                'full_name': patient.full_name,
+                'mobile_number': patient.mobile_number,
+                'email': patient.email,
+                'age': patient.age,
+                'gender': patient.gender,
+                'created_at': patient.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'appointment_count': len(patient.appointments) if hasattr(patient, 'appointments') else 0
+            }
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': 'Error fetching patient details'})
+
+@receptionist_bp.route('/patients/edit/<int:patient_id>', methods=['POST'])
+@login_required
+def receptionist_edit_patient(patient_id):
+    try:
+        patient = User.query.get_or_404(patient_id)
+        
+        full_name = request.form.get('full_name')
+        mobile_number = clean_mobile_number(request.form.get('mobile_number', ''))
+        email = request.form.get('email', '')
+        age = request.form.get('age')
+        gender = request.form.get('gender')
+
+        # Validation
+        if not all([full_name, mobile_number, age, gender]):
+            return jsonify({'success': False, 'message': 'All required fields must be filled.'})
+
+        # Check if mobile number already exists (excluding current patient)
+        existing_patient = User.query.filter(
+            (User.mobile_number == mobile_number) & (User.id != patient_id)
+        ).first()
+        
+        if existing_patient:
+            return jsonify({'success': False, 'message': 'Mobile number already registered.'})
+
+        try:
+            age = int(age)
+            if age < 0 or age > 150:
+                return jsonify({'success': False, 'message': 'Age must be between 0 and 150.'})
+        except ValueError:
+            return jsonify({'success': False, 'message': 'Age must be a valid number.'})
+
+        # Update patient information
+        patient.full_name = full_name
+        patient.mobile_number = mobile_number
+        patient.email = email if email else None
+        patient.age = age
+        patient.gender = gender
+
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Patient updated successfully!'})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': 'An error occurred while updating the patient.'})
+
 @receptionist_bp.route('/appointments')
 @login_required
 def receptionist_appointments():
@@ -171,6 +246,80 @@ def create_appointment():
         doctors = []
     
     return render_template('receptionist/create_appointment.html', patients=patients, doctors=doctors)
+
+@receptionist_bp.route('/appointments/details/<int:appointment_id>')
+@login_required
+def receptionist_appointment_details(appointment_id):
+    try:
+        appointment = Appointment.query.get_or_404(appointment_id)
+        return jsonify({
+            'success': True,
+            'appointment': {
+                'id': appointment.id,
+                'patient_name': appointment.user.full_name if appointment.user else 'N/A',
+                'patient_mobile': appointment.user.mobile_number if appointment.user else 'N/A',
+                'doctor_name': appointment.doctor.full_name if appointment.doctor else 'N/A',
+                'doctor_specialization': appointment.doctor.specialization if appointment.doctor else 'N/A',
+                'appointment_date': appointment.appointment_date.strftime('%Y-%m-%d') if appointment.appointment_date else 'N/A',
+                'appointment_time': appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A',
+                'symptoms': appointment.symptoms if hasattr(appointment, 'symptoms') else 'N/A',
+                'status': appointment.status,
+                'created_at': appointment.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            }
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': 'Error fetching appointment details'})
+
+@receptionist_bp.route('/appointments/edit/<int:appointment_id>', methods=['POST'])
+@login_required
+def receptionist_edit_appointment(appointment_id):
+    try:
+        appointment = Appointment.query.get_or_404(appointment_id)
+        
+        appointment_date = request.form.get('appointment_date')
+        appointment_time = request.form.get('appointment_time')
+        symptoms = request.form.get('symptoms', '')
+        status = request.form.get('status')
+
+        # Validation
+        if not all([appointment_date, appointment_time, status]):
+            return jsonify({'success': False, 'message': 'Date, time and status are required.'})
+
+        if status not in ['scheduled', 'completed', 'cancelled']:
+            return jsonify({'success': False, 'message': 'Invalid status'})
+
+        try:
+            appointment_date = datetime.strptime(appointment_date, '%Y-%m-%d').date()
+            appointment_time = datetime.strptime(appointment_time, '%H:%M').time()
+        except ValueError:
+            return jsonify({'success': False, 'message': 'Invalid date or time format'})
+
+        # Update appointment information
+        appointment.appointment_date = appointment_date
+        appointment.appointment_time = appointment_time
+        if hasattr(appointment, 'symptoms'):
+            appointment.symptoms = symptoms
+        appointment.status = status
+
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Appointment updated successfully!'})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': 'An error occurred while updating the appointment.'})
+
+@receptionist_bp.route('/appointments/delete/<int:appointment_id>', methods=['POST'])
+@login_required
+def receptionist_delete_appointment(appointment_id):
+    try:
+        appointment = Appointment.query.get_or_404(appointment_id)
+        db.session.delete(appointment)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Appointment deleted successfully!'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': 'An error occurred while deleting the appointment.'})
+
 
 # New routes for patients queries management
 @receptionist_bp.route('/queries')

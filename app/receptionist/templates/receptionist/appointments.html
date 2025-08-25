@@ -41,20 +41,32 @@
                             {% for appointment in appointments %}
                             <tr>
                                 <td>{{ appointment.id }}</td>
-                                <td>{{ appointment.patient.first_name }} {{ appointment.patient.last_name if appointment.patient else 'N/A' }}</td>
-                                <td>{{ appointment.doctor.first_name }} {{ appointment.doctor.last_name if appointment.doctor else 'N/A' }}</td>
+                                <td>{{ appointment.user.full_name if appointment.user else 'N/A' }}</td>
+                                <td>{{ appointment.doctor.full_name if appointment.doctor else 'N/A' }}</td>
                                 <td>{{ appointment.appointment_date.strftime('%Y-%m-%d') if appointment.appointment_date else 'N/A' }}</td>
                                 <td>{{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}</td>
-                                <td>{{ appointment.reason }}</td>
+                                <!-- Fixed hasattr undefined error by using proper Jinja2 attribute access -->
+                                <td>{{ appointment.symptoms if appointment.symptoms else 'N/A' }}</td>
                                 <td>
                                     <span class="badge bg-{{ 'success' if appointment.status == 'completed' else ('warning' if appointment.status == 'scheduled' else 'danger') }}">
                                         {{ appointment.status.title() }}
                                     </span>
                                 </td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
+                                    <div class="btn-group" role="group">
+                                        <!-- Made view button functional -->
+                                        <button class="btn btn-sm btn-outline-primary" title="View Appointment" onclick="viewAppointment({{ appointment.id }})">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <!-- Added edit button -->
+                                        <button class="btn btn-sm btn-outline-secondary" title="Edit Appointment" onclick="editAppointment({{ appointment.id }})">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <!-- Added delete button -->
+                                        <button class="btn btn-sm btn-outline-danger" title="Delete Appointment" onclick="deleteAppointment({{ appointment.id }})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -76,4 +88,239 @@
         </div>
     </div>
 </div>
+
+<!-- Added Appointment Details Modal -->
+<div class="modal fade" id="appointmentDetailsModal" tabindex="-1" aria-labelledby="appointmentDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="appointmentDetailsModalLabel">
+                    <i class="fas fa-calendar-check me-2"></i>
+                    Appointment Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="appointmentDetailsContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Added Edit Appointment Modal -->
+<div class="modal fade" id="editAppointmentModal" tabindex="-1" aria-labelledby="editAppointmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="editAppointmentModalLabel">
+                    <i class="fas fa-edit me-2"></i>
+                    Edit Appointment
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editAppointmentForm">
+                    <input type="hidden" id="editAppointmentId" name="appointment_id">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="editAppointmentDate" class="form-label">Appointment Date *</label>
+                            <input type="date" class="form-control" id="editAppointmentDate" name="appointment_date" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editAppointmentTime" class="form-label">Appointment Time *</label>
+                            <input type="time" class="form-control" id="editAppointmentTime" name="appointment_time" required>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="editAppointmentSymptoms" class="form-label">Symptoms/Reason</label>
+                            <textarea class="form-control" id="editAppointmentSymptoms" name="symptoms" rows="3"></textarea>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="editAppointmentStatus" class="form-label">Status *</label>
+                            <select class="form-control" id="editAppointmentStatus" name="status" required>
+                                <option value="scheduled">Scheduled</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitEditAppointment()">
+                    <i class="fas fa-save me-2"></i>
+                    Update Appointment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.btn-group .btn {
+    margin-right: 0.25rem;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+</style>
+
+<script>
+function viewAppointment(appointmentId) {
+    fetch(`{{ url_for("receptionist.receptionist_appointment_details", appointment_id=0) }}`.replace('0', appointmentId))
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const appointment = data.appointment;
+            const content = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Patient Information</h6>
+                        <p><strong>Patient:</strong> ${appointment.patient_name}</p>
+                        <p><strong>Mobile:</strong> ${appointment.patient_mobile}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Doctor Information</h6>
+                        <p><strong>Doctor:</strong> ${appointment.doctor_name}</p>
+                        <p><strong>Specialization:</strong> ${appointment.doctor_specialization}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Appointment Details</h6>
+                        <p><strong>Date:</strong> ${appointment.appointment_date}</p>
+                        <p><strong>Time:</strong> ${appointment.appointment_time}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Status & Info</h6>
+                        <p><strong>Status:</strong> 
+                            <span class="badge bg-${appointment.status === 'completed' ? 'success' : (appointment.status === 'scheduled' ? 'warning' : 'danger')}">
+                                ${appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                            </span>
+                        </p>
+                        <p><strong>Created:</strong> ${appointment.created_at}</p>
+                    </div>
+                    <div class="col-12">
+                        <h6 class="text-primary">Symptoms/Reason</h6>
+                        <p>${appointment.symptoms}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('appointmentDetailsContent').innerHTML = content;
+            const modal = new bootstrap.Modal(document.getElementById('appointmentDetailsModal'));
+            modal.show();
+        }
+    });
+}
+
+function editAppointment(appointmentId) {
+    fetch(`{{ url_for("receptionist.receptionist_appointment_details", appointment_id=0) }}`.replace('0', appointmentId))
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const appointment = data.appointment;
+            // Populate edit modal with appointment data
+            document.getElementById('editAppointmentId').value = appointment.id;
+            document.getElementById('editAppointmentDate').value = appointment.appointment_date;
+            document.getElementById('editAppointmentTime').value = appointment.appointment_time;
+            document.getElementById('editAppointmentSymptoms').value = appointment.symptoms;
+            document.getElementById('editAppointmentStatus').value = appointment.status;
+            
+            const modal = new bootstrap.Modal(document.getElementById('editAppointmentModal'));
+            modal.show();
+        }
+    });
+}
+
+function submitEditAppointment() {
+    const form = document.getElementById('editAppointmentForm');
+    const formData = new FormData(form);
+    const appointmentId = document.getElementById('editAppointmentId').value;
+    
+    // Show loading state
+    const submitBtn = document.querySelector('#editAppointmentModal .btn-primary');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
+    submitBtn.disabled = true;
+    
+    fetch(`{{ url_for("receptionist.receptionist_edit_appointment", appointment_id=0) }}`.replace('0', appointmentId), {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editAppointmentModal'));
+            modal.hide();
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showAlert('danger', data.message);
+        }
+    })
+    .catch(error => {
+        showAlert('danger', 'An error occurred while updating the appointment.');
+    })
+    .finally(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+}
+
+function deleteAppointment(appointmentId) {
+    if (confirm('Are you sure you want to delete this appointment? This action cannot be undone.')) {
+        fetch(`{{ url_for("receptionist.receptionist_delete_appointment", appointment_id=0) }}`.replace('0', appointmentId), {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('success', data.message);
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            } else {
+                showAlert('danger', data.message);
+            }
+        });
+    }
+}
+
+function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : (type === 'danger' ? 'exclamation-triangle' : 'info-circle')} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const container = document.querySelector('.receptionist-card');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 5000);
+}
+</script>
 {% endblock %}

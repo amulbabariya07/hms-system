@@ -179,6 +179,17 @@
                             </td>
                             <td>
                                 <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" 
+                                            onclick="viewAppointmentDetails({{ appointment.id }})" 
+                                            title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <!-- Added edit button for appointment editing functionality -->
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                            onclick="editAppointment({{ appointment.id }})" 
+                                            title="Edit Appointment">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
                                     {% if appointment.status == 'scheduled' %}
                                     <button type="button" class="btn btn-sm btn-outline-success" 
                                             onclick="updateAppointmentStatus({{ appointment.id }}, 'completed')" 
@@ -191,11 +202,6 @@
                                         <i class="fas fa-times"></i>
                                     </button>
                                     {% endif %}
-                                    <button type="button" class="btn btn-sm btn-outline-primary" 
-                                            onclick="viewAppointmentDetails({{ appointment.id }})" 
-                                            title="View Details">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -218,12 +224,12 @@
 <div class="modal fade" id="appointmentDetailsModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-info text-white">
                 <h5 class="modal-title">
                     <i class="fas fa-calendar-alt me-2"></i>
                     Appointment Details
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="appointmentDetailsContent">
                 <div class="text-center py-4">
@@ -231,6 +237,76 @@
                         <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Added Edit Appointment Modal for editing appointment information -->
+<!-- Edit Appointment Modal -->
+<div class="modal fade" id="editAppointmentModal" tabindex="-1" aria-labelledby="editAppointmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="editAppointmentModalLabel">
+                    <i class="fas fa-edit me-2"></i>
+                    Edit Appointment
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editAppointmentForm">
+                    <input type="hidden" id="editAppointmentId" name="appointment_id">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="editPatientName" class="form-label">Patient Name</label>
+                            <input type="text" class="form-control" id="editPatientName" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editDoctorName" class="form-label">Doctor</label>
+                            <input type="text" class="form-control" id="editDoctorName" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editAppointmentDate" class="form-label">Appointment Date *</label>
+                            <input type="date" class="form-control" id="editAppointmentDate" name="appointment_date" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editAppointmentTime" class="form-label">Appointment Time *</label>
+                            <input type="time" class="form-control" id="editAppointmentTime" name="appointment_time" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editStatus" class="form-label">Status *</label>
+                            <select class="form-control" id="editStatus" name="status" required>
+                                <option value="scheduled">Scheduled</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editPriority" class="form-label">Priority</label>
+                            <select class="form-control" id="editPriority" name="priority">
+                                <option value="normal">Normal</option>
+                                <option value="urgent">Urgent</option>
+                                <option value="emergency">Emergency</option>
+                            </select>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="editReason" class="form-label">Reason/Symptoms *</label>
+                            <textarea class="form-control" id="editReason" name="reason" rows="3" required placeholder="Describe the reason for appointment..."></textarea>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="editNotes" class="form-label">Admin Notes</label>
+                            <textarea class="form-control" id="editNotes" name="notes" rows="2" placeholder="Any additional notes..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitEditAppointment()">
+                    <i class="fas fa-save me-2"></i>
+                    Update Appointment
+                </button>
             </div>
         </div>
     </div>
@@ -375,6 +451,24 @@
 .btn-group .btn:last-child {
     margin-right: 0;
 }
+
+.form-label {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
+}
 </style>
 
 <script>
@@ -417,7 +511,7 @@ function updateAppointmentStatus(appointmentId, status) {
         return;
     }
     
-    fetch(`/admin/appointments/update-status/${appointmentId}`, {
+    fetch(`{{ url_for("admin.admin_update_appointment_status", appointment_id=0) }}`.replace('0', appointmentId), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -458,15 +552,167 @@ function viewAppointmentDetails(appointmentId) {
     
     modal.show();
     
-    // For now, show basic info (you can implement detailed endpoint later)
-    setTimeout(() => {
-        content.innerHTML = `
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle me-2"></i>
-                Detailed appointment view will be implemented. Appointment ID: ${appointmentId}
-            </div>
-        `;
-    }, 1000);
+    // Fetch appointment details
+    fetch(`{{ url_for("admin.admin_appointment_details", appointment_id=0) }}`.replace('0', appointmentId))
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const appointment = data.appointment;
+                content.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3">Patient Information</h6>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Name:</strong></td>
+                                    <td>${appointment.patient_name}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Mobile:</strong></td>
+                                    <td>${appointment.patient_mobile}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Email:</strong></td>
+                                    <td>${appointment.patient_email || 'Not provided'}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Age:</strong></td>
+                                    <td>${appointment.patient_age || 'Not provided'}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3">Doctor Information</h6>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Doctor:</strong></td>
+                                    <td>Dr. ${appointment.doctor_name}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Specialization:</strong></td>
+                                    <td>${appointment.doctor_specialization}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Experience:</strong></td>
+                                    <td>${appointment.doctor_experience} years</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-12">
+                            <h6 class="text-primary mb-3">Appointment Details</h6>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Date:</strong></td>
+                                    <td>${appointment.appointment_date}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Time:</strong></td>
+                                    <td>${appointment.appointment_time}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Status:</strong></td>
+                                    <td>
+                                        <span class="badge bg-${appointment.status === 'completed' ? 'success' : (appointment.status === 'scheduled' ? 'warning' : 'danger')}">
+                                            ${appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Reason:</strong></td>
+                                    <td>${appointment.reason}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Booked On:</strong></td>
+                                    <td>${appointment.created_at}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } else {
+                content.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Error loading appointment details: ${data.message}
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            content.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Error loading appointment details. Please try again.
+                </div>
+            `;
+        });
+}
+
+// Edit appointment
+function editAppointment(appointmentId) {
+    fetch(`{{ url_for("admin.admin_appointment_details", appointment_id=0) }}`.replace('0', appointmentId))
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const appointment = data.appointment;
+                // Populate edit modal with appointment data
+                document.getElementById('editAppointmentId').value = appointment.id;
+                document.getElementById('editPatientName').value = appointment.patient_name;
+                document.getElementById('editDoctorName').value = `Dr. ${appointment.doctor_name} (${appointment.doctor_specialization})`;
+                document.getElementById('editAppointmentDate').value = appointment.appointment_date_raw;
+                document.getElementById('editAppointmentTime').value = appointment.appointment_time_raw;
+                document.getElementById('editStatus').value = appointment.status;
+                document.getElementById('editPriority').value = appointment.priority || 'normal';
+                document.getElementById('editReason').value = appointment.reason;
+                document.getElementById('editNotes').value = appointment.notes || '';
+                
+                const modal = new bootstrap.Modal(document.getElementById('editAppointmentModal'));
+                modal.show();
+            } else {
+                showAlert('danger', 'Error loading appointment data: ' + data.message);
+            }
+        })
+        .catch(error => {
+            showAlert('danger', 'Error loading appointment data. Please try again.');
+        });
+}
+
+// Submit edit appointment form
+function submitEditAppointment() {
+    const form = document.getElementById('editAppointmentForm');
+    const formData = new FormData(form);
+    const appointmentId = document.getElementById('editAppointmentId').value;
+    
+    // Show loading state
+    const submitBtn = document.querySelector('#editAppointmentModal .btn-primary');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
+    submitBtn.disabled = true;
+    
+    fetch(`{{ url_for("admin.admin_edit_appointment", appointment_id=0) }}`.replace('0', appointmentId), {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editAppointmentModal'));
+            modal.hide();
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showAlert('danger', data.message);
+        }
+    })
+    .catch(error => {
+        showAlert('danger', 'An error occurred while updating the appointment.');
+    })
+    .finally(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
 }
 
 // Export appointments
@@ -480,6 +726,7 @@ function showAlert(type, message) {
     alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
     alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
     alertDiv.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : (type === 'danger' ? 'exclamation-triangle' : 'info-circle')} me-2"></i>
         ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;

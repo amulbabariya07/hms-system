@@ -72,8 +72,13 @@
                                 </td>
                                 <td>
                                     <div class="btn-group" role="group">
-                                        <button class="btn btn-sm btn-outline-primary" title="View Patient">
+                                        <!-- Made view button functional -->
+                                        <button class="btn btn-sm btn-outline-primary" title="View Patient" onclick="viewPatient({{ patient.id }})">
                                             <i class="fas fa-eye"></i>
+                                        </button>
+                                        <!-- Added edit button -->
+                                        <button class="btn btn-sm btn-outline-secondary" title="Edit Patient" onclick="editPatient({{ patient.id }})">
+                                            <i class="fas fa-edit"></i>
                                         </button>
                                         <button class="btn btn-sm btn-outline-success" title="Create Appointment">
                                             <i class="fas fa-calendar-plus"></i>
@@ -98,6 +103,78 @@
                     </div>
                 </div>
                 {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Added Patient Details Modal -->
+<div class="modal fade" id="patientDetailsModal" tabindex="-1" aria-labelledby="patientDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="patientDetailsModalLabel">
+                    <i class="fas fa-user me-2"></i>
+                    Patient Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="patientDetailsContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Added Edit Patient Modal -->
+<div class="modal fade" id="editPatientModal" tabindex="-1" aria-labelledby="editPatientModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="editPatientModalLabel">
+                    <i class="fas fa-edit me-2"></i>
+                    Edit Patient
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editPatientForm">
+                    <input type="hidden" id="editPatientId" name="patient_id">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="editPatientName" class="form-label">Full Name *</label>
+                            <input type="text" class="form-control" id="editPatientName" name="full_name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editPatientMobile" class="form-label">Mobile Number *</label>
+                            <input type="tel" class="form-control" id="editPatientMobile" name="mobile_number" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editPatientEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editPatientEmail" name="email">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editPatientAge" class="form-label">Age *</label>
+                            <input type="number" class="form-control" id="editPatientAge" name="age" min="0" max="150" required>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="editPatientGender" class="form-label">Gender *</label>
+                            <select class="form-control" id="editPatientGender" name="gender" required>
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitEditPatient()">
+                    <i class="fas fa-save me-2"></i>
+                    Update Patient
+                </button>
             </div>
         </div>
     </div>
@@ -128,5 +205,133 @@
 .btn-group .btn:last-child {
     margin-right: 0;
 }
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
 </style>
+
+<script>
+function viewPatient(patientId) {
+    fetch(`{{ url_for("receptionist.receptionist_patient_details", patient_id=0) }}`.replace('0', patientId))
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const patient = data.patient;
+            const content = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Personal Information</h6>
+                        <p><strong>Name:</strong> ${patient.full_name}</p>
+                        <p><strong>Mobile:</strong> ${patient.mobile_number}</p>
+                        <p><strong>Email:</strong> ${patient.email || 'Not provided'}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Additional Information</h6>
+                        <p><strong>Age:</strong> ${patient.age || 'Not provided'}</p>
+                        <p><strong>Gender:</strong> ${patient.gender || 'Not specified'}</p>
+                        <p><strong>Appointments:</strong> ${patient.appointment_count}</p>
+                    </div>
+                    <div class="col-12">
+                        <h6 class="text-primary">Account Information</h6>
+                        <p><strong>Registered:</strong> ${patient.created_at}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('patientDetailsContent').innerHTML = content;
+            const modal = new bootstrap.Modal(document.getElementById('patientDetailsModal'));
+            modal.show();
+        }
+    });
+}
+
+function editPatient(patientId) {
+    fetch(`{{ url_for("receptionist.receptionist_patient_details", patient_id=0) }}`.replace('0', patientId))
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const patient = data.patient;
+            // Populate edit modal with patient data
+            document.getElementById('editPatientId').value = patient.id;
+            document.getElementById('editPatientName').value = patient.full_name;
+            document.getElementById('editPatientMobile').value = patient.mobile_number;
+            document.getElementById('editPatientEmail').value = patient.email || '';
+            document.getElementById('editPatientAge').value = patient.age || '';
+            document.getElementById('editPatientGender').value = patient.gender || '';
+            
+            const modal = new bootstrap.Modal(document.getElementById('editPatientModal'));
+            modal.show();
+        }
+    });
+}
+
+function submitEditPatient() {
+    const form = document.getElementById('editPatientForm');
+    const formData = new FormData(form);
+    const patientId = document.getElementById('editPatientId').value;
+    
+    // Show loading state
+    const submitBtn = document.querySelector('#editPatientModal .btn-primary');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
+    submitBtn.disabled = true;
+    
+    fetch(`{{ url_for("receptionist.receptionist_edit_patient", patient_id=0) }}`.replace('0', patientId), {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editPatientModal'));
+            modal.hide();
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showAlert('danger', data.message);
+        }
+    })
+    .catch(error => {
+        showAlert('danger', 'An error occurred while updating the patient.');
+    })
+    .finally(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+}
+
+function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : (type === 'danger' ? 'exclamation-triangle' : 'info-circle')} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const container = document.querySelector('.receptionist-card');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 5000);
+}
+</script>
 {% endblock %}

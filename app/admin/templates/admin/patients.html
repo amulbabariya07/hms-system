@@ -122,6 +122,12 @@
                                             title="View Details">
                                         <i class="fas fa-eye"></i>
                                     </button>
+                                    <!-- Added edit button for patient editing functionality -->
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                            onclick="editPatient({{ patient.id }})" 
+                                            title="Edit Patient">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
                                     <button type="button" class="btn btn-sm btn-outline-info" 
                                             onclick="viewPatientAppointments({{ patient.id }})" 
                                             title="View Appointments">
@@ -149,12 +155,12 @@
 <div class="modal fade" id="patientDetailsModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-info text-white">
                 <h5 class="modal-title">
                     <i class="fas fa-user me-2"></i>
                     Patient Details
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="patientDetailsContent">
                 <div class="text-center py-4">
@@ -162,6 +168,69 @@
                         <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Added Edit Patient Modal for editing patient information -->
+<!-- Edit Patient Modal -->
+<div class="modal fade" id="editPatientModal" tabindex="-1" aria-labelledby="editPatientModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="editPatientModalLabel">
+                    <i class="fas fa-edit me-2"></i>
+                    Edit Patient
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editPatientForm">
+                    <input type="hidden" id="editPatientId" name="patient_id">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="editFullName" class="form-label">Full Name *</label>
+                            <input type="text" class="form-control" id="editFullName" name="full_name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editMobileNumber" class="form-label">Mobile Number *</label>
+                            <input type="tel" class="form-control" id="editMobileNumber" name="mobile_number" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editEmail" name="email">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editAge" class="form-label">Age</label>
+                            <input type="number" class="form-control" id="editAge" name="age" min="1" max="120">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editGender" class="form-label">Gender</label>
+                            <select class="form-control" id="editGender" name="gender">
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editAddress" class="form-label">Address</label>
+                            <input type="text" class="form-control" id="editAddress" name="address">
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="editMedicalHistory" class="form-label">Medical History</label>
+                            <textarea class="form-control" id="editMedicalHistory" name="medical_history" rows="3" placeholder="Any relevant medical history..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitEditPatient()">
+                    <i class="fas fa-save me-2"></i>
+                    Update Patient
+                </button>
             </div>
         </div>
     </div>
@@ -238,6 +307,19 @@
     border-color: #667eea;
     box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
 }
+
+.form-label {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
+}
 </style>
 
 <script>
@@ -268,8 +350,8 @@ function viewPatientDetails(patientId) {
     
     modal.show();
     
-    // Fetch patient details (you'll need to implement this endpoint)
-    fetch(`/admin/patients/details/${patientId}`)
+    // Fetch patient details
+    fetch(`{{ url_for("admin.admin_patient_details", patient_id=0) }}`.replace('0', patientId))
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -297,7 +379,11 @@ function viewPatientDetails(patientId) {
                                 </tr>
                                 <tr>
                                     <td><strong>Gender:</strong></td>
-                                    <td>${patient.gender || 'Not provided'}</td>
+                                    <td>${patient.gender ? patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1) : 'Not provided'}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Address:</strong></td>
+                                    <td>${patient.address || 'Not provided'}</td>
                                 </tr>
                             </table>
                         </div>
@@ -322,6 +408,12 @@ function viewPatientDetails(patientId) {
                                 </tr>
                             </table>
                         </div>
+                        ${patient.medical_history ? `
+                        <div class="col-12">
+                            <h6 class="text-primary mb-3">Medical History</h6>
+                            <p class="text-muted">${patient.medical_history}</p>
+                        </div>
+                        ` : ''}
                     </div>
                 `;
             } else {
@@ -343,6 +435,72 @@ function viewPatientDetails(patientId) {
         });
 }
 
+// Edit patient
+function editPatient(patientId) {
+    fetch(`{{ url_for("admin.admin_patient_details", patient_id=0) }}`.replace('0', patientId))
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const patient = data.patient;
+                // Populate edit modal with patient data
+                document.getElementById('editPatientId').value = patient.id;
+                document.getElementById('editFullName').value = patient.full_name;
+                document.getElementById('editMobileNumber').value = patient.mobile_number;
+                document.getElementById('editEmail').value = patient.email || '';
+                document.getElementById('editAge').value = patient.age || '';
+                document.getElementById('editGender').value = patient.gender || '';
+                document.getElementById('editAddress').value = patient.address || '';
+                document.getElementById('editMedicalHistory').value = patient.medical_history || '';
+                
+                const modal = new bootstrap.Modal(document.getElementById('editPatientModal'));
+                modal.show();
+            } else {
+                showAlert('danger', 'Error loading patient data: ' + data.message);
+            }
+        })
+        .catch(error => {
+            showAlert('danger', 'Error loading patient data. Please try again.');
+        });
+}
+
+// Submit edit patient form
+function submitEditPatient() {
+    const form = document.getElementById('editPatientForm');
+    const formData = new FormData(form);
+    const patientId = document.getElementById('editPatientId').value;
+    
+    // Show loading state
+    const submitBtn = document.querySelector('#editPatientModal .btn-primary');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
+    submitBtn.disabled = true;
+    
+    fetch(`{{ url_for("admin.admin_edit_patient", patient_id=0) }}`.replace('0', patientId), {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editPatientModal'));
+            modal.hide();
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showAlert('danger', data.message);
+        }
+    })
+    .catch(error => {
+        showAlert('danger', 'An error occurred while updating the patient.');
+    })
+    .finally(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+}
+
 // View patient appointments
 function viewPatientAppointments(patientId) {
     window.location.href = `/admin/appointments?patient_id=${patientId}`;
@@ -352,6 +510,25 @@ function viewPatientAppointments(patientId) {
 function exportPatients() {
     // Implement export functionality
     alert('Export functionality will be implemented');
+}
+
+// Show alert messages
+function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : (type === 'danger' ? 'exclamation-triangle' : 'info-circle')} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 5000);
 }
 </script>
 {% endblock %}

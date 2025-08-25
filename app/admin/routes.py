@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from app import db
-from app.models import Doctor
+from app.models import Doctor, User, Appointment
 from werkzeug.security import generate_password_hash
+from datetime import datetime
 import re
 
 admin_bp = Blueprint('admin', __name__, template_folder='templates')
@@ -52,7 +53,6 @@ def admin_dashboard():
         flash('Please login to access dashboard.', 'warning')
         return redirect(url_for('admin.admin_login'))
     
-    from app.models import User, Appointment
     from datetime import date
     
     # Get statistics
@@ -80,24 +80,6 @@ def admin_configuration():
         return redirect(url_for('admin.admin_login'))
     return render_template('admin/configuration.html')
 
-@admin_bp.route('/configuration/theme', methods=['POST'])
-def update_receptionist_theme():
-    if 'admin_logged_in' not in session:
-        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
-    
-    try:
-        primary_color = request.json.get('primary_color')
-        accent_color = request.json.get('accent_color')
-        
-        # In production, save to database. For now, using session
-        session['receptionist_theme'] = {
-            'primary_color': primary_color,
-            'accent_color': accent_color
-        }
-        
-        return jsonify({'success': True, 'message': 'Theme updated successfully!'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': 'Error updating theme'})
 
 @admin_bp.route('/configuration/receptionist-auth', methods=['POST'])
 def update_receptionist_auth():
@@ -108,13 +90,26 @@ def update_receptionist_auth():
         username = request.json.get('username')
         password = request.json.get('password')
         
-        # In production, save to database. For now, using session
+        # Validation
+        if not username or not password:
+            return jsonify({'success': False, 'message': 'Username and password are required'})
+        
+        if len(username) < 3:
+            return jsonify({'success': False, 'message': 'Username must be at least 3 characters long'})
+        
+        if len(password) < 3:
+            return jsonify({'success': False, 'message': 'Password must be at least 3 characters long'})
+        
         session['receptionist_credentials'] = {
             'username': username,
             'password': password
         }
         
-        return jsonify({'success': True, 'message': 'Credentials updated successfully!'})
+        if 'receptionist_logged_in' in session:
+            session.pop('receptionist_logged_in', None)
+            session.pop('receptionist_username', None)
+        
+        return jsonify({'success': True, 'message': 'Receptionist credentials updated successfully! The receptionist will need to log in again with the new credentials.'})
     except Exception as e:
         return jsonify({'success': False, 'message': 'Error updating credentials'})
 
@@ -190,6 +185,65 @@ def admin_add_doctor():
         db.session.rollback()
         return jsonify({'success': False, 'message': 'An error occurred while adding the doctor.'})
 
+@admin_bp.route('/doctors/edit/<int:doctor_id>', methods=['POST'])
+def admin_edit_doctor(doctor_id):
+    if 'admin_logged_in' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    try:
+        doctor = Doctor.query.get_or_404(doctor_id)
+        
+        full_name = request.form.get('full_name')
+        mobile_number = clean_mobile_number(request.form.get('mobile_number', ''))
+        email = request.form.get('email', '')
+        specialization = request.form.get('specialization')
+        license_number = request.form.get('license_number')
+        experience_years = request.form.get('experience_years')
+        qualification = request.form.get('qualification')
+        hospital_affiliation = request.form.get('hospital_affiliation', '')
+
+        # Validation
+        if not all([full_name, mobile_number, specialization, license_number, 
+                    experience_years, qualification]):
+            return jsonify({'success': False, 'message': 'All required fields must be filled.'})
+
+        # Check if mobile number or license number already exists (excluding current doctor)
+        existing_doctor = Doctor.query.filter(
+            ((Doctor.mobile_number == mobile_number) | 
+             (Doctor.license_number == license_number)) &
+            (Doctor.id != doctor_id)
+        ).first()
+        
+        if existing_doctor:
+            if existing_doctor.mobile_number == mobile_number:
+                return jsonify({'success': False, 'message': 'Mobile number already registered.'})
+            else:
+                return jsonify({'success': False, 'message': 'License number already registered.'})
+
+        try:
+            experience_years = int(experience_years)
+            if experience_years < 0 or experience_years > 50:
+                return jsonify({'success': False, 'message': 'Experience years must be between 0 and 50.'})
+        except ValueError:
+            return jsonify({'success': False, 'message': 'Experience years must be a valid number.'})
+
+        # Update doctor information
+        doctor.full_name = full_name
+        doctor.mobile_number = mobile_number
+        doctor.email = email if email else None
+        doctor.specialization = specialization
+        doctor.license_number = license_number
+        doctor.experience_years = experience_years
+        doctor.qualification = qualification
+        doctor.hospital_affiliation = hospital_affiliation if hospital_affiliation else None
+
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Doctor updated successfully!'})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': 'An error occurred while updating the doctor.'})
+
 @admin_bp.route('/doctors/approval')
 def admin_doctors_approval():
     if 'admin_logged_in' not in session:
@@ -260,9 +314,75 @@ def admin_patients():
         flash('Please login to access patients.', 'warning')
         return redirect(url_for('admin.admin_login'))
     
-    from app.models import User
     patients = User.query.all()
     return render_template('admin/patients.html', patients=patients)
+
+@admin_bp.route('/patients/edit/<int:patient_id>', methods=['POST'])
+def admin_edit_patient(patient_id):
+    if 'admin_logged_in' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    try:
+        patient = User.query.get_or_404(patient_id)
+        
+        full_name = request.form.get('full_name')
+        mobile_number = clean_mobile_number(request.form.get('mobile_number', ''))
+        email = request.form.get('email', '')
+        age = request.form.get('age')
+        gender = request.form.get('gender')
+
+        # Validation
+        if not all([full_name, mobile_number, age, gender]):
+            return jsonify({'success': False, 'message': 'All required fields must be filled.'})
+
+        # Check if mobile number already exists (excluding current patient)
+        existing_patient = User.query.filter(
+            (User.mobile_number == mobile_number) & (User.id != patient_id)
+        ).first()
+        
+        if existing_patient:
+            return jsonify({'success': False, 'message': 'Mobile number already registered.'})
+
+        try:
+            age = int(age)
+            if age < 0 or age > 150:
+                return jsonify({'success': False, 'message': 'Age must be between 0 and 150.'})
+        except ValueError:
+            return jsonify({'success': False, 'message': 'Age must be a valid number.'})
+
+        # Update patient information
+        patient.full_name = full_name
+        patient.mobile_number = mobile_number
+        patient.email = email if email else None
+        patient.age = age
+        patient.gender = gender
+
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Patient updated successfully!'})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': 'An error occurred while updating the patient.'})
+
+@admin_bp.route('/patients/details/<int:patient_id>')
+def admin_patient_details(patient_id):
+    if 'admin_logged_in' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    patient = User.query.get_or_404(patient_id)
+    return jsonify({
+        'success': True,
+        'patient': {
+            'id': patient.id,
+            'full_name': patient.full_name,
+            'mobile_number': patient.mobile_number,
+            'email': patient.email,
+            'age': patient.age,
+            'gender': patient.gender,
+            'created_at': patient.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'appointment_count': len(patient.appointments) if hasattr(patient, 'appointments') else 0
+        }
+    })
 
 @admin_bp.route('/appointments')
 def admin_appointments():
@@ -270,7 +390,6 @@ def admin_appointments():
         flash('Please login to access appointments.', 'warning')
         return redirect(url_for('admin.admin_login'))
     
-    from app.models import Appointment
     appointments = Appointment.query.order_by(Appointment.created_at.desc()).all()
     return render_template('admin/appointments.html', appointments=appointments)
 
@@ -280,7 +399,6 @@ def admin_update_appointment_status(appointment_id):
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
 
     try:
-        from app.models import Appointment
         appointment = Appointment.query.get_or_404(appointment_id)
         new_status = request.json.get('status')
         
@@ -296,23 +414,66 @@ def admin_update_appointment_status(appointment_id):
         db.session.rollback()
         return jsonify({'success': False, 'message': 'An error occurred while updating the appointment.'})
 
-@admin_bp.route('/patients/details/<int:patient_id>')
-def admin_patient_details(patient_id):
+@admin_bp.route('/appointments/details/<int:appointment_id>')
+def admin_appointment_details(appointment_id):
     if 'admin_logged_in' not in session:
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
 
-    from app.models import User
-    patient = User.query.get_or_404(patient_id)
-    return jsonify({
-        'success': True,
-        'patient': {
-            'id': patient.id,
-            'full_name': patient.full_name,
-            'mobile_number': patient.mobile_number,
-            'email': patient.email,
-            'age': patient.age,
-            'gender': patient.gender,
-            'created_at': patient.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-            'appointment_count': len(patient.appointments) if hasattr(patient, 'appointments') else 0
-        }
-    })
+    try:
+        appointment = Appointment.query.get_or_404(appointment_id)
+        return jsonify({
+            'success': True,
+            'appointment': {
+                'id': appointment.id,
+                'patient_name': appointment.user.full_name,
+                'patient_mobile': appointment.user.mobile_number,
+                'doctor_name': appointment.doctor.full_name,
+                'doctor_specialization': appointment.doctor.specialization,
+                'appointment_date': appointment.appointment_date.strftime('%Y-%m-%d'),
+                'appointment_time': appointment.appointment_time.strftime('%H:%M'),
+                'symptoms': appointment.symptoms,
+                'status': appointment.status,
+                'created_at': appointment.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            }
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': 'Error fetching appointment details'})
+
+@admin_bp.route('/appointments/edit/<int:appointment_id>', methods=['POST'])
+def admin_edit_appointment(appointment_id):
+    if 'admin_logged_in' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    try:
+        appointment = Appointment.query.get_or_404(appointment_id)
+        
+        appointment_date = request.form.get('appointment_date')
+        appointment_time = request.form.get('appointment_time')
+        symptoms = request.form.get('symptoms')
+        status = request.form.get('status')
+
+        # Validation
+        if not all([appointment_date, appointment_time, symptoms, status]):
+            return jsonify({'success': False, 'message': 'All fields must be filled.'})
+
+        if status not in ['scheduled', 'completed', 'cancelled']:
+            return jsonify({'success': False, 'message': 'Invalid status'})
+
+        try:
+            appointment_date = datetime.strptime(appointment_date, '%Y-%m-%d').date()
+            appointment_time = datetime.strptime(appointment_time, '%H:%M').time()
+        except ValueError:
+            return jsonify({'success': False, 'message': 'Invalid date or time format'})
+
+        # Update appointment information
+        appointment.appointment_date = appointment_date
+        appointment.appointment_time = appointment_time
+        appointment.symptoms = symptoms
+        appointment.status = status
+
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Appointment updated successfully!'})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': 'An error occurred while updating the appointment.'})

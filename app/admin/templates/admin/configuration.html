@@ -5,56 +5,8 @@
 
 {% block content %}
 <div class="configuration-content">
-    <!-- Receptionist Theme Settings -->
-    <div class="admin-card mb-4">
-        <div class="admin-card-header">
-            <h5 class="mb-0">
-                <i class="fas fa-palette me-2"></i>
-                Receptionist Theme Settings
-            </h5>
-        </div>
-        <div class="admin-card-body">
-            <form id="themeForm">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="primaryColor" class="form-label">Primary Color</label>
-                            <input type="color" class="form-control form-control-color" id="primaryColor" value="#1e3a8a" title="Choose primary color">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="accentColor" class="form-label">Accent Color</label>
-                            <input type="color" class="form-control form-control-color" id="accentColor" value="#3b82f6" title="Choose accent color">
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="mb-3">
-                            <label class="form-label">Theme Preview</label>
-                            <div class="theme-preview p-3 rounded" id="themePreview">
-                                <div class="preview-sidebar" id="previewSidebar">
-                                    <div class="preview-nav-item">Dashboard</div>
-                                    <div class="preview-nav-item active">Patients</div>
-                                    <div class="preview-nav-item">Appointments</div>
-                                </div>
-                                <div class="preview-content">
-                                    <div class="preview-header" id="previewHeader">Receptionist Panel</div>
-                                    <div class="preview-button" id="previewButton">Sample Button</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-admin-primary">
-                    <i class="fas fa-save me-2"></i>
-                    Save Theme Settings
-                </button>
-            </form>
-        </div>
-    </div>
-
+    <!-- Removed Receptionist Theme Settings section completely -->
+    
     <!-- Receptionist Authentication -->
     <div class="admin-card mb-4">
         <div class="admin-card-header">
@@ -121,108 +73,8 @@
     </div>
 </div>
 
-<style>
-.theme-preview {
-    background: #f8f9fa;
-    border: 2px solid #dee2e6;
-    min-height: 200px;
-    display: flex;
-    gap: 1rem;
-}
-
-.preview-sidebar {
-    width: 200px;
-    background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
-    border-radius: 8px;
-    padding: 1rem;
-}
-
-.preview-nav-item {
-    color: rgba(255,255,255,0.8);
-    padding: 0.5rem;
-    margin: 0.25rem 0;
-    border-radius: 4px;
-    font-size: 0.9rem;
-}
-
-.preview-nav-item.active {
-    background-color: #3b82f6;
-    color: white;
-}
-
-.preview-content {
-    flex: 1;
-    padding: 1rem;
-}
-
-.preview-header {
-    color: #1e3a8a;
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 3px solid #3b82f6;
-}
-
-.preview-button {
-    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    display: inline-block;
-    font-weight: 600;
-}
-
-.form-control-color {
-    width: 100%;
-    height: 40px;
-}
-</style>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Theme color picker functionality
-    const primaryColorPicker = document.getElementById('primaryColor');
-    const accentColorPicker = document.getElementById('accentColor');
-    const previewSidebar = document.getElementById('previewSidebar');
-    const previewHeader = document.getElementById('previewHeader');
-    const previewButton = document.getElementById('previewButton');
-
-    function updatePreview() {
-        const primaryColor = primaryColorPicker.value;
-        const accentColor = accentColorPicker.value;
-        
-        // Update preview elements
-        previewSidebar.style.background = `linear-gradient(180deg, ${primaryColor} 0%, ${primaryColor}dd 100%)`;
-        previewHeader.style.color = primaryColor;
-        previewHeader.style.borderBottomColor = accentColor;
-        previewButton.style.background = `linear-gradient(135deg, ${primaryColor}, ${accentColor})`;
-        
-        // Update active nav item
-        const activeItem = previewSidebar.querySelector('.preview-nav-item.active');
-        if (activeItem) {
-            activeItem.style.backgroundColor = accentColor;
-        }
-    }
-
-    primaryColorPicker.addEventListener('change', updatePreview);
-    accentColorPicker.addEventListener('change', updatePreview);
-
-    // Theme form submission
-    document.getElementById('themeForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const primaryColor = primaryColorPicker.value;
-        const accentColor = accentColorPicker.value;
-        
-        // Store in session storage (in production, this would be saved to database)
-        sessionStorage.setItem('receptionist_primary_color', primaryColor);
-        sessionStorage.setItem('receptionist_accent_color', accentColor);
-        
-        // Show success message
-        showAlert('Theme settings saved successfully!', 'success');
-    });
-
     // Password toggle functionality
     document.getElementById('togglePassword').addEventListener('click', function() {
         const passwordField = document.getElementById('receptionistPassword');
@@ -239,19 +91,45 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Auth form submission
     document.getElementById('authForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
         const username = document.getElementById('receptionistUsername').value;
         const password = document.getElementById('receptionistPassword').value;
         
-        // Store in session storage (in production, this would be saved to database)
-        sessionStorage.setItem('receptionist_username', username);
-        sessionStorage.setItem('receptionist_password', password);
+        // Show loading state
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
+        submitBtn.disabled = true;
         
-        // Show success message
-        showAlert('Receptionist credentials updated successfully!', 'success');
+        // Send to backend API
+        fetch('{{ url_for("admin.update_receptionist_auth") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert(data.message, 'success');
+            } else {
+                showAlert(data.message, 'danger');
+            }
+        })
+        .catch(error => {
+            showAlert('An error occurred while updating credentials.', 'danger');
+        })
+        .finally(() => {
+            // Reset button
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
     });
 
     // Helper function to show alerts
@@ -259,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
         alertDiv.innerHTML = `
-            <i class="fas fa-check-circle me-2"></i>
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
             ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
@@ -267,10 +145,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const container = document.querySelector('.configuration-content');
         container.insertBefore(alertDiv, container.firstChild);
         
-        // Auto dismiss after 3 seconds
+        // Auto dismiss after 5 seconds
         setTimeout(() => {
             alertDiv.remove();
-        }, 3000);
+        }, 5000);
     }
 });
 </script>

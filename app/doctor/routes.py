@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from app import db
-from app.models import Doctor
+from app.models import Doctor, Appointment, User
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime, date
 import re
 
 def clean_mobile_number(number):
@@ -118,6 +119,113 @@ def doctor_dashboard():
     
     doctor = Doctor.query.get(session['doctor_id'])
     return render_template('doctor/dashboard.html', doctor=doctor)
+
+@doctor_bp.route('/appointments')
+def doctor_appointments():
+    if 'doctor_logged_in' not in session:
+        flash('Please login to access appointments.', 'warning')
+        return redirect(url_for('doctor.doctor_login'))
+    
+    doctor_id = session['doctor_id']
+    view_type = request.args.get('view', 'list')  # list or kanban
+    selected_date = request.args.get('date', date.today().strftime('%Y-%m-%d'))
+    search_query = request.args.get('search', '')
+    
+    try:
+        # Parse the selected date
+        filter_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
+    except ValueError:
+        filter_date = date.today()
+        selected_date = filter_date.strftime('%Y-%m-%d')
+    
+    # Base query for doctor's appointments
+    appointments_query = Appointment.query.filter_by(doctor_id=doctor_id)
+    
+    # Filter by date
+    appointments_query = appointments_query.filter(Appointment.appointment_date == filter_date)
+    
+    # Apply search filter if provided
+    if search_query:
+        appointments_query = appointments_query.join(User).filter(
+            User.full_name.ilike(f'%{search_query}%')
+        )
+    
+    appointments = appointments_query.order_by(Appointment.appointment_time).all()
+    
+    # Get statistics
+    today = date.today()
+    today_appointments = Appointment.query.filter_by(doctor_id=doctor_id, appointment_date=today).count()
+    total_appointments = Appointment.query.filter_by(doctor_id=doctor_id).count()
+    completed_appointments = Appointment.query.filter_by(doctor_id=doctor_id, status='completed').count()
+    
+    stats = {
+        'today': today_appointments,
+        'total': total_appointments,
+        'completed': completed_appointments,
+        'pending': total_appointments - completed_appointments
+    }
+    
+    return render_template('doctor/appointments.html', 
+                         appointments=appointments,
+                         stats=stats,
+                         view_type=view_type,
+                         selected_date=selected_date,
+                         search_query=search_query,
+                         filter_date=filter_date)
+
+@doctor_bp.route('/appointments/update-status/<int:appointment_id>', methods=['POST'])
+def doctor_update_appointment_status(appointment_id):
+    if 'doctor_logged_in' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    try:
+        appointment = Appointment.query.filter_by(
+            id=appointment_id, 
+            doctor_id=session['doctor_id']
+        ).first_or_404()
+        
+        new_status = request.json.get('status')
+        
+        if new_status not in ['scheduled', 'completed', 'cancelled']:
+            return jsonify({'success': False, 'message': 'Invalid status'})
+        
+        appointment.status = new_status
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': f'Appointment status updated to {new_status}'})
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': 'An error occurred while updating the appointment.'})
+
+@doctor_bp.route('/appointments/details/<int:appointment_id>')
+def doctor_appointment_details(appointment_id):
+    if 'doctor_logged_in' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    try:
+        appointment = Appointment.query.filter_by(
+            id=appointment_id, 
+            doctor_id=session['doctor_id']
+        ).first_or_404()
+        
+        return jsonify({
+            'success': True,
+            'appointment': {
+                'id': appointment.id,
+                'patient_name': appointment.user.full_name if appointment.user else 'N/A',
+                'patient_mobile': appointment.user.mobile_number if appointment.user else 'N/A',
+                'patient_age': appointment.user.age if appointment.user else 'N/A',
+                'patient_gender': appointment.user.gender if appointment.user else 'N/A',
+                'appointment_date': appointment.appointment_date.strftime('%Y-%m-%d') if appointment.appointment_date else 'N/A',
+                'appointment_time': appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A',
+                'symptoms': appointment.symptoms if hasattr(appointment, 'symptoms') else 'N/A',
+                'status': appointment.status,
+                'created_at': appointment.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            }
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': 'Error fetching appointment details'})
 
 @doctor_bp.route('/profile')
 def doctor_profile():

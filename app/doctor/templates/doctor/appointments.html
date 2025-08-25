@@ -1,0 +1,553 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Navigation Menu -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary fs-3" href="/">
+            <i class="fas fa-hospital-alt me-2"></i>
+            HMS
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="{{ url_for('doctor.doctor_dashboard') }}">
+                        <i class="fas fa-home me-1"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold active" href="{{ url_for('doctor.doctor_appointments') }}">
+                        <i class="fas fa-calendar-check me-1"></i>Appointments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="{{ url_for('doctor.doctor_profile') }}">
+                        <i class="fas fa-user me-1"></i>Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <span class="nav-link fw-semibold text-success">
+                        <i class="fas fa-user-md me-1"></i>Dr. {{ session.doctor_name }}
+                    </span>
+                </li>
+                <li class="nav-item ms-2">
+                    <a href="{{ url_for('doctor.doctor_logout') }}" class="btn btn-outline-danger rounded-pill px-4">
+                        <i class="fas fa-sign-out-alt me-1"></i>Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Breadcrumb -->
+<div class="bg-light py-3">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('doctor.doctor_dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Appointments</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Header Section -->
+<div class="bg-gradient-primary text-white py-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-6 fw-bold mb-2">
+                    <i class="fas fa-calendar-check me-3"></i>
+                    View Appointments
+                </h1>
+                <p class="lead mb-0">Manage your patient appointments efficiently</p>
+            </div>
+            <div class="col-lg-6">
+                <div class="row g-3 text-center">
+                    <div class="col-3">
+                        <div class="stat-card bg-white bg-opacity-20 rounded-3 p-3">
+                            <div class="stat-number fw-bold fs-4">{{ stats.today }}</div>
+                            <div class="stat-label small">Today</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="stat-card bg-white bg-opacity-20 rounded-3 p-3">
+                            <div class="stat-number fw-bold fs-4">{{ stats.total }}</div>
+                            <div class="stat-label small">Total</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="stat-card bg-white bg-opacity-20 rounded-3 p-3">
+                            <div class="stat-number fw-bold fs-4">{{ stats.completed }}</div>
+                            <div class="stat-label small">Completed</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="stat-card bg-white bg-opacity-20 rounded-3 p-3">
+                            <div class="stat-number fw-bold fs-4">{{ stats.pending }}</div>
+                            <div class="stat-label small">Pending</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Controls Section -->
+<div class="bg-white py-4 shadow-sm">
+    <div class="container">
+        <div class="row align-items-center g-3">
+            <div class="col-lg-4">
+                <div class="search-box">
+                    <form method="GET" class="d-flex">
+                        <input type="hidden" name="view" value="{{ view_type }}">
+                        <input type="hidden" name="date" value="{{ selected_date }}">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0" 
+                                   name="search" value="{{ search_query }}" 
+                                   placeholder="Search patients...">
+                            <button class="btn btn-primary" type="submit">Search</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="date-picker">
+                    <form method="GET" class="d-flex">
+                        <input type="hidden" name="view" value="{{ view_type }}">
+                        <input type="hidden" name="search" value="{{ search_query }}">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="fas fa-calendar text-muted"></i>
+                            </span>
+                            <input type="date" class="form-control" name="date" 
+                                   value="{{ selected_date }}" onchange="this.form.submit()">
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="view-toggle d-flex justify-content-end">
+                    <div class="btn-group" role="group">
+                        <a href="?view=list&date={{ selected_date }}&search={{ search_query }}" 
+                           class="btn btn-outline-primary {{ 'active' if view_type == 'list' else '' }}">
+                            <i class="fas fa-list me-1"></i>List
+                        </a>
+                        <a href="?view=kanban&date={{ selected_date }}&search={{ search_query }}" 
+                           class="btn btn-outline-primary {{ 'active' if view_type == 'kanban' else '' }}">
+                            <i class="fas fa-columns me-1"></i>Kanban
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Appointments Content -->
+<div class="py-5">
+    <div class="container">
+        {% if appointments %}
+            {% if view_type == 'list' %}
+                <!-- List View -->
+                <div class="appointments-list">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Patient</th>
+                                    <th>Contact</th>
+                                    <th>Symptoms</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in appointments %}
+                                <tr>
+                                    <td>
+                                        <div class="time-slot">
+                                            <div class="fw-bold text-primary">
+                                                {{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}
+                                            </div>
+                                            <small class="text-muted">
+                                                {{ appointment.appointment_date.strftime('%b %d') if appointment.appointment_date else 'N/A' }}
+                                            </small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="patient-info">
+                                            <div class="fw-bold">{{ appointment.user.full_name if appointment.user else 'N/A' }}</div>
+                                            <small class="text-muted">
+                                                {% if appointment.user %}
+                                                    {{ appointment.user.age }} years, {{ appointment.user.gender }}
+                                                {% else %}
+                                                    N/A
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="contact-info">
+                                            <div><i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="symptoms">
+                                            {{ appointment.symptoms[:50] if hasattr(appointment, 'symptoms') and appointment.symptoms else 'N/A' }}
+                                            {% if hasattr(appointment, 'symptoms') and appointment.symptoms and appointment.symptoms|length > 50 %}...{% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if appointment.status == 'completed' else ('warning' if appointment.status == 'scheduled' else 'danger') }} status-badge">
+                                            {{ appointment.status.title() }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="viewAppointment({{ appointment.id }})" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <div class="btn-group" role="group">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus({{ appointment.id }}, 'scheduled')">Mark Scheduled</a></li>
+                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus({{ appointment.id }}, 'completed')">Mark Completed</a></li>
+                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus({{ appointment.id }}, 'cancelled')">Mark Cancelled</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% else %}
+                <!-- Kanban View -->
+                <div class="appointments-kanban">
+                    <div class="row g-4">
+                        <div class="col-lg-4">
+                            <div class="kanban-column">
+                                <div class="kanban-header bg-warning text-white p-3 rounded-top">
+                                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Scheduled</h5>
+                                </div>
+                                <div class="kanban-body bg-light p-3 rounded-bottom">
+                                    {% for appointment in appointments if appointment.status == 'scheduled' %}
+                                    <div class="kanban-card bg-white rounded-3 p-3 mb-3 shadow-sm">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div class="time-badge bg-warning text-white px-2 py-1 rounded-pill small">
+                                                {{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}
+                                            </div>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="#" onclick="viewAppointment({{ appointment.id }})">View Details</a></li>
+                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus({{ appointment.id }}, 'completed')">Mark Completed</a></li>
+                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus({{ appointment.id }}, 'cancelled')">Cancel</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <h6 class="fw-bold mb-1">{{ appointment.user.full_name if appointment.user else 'N/A' }}</h6>
+                                        <p class="text-muted small mb-2">
+                                            <i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}
+                                        </p>
+                                        <p class="small mb-0">{{ appointment.symptoms[:60] if hasattr(appointment, 'symptoms') and appointment.symptoms else 'N/A' }}{% if hasattr(appointment, 'symptoms') and appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="kanban-column">
+                                <div class="kanban-header bg-success text-white p-3 rounded-top">
+                                    <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>Completed</h5>
+                                </div>
+                                <div class="kanban-body bg-light p-3 rounded-bottom">
+                                    {% for appointment in appointments if appointment.status == 'completed' %}
+                                    <div class="kanban-card bg-white rounded-3 p-3 mb-3 shadow-sm">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div class="time-badge bg-success text-white px-2 py-1 rounded-pill small">
+                                                {{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}
+                                            </div>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="#" onclick="viewAppointment({{ appointment.id }})">View Details</a></li>
+                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus({{ appointment.id }}, 'scheduled')">Mark Scheduled</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <h6 class="fw-bold mb-1">{{ appointment.user.full_name if appointment.user else 'N/A' }}</h6>
+                                        <p class="text-muted small mb-2">
+                                            <i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}
+                                        </p>
+                                        <p class="small mb-0">{{ appointment.symptoms[:60] if hasattr(appointment, 'symptoms') and appointment.symptoms else 'N/A' }}{% if hasattr(appointment, 'symptoms') and appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="kanban-column">
+                                <div class="kanban-header bg-danger text-white p-3 rounded-top">
+                                    <h5 class="mb-0"><i class="fas fa-times-circle me-2"></i>Cancelled</h5>
+                                </div>
+                                <div class="kanban-body bg-light p-3 rounded-bottom">
+                                    {% for appointment in appointments if appointment.status == 'cancelled' %}
+                                    <div class="kanban-card bg-white rounded-3 p-3 mb-3 shadow-sm">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div class="time-badge bg-danger text-white px-2 py-1 rounded-pill small">
+                                                {{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}
+                                            </div>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="#" onclick="viewAppointment({{ appointment.id }})">View Details</a></li>
+                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus({{ appointment.id }}, 'scheduled')">Reschedule</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <h6 class="fw-bold mb-1">{{ appointment.user.full_name if appointment.user else 'N/A' }}</h6>
+                                        <p class="text-muted small mb-2">
+                                            <i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}
+                                        </p>
+                                        <p class="small mb-0">{{ appointment.symptoms[:60] if hasattr(appointment, 'symptoms') and appointment.symptoms else 'N/A' }}{% if hasattr(appointment, 'symptoms') and appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-5">
+                <div class="empty-state">
+                    <i class="fas fa-calendar-times fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted mb-3">No Appointments Found</h4>
+                    <p class="text-muted mb-4">
+                        {% if selected_date == datetime.date.today().strftime('%Y-%m-%d') %}
+                            You don't have any appointments scheduled for today.
+                        {% else %}
+                            No appointments found for {{ filter_date.strftime('%B %d, %Y') }}.
+                        {% endif %}
+                    </p>
+                    <a href="?date={{ datetime.date.today().strftime('%Y-%m-%d') }}&view={{ view_type }}" class="btn btn-primary">
+                        <i class="fas fa-calendar-day me-2"></i>View Today's Appointments
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Appointment Details Modal -->
+<div class="modal fade" id="appointmentDetailsModal" tabindex="-1" aria-labelledby="appointmentDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="appointmentDetailsModalLabel">
+                    <i class="fas fa-calendar-check me-2"></i>
+                    Appointment Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="appointmentDetailsContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
+}
+
+.stat-card {
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.search-box .input-group-text {
+    background-color: #f8f9fa;
+    border-right: none;
+}
+
+.search-box .form-control {
+    border-left: none;
+    background-color: #f8f9fa;
+}
+
+.search-box .form-control:focus {
+    background-color: white;
+    box-shadow: none;
+    border-color: #dee2e6;
+}
+
+.btn-group .btn.active {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
+.kanban-column {
+    min-height: 600px;
+}
+
+.kanban-body {
+    min-height: 500px;
+}
+
+.kanban-card {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.kanban-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.time-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-badge {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.table th {
+    font-weight: 600;
+    color: #2c3e50;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.empty-state {
+    padding: 4rem 2rem;
+}
+
+@media (max-width: 768px) {
+    .kanban-column {
+        min-height: auto;
+    }
+    
+    .kanban-body {
+        min-height: auto;
+    }
+    
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+}
+</style>
+
+<script>
+function viewAppointment(appointmentId) {
+    fetch(`{{ url_for("doctor.doctor_appointment_details", appointment_id=0) }}`.replace('0', appointmentId))
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const appointment = data.appointment;
+            const content = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Patient Information</h6>
+                        <p><strong>Name:</strong> ${appointment.patient_name}</p>
+                        <p><strong>Mobile:</strong> ${appointment.patient_mobile}</p>
+                        <p><strong>Age:</strong> ${appointment.patient_age}</p>
+                        <p><strong>Gender:</strong> ${appointment.patient_gender}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Appointment Details</h6>
+                        <p><strong>Date:</strong> ${appointment.appointment_date}</p>
+                        <p><strong>Time:</strong> ${appointment.appointment_time}</p>
+                        <p><strong>Status:</strong> 
+                            <span class="badge bg-${appointment.status === 'completed' ? 'success' : (appointment.status === 'scheduled' ? 'warning' : 'danger')}">
+                                ${appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                            </span>
+                        </p>
+                        <p><strong>Created:</strong> ${appointment.created_at}</p>
+                    </div>
+                    <div class="col-12">
+                        <h6 class="text-primary">Symptoms/Reason</h6>
+                        <p>${appointment.symptoms}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('appointmentDetailsContent').innerHTML = content;
+            const modal = new bootstrap.Modal(document.getElementById('appointmentDetailsModal'));
+            modal.show();
+        }
+    });
+}
+
+function updateStatus(appointmentId, newStatus) {
+    if (confirm(`Are you sure you want to mark this appointment as ${newStatus}?`)) {
+        fetch(`{{ url_for("doctor.doctor_update_appointment_status", appointment_id=0) }}`.replace('0', appointmentId), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                status: newStatus
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('success', data.message);
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            } else {
+                showAlert('danger', data.message);
+            }
+        });
+    }
+}
+
+function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : (type === 'danger' ? 'exclamation-triangle' : 'info-circle')} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 5000);
+}
+</script>
+{% endblock %}
