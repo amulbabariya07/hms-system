@@ -307,3 +307,8 @@ def patients():
     # Assuming User model has doctor_id or appointments are linked to doctor
     patients = User.query.join(Appointment).filter(Appointment.doctor_id == doctor.id).distinct().all()
     return render_template('doctor/patients.html', patients=patients)
+
+@doctor_bp.route('/add-prescription', methods=['POST'])
+def add_prescription():
+    # Your logic for adding prescription
+    return "Prescription added"

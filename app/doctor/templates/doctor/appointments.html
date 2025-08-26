@@ -216,6 +216,9 @@
                                             <button class="btn btn-sm btn-outline-primary" onclick="viewAppointment({{ appointment.id }})" title="View Details">
                                                 <i class="fas fa-eye"></i>
                                             </button>
+                                            <button class="btn btn-sm btn-outline-success" onclick="openPrescriptionModal({{ appointment.id }})" title="Add Prescription">
+                                                <i class="fa-solid fa-prescription"></i>
+                                            </button>
                                             <div class="btn-group" role="group">
                                                 <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
                                                     <i class="fas fa-edit"></i>
@@ -507,6 +510,13 @@ function viewAppointment(appointmentId) {
     });
 }
 
+function openPrescriptionModal(appointmentId) {
+    document.getElementById('prescriptionAppointmentId').value = appointmentId;
+    document.getElementById('prescriptionForm').reset();
+    const modal = new bootstrap.Modal(document.getElementById('prescriptionModal'));
+    modal.show();
+}
+
 function updateStatus(appointmentId, newStatus) {
     if (confirm(`Are you sure you want to mark this appointment as ${newStatus}?`)) {
         fetch(`{{ url_for("doctor.doctor_update_appointment_status", appointment_id=0) }}`.replace('0', appointmentId), {
@@ -541,13 +551,46 @@ function showAlert(type, message) {
         ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
-    
     document.body.appendChild(alertDiv);
-    
-    // Auto remove after 5 seconds
     setTimeout(() => {
         alertDiv.remove();
     }, 5000);
 }
 </script>
+
+<!-- Prescription Modal -->
+<div class="modal fade" id="prescriptionModal" tabindex="-1" aria-labelledby="prescriptionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="prescriptionForm" method="POST" action="{{ url_for('doctor.add_prescription') }}">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="prescriptionModalLabel">
+                        <i class="fa-solid fa-prescription me-2"></i>
+                        Add Prescription
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="appointment_id" id="prescriptionAppointmentId">
+                    <div class="mb-3">
+                        <label for="medicine" class="form-label">Medicine</label>
+                        <input type="text" class="form-control" name="medicine" id="medicine" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="dosage" class="form-label">Dosage</label>
+                        <input type="text" class="form-control" name="dosage" id="dosage" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="instructions" class="form-label">Instructions</label>
+                        <textarea class="form-control" name="instructions" id="instructions" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save Prescription</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

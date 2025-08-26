@@ -1,3 +1,4 @@
+
 # ContactQuery model for Contact Us form
 from datetime import datetime
 from app import db
@@ -83,3 +84,21 @@ class Appointment(db.Model):
     
     def __repr__(self):
         return f'<Appointment {self.patient_name} with Dr. {self.doctor.full_name}>'
+
+
+# MedicalPrescription model for prescriptions
+class MedicalPrescription(db.Model):
+    __tablename__ = 'medical_prescriptions'
+    id = db.Column(db.Integer, primary_key=True)
+    appointment_id = db.Column(db.Integer, db.ForeignKey('appointments.id'), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False)
+    medicines = db.Column(db.Text, nullable=False)
+    instructions = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    appointment = db.relationship('Appointment', backref='prescriptions')
+    doctor = db.relationship('Doctor', backref='prescriptions')
+
+    def __repr__(self):
+        return f'<MedicalPrescription {self.id}>'
