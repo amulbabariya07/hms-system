@@ -232,6 +232,11 @@
                             </a>
                         </li>
                         <li class="nav-item mb-2">
+                            <a class="nav-link d-flex align-items-center gap-2 {% if request.endpoint == 'admin.email_configuration' %}active{% endif %}" href="{{ url_for('admin.email_configuration') }}">
+                                <i class="fas fa-envelope"></i> Email Configuration
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
                             <a class="nav-link d-flex align-items-center gap-2 {% if request.endpoint == 'admin.admin_patients' %}active{% endif %}" href="{{ url_for('admin.admin_patients') }}">
                                 <i class="fas fa-user-md"></i>
                                 Patients

@@ -1,4 +1,4 @@
-from app.admin.mail_setting import MAIL_SERVER, MAIL_PORT, MAIL_USE_TLS, MAIL_USERNAME, MAIL_PASSWORD, MAIL_DEFAULT_NAME, MAIL_DEFAULT_EMAIL
+from app.admin.mail_setting import get_mail_settings
 import smtplib
 from email.mime.text import MIMEText
 
@@ -490,19 +490,30 @@ def reply_to_query(query_id):
             message=message
         )
 
+        mail_config = get_mail_settings()
+        required_fields = ['MAIL_SERVER', 'MAIL_PORT', 'MAIL_USERNAME', 'MAIL_PASSWORD', 'MAIL_DEFAULT_EMAIL']
+        missing = [field for field in required_fields if not mail_config.get(field)]
+        if missing:
+            return jsonify({
+                'success': False,
+                'message': 'Email configuration is incomplete. Please ask the admin to set up email settings in the Email Configuration panel before sending replies.'
+            }), 400
+
         msg = MIMEText(html_body, "html")
         msg['Subject'] = subject
-        msg['From'] = f'{MAIL_DEFAULT_NAME} <{MAIL_DEFAULT_EMAIL}>'
+        name = mail_config['MAIL_DEFAULT_NAME']
+        email = mail_config['MAIL_DEFAULT_EMAIL']
+        msg['From'] = f"{name} <{email}>"
         msg['To'] = recipient_email
 
-        server = smtplib.SMTP(MAIL_SERVER, MAIL_PORT)
-        if MAIL_USE_TLS:
+        server = smtplib.SMTP(mail_config['MAIL_SERVER'], mail_config['MAIL_PORT'])
+        if mail_config['MAIL_USE_TLS']:
             server.starttls()
-        server.login(MAIL_USERNAME, MAIL_PASSWORD)
-        server.sendmail(MAIL_DEFAULT_EMAIL, [recipient_email], msg.as_string())
+        server.login(mail_config['MAIL_USERNAME'], mail_config['MAIL_PASSWORD'])
+        server.sendmail(mail_config['MAIL_DEFAULT_EMAIL'], [recipient_email], msg.as_string())
         server.quit()
 
         return jsonify({'success': True})
 
     except Exception as e:
-        return jsonify({'success': True, 'message': 'Reply sent successfully'})
+        return jsonify({'success': False, 'message': 'An error occurred while sending the reply. Please check your email configuration or try again later.'})

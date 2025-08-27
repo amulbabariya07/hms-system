@@ -1,0 +1,60 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Email Configuration - Admin Panel{% endblock %}
+{% block page_title %}Email Configuration{% endblock %}
+
+{% block content %}
+<div class="admin-card mb-4">
+    <div class="admin-card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-envelope me-2"></i>
+            Email Configuration
+        </h5>
+    </div>
+    <div class="admin-card-body">
+        <form method="POST" action="{{ url_for('admin.email_configuration') }}">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="mail_server" class="form-label">Mail Server</label>
+                    <input type="text" class="form-control" id="mail_server" name="mail_server" value="{{ mail_setting.mail_server if mail_setting else '' }}" required>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="mail_port" class="form-label">Mail Port</label>
+                    <input type="number" class="form-control" id="mail_port" name="mail_port" value="{{ mail_setting.mail_port if mail_setting else '' }}" required>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="mail_use_tls" class="form-label">Use TLS</label>
+                    <select class="form-select" id="mail_use_tls" name="mail_use_tls">
+                        <option value="True" {% if mail_setting and mail_setting.mail_use_tls %}selected{% endif %}>Yes</option>
+                        <option value="False" {% if mail_setting and not mail_setting.mail_use_tls %}selected{% endif %}>No</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="mail_username" class="form-label">Mail Username</label>
+                    <input type="text" class="form-control" id="mail_username" name="mail_username" value="{{ mail_setting.mail_username if mail_setting else '' }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="mail_password" class="form-label">Mail Password</label>
+                    <input type="password" class="form-control" id="mail_password" name="mail_password" value="{{ mail_setting.mail_password if mail_setting else '' }}" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="mail_default_name" class="form-label">Default Sender Name</label>
+                    <input type="text" class="form-control" id="mail_default_name" name="mail_default_name" value="{{ mail_setting.mail_default_name if mail_setting else '' }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="mail_default_email" class="form-label">Default Sender Email</label>
+                    <input type="email" class="form-control" id="mail_default_email" name="mail_default_email" value="{{ mail_setting.mail_default_email if mail_setting else '' }}">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-admin-primary">
+                <i class="fas fa-save me-2"></i>
+                Save Configuration
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -102,3 +102,20 @@ class MedicalPrescription(db.Model):
 
     def __repr__(self):
         return f'<MedicalPrescription {self.id}>'
+
+
+# MailSetting model for SMTP configuration
+class MailSetting(db.Model):
+    __tablename__ = 'mail_settings'
+    id = db.Column(db.Integer, primary_key=True)
+    mail_server = db.Column(db.String(120), nullable=False)
+    mail_port = db.Column(db.Integer, nullable=False)
+    mail_use_tls = db.Column(db.Boolean, default=True)
+    mail_username = db.Column(db.String(120), nullable=False)
+    mail_password = db.Column(db.String(255), nullable=False)
+    mail_default_name = db.Column(db.String(120), nullable=True)
+    mail_default_email = db.Column(db.String(120), nullable=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<MailSetting {self.mail_server}>'
