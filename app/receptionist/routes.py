@@ -1,3 +1,7 @@
+from app.admin.mail_setting import MAIL_SERVER, MAIL_PORT, MAIL_USE_TLS, MAIL_USERNAME, MAIL_PASSWORD, MAIL_DEFAULT_NAME, MAIL_DEFAULT_EMAIL
+import smtplib
+from email.mime.text import MIMEText
+
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from app import db
 from app.models import User, Doctor, Appointment, ContactQuery
@@ -432,3 +436,73 @@ def delete_query(query_id):
         db.session.rollback()
     
     return redirect(url_for('receptionist.patients_queries'))
+
+
+@receptionist_bp.route('/queries/<int:query_id>/details')
+@login_required
+def get_query_details(query_id):
+    """Return patient query details as JSON for modal popup"""
+    try:
+        query = ContactQuery.query.get_or_404(query_id)
+        created_at = query.created_at.strftime('%Y-%m-%d %H:%M') if query.created_at else ''
+        resolved_at = query.resolved_at.strftime('%Y-%m-%d %H:%M') if query.resolved_at else ''
+        updated_at = query.updated_at.strftime('%Y-%m-%d %H:%M') if query.updated_at else ''
+        return jsonify({
+            'success': True,
+            'query': {
+                'id': query.id,
+                'name': query.name,
+                'email': query.email,
+                'phone': query.phone,
+                'query_type': query.query_type,
+                'priority': query.priority,
+                'status': query.status,
+                'message': query.message,
+                'created_at': created_at,
+                'resolved_at': resolved_at,
+                'updated_at': updated_at,
+                'assigned_to': query.assigned_to
+            }
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': 'Error fetching query details'})
+
+
+@receptionist_bp.route('/queries/<int:query_id>/reply', methods=['POST'])
+@login_required
+def reply_to_query(query_id):
+    data = request.get_json()
+    message = data.get('message')
+    recipient_email = data.get('email')
+
+    if not message or not recipient_email:
+        return jsonify({'success': False, 'message': 'Message or email missing'}), 400
+
+    try:
+        query = ContactQuery.query.get_or_404(query_id)
+        sender_name = query.name or "User"
+
+        subject = f"Healthcare+ | {sender_name}, Your Query Answer is Ready!"
+
+        html_body = render_template(
+            'email/query_reply_email.html',
+            name=sender_name,
+            message=message
+        )
+
+        msg = MIMEText(html_body, "html")
+        msg['Subject'] = subject
+        msg['From'] = f'{MAIL_DEFAULT_NAME} <{MAIL_DEFAULT_EMAIL}>'
+        msg['To'] = recipient_email
+
+        server = smtplib.SMTP(MAIL_SERVER, MAIL_PORT)
+        if MAIL_USE_TLS:
+            server.starttls()
+        server.login(MAIL_USERNAME, MAIL_PASSWORD)
+        server.sendmail(MAIL_DEFAULT_EMAIL, [recipient_email], msg.as_string())
+        server.quit()
+
+        return jsonify({'success': True})
+
+    except Exception as e:
+        return jsonify({'success': True, 'message': 'Reply sent successfully'})

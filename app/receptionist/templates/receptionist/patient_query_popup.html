@@ -1,0 +1,76 @@
+<!-- Patient Query Popup Modal -->
+<div class="modal fade" id="patientQueryModal" tabindex="-1" aria-labelledby="patientQueryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="patientQueryModalLabel">
+                    <i class="fas fa-comments me-2"></i>
+                    Patient Query Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body" id="patientQueryModalContent">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success" id="replyBtn" onclick="toggleReplySection()">
+                    <i class="fas fa-reply me-1"></i>Reply
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+            <div id="replySection" style="display:none; padding: 1rem; border-top: 1px solid #e9ecef;">
+                <form id="replyForm">
+                    <div class="mb-3">
+                        <label for="replyMessage" class="form-label">Your Reply</label>
+                        <textarea class="form-control" id="replyMessage" name="message" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success">Send Reply</button>
+                </form>
+            </div>
+
+            <script>
+            // Global variables to store current query info
+            let currentQueryId = null;
+            let currentQueryEmail = null;
+
+            // Call this when user opens modal and selects a query
+            function setReplyContext(queryId, email) {
+                currentQueryId = queryId;
+                currentQueryEmail = email;
+                document.getElementById('replySection').style.display = 'block';
+            }
+
+            // Handle form submission with JSON
+            document.getElementById('replyForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const message = document.getElementById('replyMessage').value;
+
+                if (!currentQueryId || !currentQueryEmail) {
+                    alert('Missing query context.');
+                    return;
+                }
+
+                fetch(`/receptionist/queries/${currentQueryId}/reply`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: message, email: currentQueryEmail })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Reply sent successfully!');
+                    } else {
+                        alert('Failed: ' + data.message);
+                    }
+                    document.getElementById('replyMessage').value = '';
+                    document.getElementById('replySection').style.display = 'none';
+                })
+                .catch(err => console.error('Error:', err));
+            });
+            </script>
+        </div>
+    </div>
+</div>
