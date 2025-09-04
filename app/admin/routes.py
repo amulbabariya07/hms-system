@@ -420,25 +420,17 @@ def admin_appointment_details(appointment_id):
     if 'admin_logged_in' not in session:
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
 
+    edit_mode = request.args.get('edit', 'false').lower() == 'true'
     try:
         appointment = Appointment.query.get_or_404(appointment_id)
-        return jsonify({
-            'success': True,
-            'appointment': {
-                'id': appointment.id,
-                'patient_name': appointment.user.full_name,
-                'patient_mobile': appointment.user.mobile_number,
-                'doctor_name': appointment.doctor.full_name,
-                'doctor_specialization': appointment.doctor.specialization,
-                'appointment_date': appointment.appointment_date.strftime('%Y-%m-%d'),
-                'appointment_time': appointment.appointment_time.strftime('%H:%M'),
-                'symptoms': appointment.symptoms,
-                'status': appointment.status,
-                'created_at': appointment.created_at.strftime('%Y-%m-%d %H:%M:%S')
-            }
-        })
+        # Render the wizard template with appointment and edit flag
+        return render_template(
+            'wizard/appointment_details.html',
+            appointment=appointment,
+            edit=edit_mode
+        )
     except Exception as e:
-        return jsonify({'success': False, 'message': 'Error fetching appointment details'})
+        return render_template('wizard/appointment_details.html', appointment=None, edit=edit_mode)
 
 @admin_bp.route('/appointments/edit/<int:appointment_id>', methods=['POST'])
 def admin_edit_appointment(appointment_id):
@@ -530,3 +522,11 @@ def admin_payment_records():
         query = query.filter(Appointment.patient_name.ilike(f'%{search}%'))
     payments = query.order_by(Payment.created_at.desc()).all()
     return render_template('admin/payment_records.html', payments=payments)
+
+
+@admin_bp.route("/appointment/details")
+def appointment_details():
+    appointment_id = request.args.get("id")
+    mode = request.args.get("mode", "view")  # "view" or "edit"
+    appointment = Appointment.query.get_or_404(appointment_id)
+    return render_template("wizard/appointment_details.html", appointment=appointment, mode=mode)

@@ -1,0 +1,69 @@
+{# This is a partial template and does not extend any base layout #}
+{% if appointment %}
+<dl class="row">
+    <dt class="col-sm-4 col-lg-3 text-primary border-bottom pb-2">
+        <i class="fas fa-user-injured fa-fw me-2"></i>Patient
+    </dt>
+    <dd class="col-sm-8 col-lg-9 text-dark fw-bold border-bottom pb-2">
+        {{ appointment.patient_name }}
+    </dd>
+
+    <dt class="col-sm-4 col-lg-3 pt-2">Contact</dt>
+    <dd class="col-sm-8 col-lg-9 pt-2">
+        {{ appointment.user.mobile_number }} / {{ appointment.user.email or 'N/A' }}
+    </dd>
+    
+    <dt class="col-sm-4 col-lg-3 pt-2">Patient ID</dt>
+    <dd class="col-sm-8 col-lg-9 pt-2">
+        <span class="badge text-bg-light">#{{ appointment.patient_id }}</span>
+    </dd>
+
+    <dt class="col-sm-4 col-lg-3 text-primary border-bottom pb-2 mt-4">
+        <i class="fas fa-user-md fa-fw me-2"></i>Doctor
+    </dt>
+    <dd class="col-sm-8 col-lg-9 text-dark fw-bold border-bottom pb-2 mt-4">
+        Dr. {{ appointment.doctor.full_name }}
+    </dd>
+
+    <dt class="col-sm-4 col-lg-3 pt-2">Specialization</dt>
+    <dd class="col-sm-8 col-lg-9 pt-2">
+        {{ appointment.doctor.specialization }}
+    </dd>
+
+    <dt class="col-sm-4 col-lg-3 text-primary border-bottom pb-2 mt-4">
+        <i class="fas fa-calendar-alt fa-fw me-2"></i>Appointment
+    </dt>
+    <dd class="col-sm-8 col-lg-9 text-dark fw-bold border-bottom pb-2 mt-4">
+        {{ appointment.appointment_date.strftime('%A, %d %B %Y') }} at {{ appointment.appointment_time.strftime('%I:%M %p') }}
+    </dd>
+
+    <dt class="col-sm-4 col-lg-3 pt-2">Status</dt>
+    <dd class="col-sm-8 col-lg-9 pt-2">
+        {% if appointment.status == 'scheduled' %}
+            <span class="badge fs-6 text-bg-warning">Scheduled</span>
+        {% elif appointment.status == 'completed' %}
+            <span class="badge fs-6 text-bg-success">Completed</span>
+        {% elif appointment.status == 'cancelled' %}
+            <span class="badge fs-6 text-bg-danger">Cancelled</span>
+        {% else %}
+            <span class="badge fs-6 text-bg-secondary">{{ appointment.status.title() }}</span>
+        {% endif %}
+    </dd>
+    
+    <dt class="col-sm-4 col-lg-3 pt-2">Booked On</dt>
+    <dd class="col-sm-8 col-lg-9 pt-2">
+        {{ appointment.created_at.strftime('%d %b %Y, %I:%M %p') }}
+    </dd>
+</dl>
+
+<div class="mt-4">
+    <h6 class="text-dark">Reason for Visit</h6>
+    <div class="bg-light p-3 rounded text-muted">
+        {{ appointment.reason | replace('\n', '<br>') | safe }}
+    </div>
+</div>
+{% else %}
+<div class="alert alert-danger">
+    <i class="fas fa-exclamation-triangle me-2"></i>Could not load appointment details.
+</div>
+{% endif %}
