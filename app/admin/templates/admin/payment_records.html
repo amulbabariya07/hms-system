@@ -1,0 +1,49 @@
+{% extends 'admin/base_admin.html' %}
+{% block page_title %}Payment Records{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('admin.admin_dashboard') }}">Admin</a></li>
+<li class="breadcrumb-item active" aria-current="page">Payment Records</li>
+{% endblock %}
+{% block content %}
+<div class="admin-card mb-4">
+    <div class="admin-card-header d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">Payment Records</h3>
+        <form class="d-flex" method="GET" action="">
+            <input type="text" name="search" class="form-control me-2" placeholder="Search by patient name" value="{{ request.args.get('search', '') }}">
+            <button class="btn btn-admin-primary" type="submit"><i class="fas fa-search"></i> Search</button>
+        </form>
+    </div>
+    <div class="admin-card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Payment ID</th>
+                        <th>Patient Name</th>
+                        <th>Doctor Name</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Razorpay Payment ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                    <tr>
+                        <td>{{ payment.id }}</td>
+                        <td>{{ payment.appointment.patient_name }}</td>
+                        <td>{{ payment.appointment.doctor.full_name }}</td>
+                        <td>₹{{ payment.amount }}</td>
+                        <td>{{ payment.status }}</td>
+                        <td>{{ payment.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ payment.razorpay_payment_id }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="text-center">No payments found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,3 +1,4 @@
+from app.models import Payment, Appointment, Doctor
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from app import db
 from app.models import Doctor, User, Appointment, MailSetting
@@ -518,3 +519,14 @@ def email_configuration():
         return redirect(url_for('admin.email_configuration'))
 
     return render_template('admin/email_configuration.html', mail_setting=mail_setting)
+
+
+# Payment Records view
+@admin_bp.route('/payment-records', methods=['GET'])
+def admin_payment_records():
+    search = request.args.get('search', '').strip()
+    query = Payment.query.join(Appointment)
+    if search:
+        query = query.filter(Appointment.patient_name.ilike(f'%{search}%'))
+    payments = query.order_by(Payment.created_at.desc()).all()
+    return render_template('admin/payment_records.html', payments=payments)

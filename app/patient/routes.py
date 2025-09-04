@@ -106,23 +106,30 @@ def book_appointment_post():
         flash('Please login to book an appointment.', 'warning')
         return redirect(url_for('patient.patient_login'))
     
+
     try:
         doctor_id = request.form.get('doctor_id')
         appointment_date = request.form.get('appointment_date')
         appointment_time = request.form.get('appointment_time')
         reason = request.form.get('reason', '')
-        
+
+        # Payment info from Razorpay
+        razorpay_payment_id = request.form.get('razorpay_payment_id')
+        razorpay_order_id = request.form.get('razorpay_order_id')
+        razorpay_signature = request.form.get('razorpay_signature')
+        amount = request.form.get('amount')
+
         # Validation
-        if not all([doctor_id, appointment_date, appointment_time]):
-            flash('Please fill all required fields.', 'danger')
+        if not all([doctor_id, appointment_date, appointment_time, razorpay_payment_id, razorpay_order_id, razorpay_signature, amount]):
+            flash('Payment or appointment details missing.', 'danger')
             return redirect(url_for('patient.book_appointment'))
-        
+
         # Check if doctor exists
         doctor = Doctor.query.get(doctor_id)
         if not doctor:
             flash('Selected doctor not found.', 'danger')
             return redirect(url_for('patient.book_appointment'))
-        
+
         # Parse date and time
         try:
             appt_date = datetime.strptime(appointment_date, '%Y-%m-%d').date()
@@ -130,12 +137,12 @@ def book_appointment_post():
         except ValueError:
             flash('Invalid date or time format.', 'danger')
             return redirect(url_for('patient.book_appointment'))
-        
+
         # Check if appointment date is in the future
         if appt_date < date.today():
             flash('Appointment date must be in the future.', 'danger')
             return redirect(url_for('patient.book_appointment'))
-        
+
         # Check if appointment already exists for the same doctor, date, and time
         existing_appointment = Appointment.query.filter_by(
             doctor_id=doctor_id,
@@ -143,11 +150,18 @@ def book_appointment_post():
             appointment_time=appt_time,
             status='scheduled'
         ).first()
-        
+
         if existing_appointment:
             flash('This time slot is already booked. Please choose a different time.', 'danger')
             return redirect(url_for('patient.book_appointment'))
-        
+
+        # Verify Razorpay payment
+        from app.payment.razorpay_utils import verify_payment
+        payment_verified = verify_payment(razorpay_payment_id, razorpay_order_id, razorpay_signature)
+        if not payment_verified:
+            flash('Payment verification failed. Please try again.', 'danger')
+            return redirect(url_for('patient.book_appointment'))
+
         # Create new appointment
         new_appointment = Appointment(
             patient_id=session['user_id'],
@@ -158,13 +172,24 @@ def book_appointment_post():
             reason=reason,
             status='scheduled'
         )
-        
         db.session.add(new_appointment)
         db.session.commit()
-        
-        flash('Appointment booked successfully!', 'success')
+
+        # Store payment record
+        from app.models import Payment
+        payment = Payment(
+            appointment_id=new_appointment.id,
+            razorpay_payment_id=razorpay_payment_id,
+            amount=float(amount),
+            currency='INR',
+            status='success',
+        )
+        db.session.add(payment)
+        db.session.commit()
+
+        flash('Appointment booked and payment successful!', 'success')
         return redirect(url_for('patient.my_appointments'))
-        
+
     except Exception as e:
         db.session.rollback()
         flash('An error occurred while booking the appointment. Please try again.', 'danger')

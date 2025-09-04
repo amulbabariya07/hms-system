@@ -249,6 +249,12 @@
                             </a>
                         </li>
                         <li class="nav-item mb-2">
+                            <a class="nav-link d-flex align-items-center gap-2 {% if request.endpoint == 'admin.admin_payment_records' %}active{% endif %}" href="{{ url_for('admin.admin_payment_records') }}">
+                                <i class="fas fa-sack-dollar"></i>
+                                Payment Records
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
                             <a class="nav-link d-flex align-items-center gap-2 {% if request.endpoint == 'admin.admin_configuration' %}active{% endif %}" href="{{ url_for('admin.admin_configuration') }}">
                                 <i class="fas fa-cog"></i>
                                 Configuration

@@ -117,5 +117,23 @@ class MailSetting(db.Model):
     mail_default_email = db.Column(db.String(120), nullable=True)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+
     def __repr__(self):
         return f'<MailSetting {self.mail_server}>'
+
+
+# Payment model for Razorpay integration
+class Payment(db.Model):
+    __tablename__ = 'payments'
+    id = db.Column(db.Integer, primary_key=True)
+    appointment_id = db.Column(db.Integer, db.ForeignKey('appointments.id'), nullable=False)
+    razorpay_payment_id = db.Column(db.String(100), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    currency = db.Column(db.String(10), default='INR')
+    status = db.Column(db.String(50), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    appointment = db.relationship('Appointment', backref='payments')
+
+    def __repr__(self):
+        return f'<Payment {self.razorpay_payment_id}>'

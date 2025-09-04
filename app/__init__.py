@@ -1,3 +1,4 @@
+from app.payment.routes import payment_bp
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
@@ -56,6 +57,8 @@ def create_app():
 
     from app.receptionist.routes import receptionist_bp
     app.register_blueprint(receptionist_bp, url_prefix='/receptionist')
+
+    app.register_blueprint(payment_bp, url_prefix='/payment')
 
     from app import models
     with app.app_context():

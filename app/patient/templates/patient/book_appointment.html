@@ -560,6 +560,65 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Please select a future date for your appointment.');
                 return;
             }
+
+            // Razorpay integration
+            e.preventDefault();
+            // Set your appointment fee here
+            const appointmentFee = 500; // INR
+            fetch('/payment/create_order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    amount: appointmentFee,
+                    receipt: 'appointment_' + Date.now()
+                })
+            })
+            .then(response => response.json())
+            .then(order => {
+                if (!order.id) {
+                    alert('Error creating payment order.');
+                    return;
+                }
+                const options = {
+                    key: '{{ config["RAZORPAY_KEY_ID"] if config else "rzp_test_RCbfCPgiV69xNy" }}',
+                    amount: order.amount,
+                    currency: order.currency,
+                    name: 'HMS Appointment',
+                    description: 'Doctor Appointment Fee',
+                    order_id: order.id,
+                    handler: function (response){
+                        // On payment success, submit appointment and payment details
+                        const formData = new FormData(form);
+                        formData.append('razorpay_payment_id', response.razorpay_payment_id);
+                        formData.append('razorpay_order_id', response.razorpay_order_id);
+                        formData.append('razorpay_signature', response.razorpay_signature);
+                        formData.append('amount', appointmentFee);
+                        fetch(form.action, {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                window.location.href = data.redirect_url;
+                            } else {
+                                alert(data.message || 'Appointment booking failed.');
+                            }
+                        });
+                    },
+                    prefill: {
+                        name: '{{ user_name }}',
+                        email: '{{ user_email if user_email else "" }}'
+                    },
+                    theme: {
+                        color: '#667eea'
+                    }
+                };
+                const rzp = new window.Razorpay(options);
+                rzp.open();
+            });
         });
     }
     
@@ -576,6 +635,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Load Razorpay script
+    if (!window.Razorpay) {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.async = true;
+        document.body.appendChild(script);
+    }
 });
 </script>
 {% endblock %}
