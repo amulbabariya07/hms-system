@@ -1,142 +1,68 @@
 {% extends "base.html" %}
 {% block content %}
-<!-- Lottie Animation Loader -->
 <div id="lottie-loader" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;background:#fff;display:flex;align-items:center;justify-content:center;opacity:1;">
     <div id="lottie-animation" style="width:400px;height:400px;"></div>
 </div>
 
-<!-- Navigation Menu -->
-<!-- <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
-    <div class="container">
-        <a class="navbar-brand fw-bold text-primary fs-3" href="/">
-            <div class="logo-container d-flex align-items-center">
-                <div class="logo-icon me-2">
-                    <i class="fas fa-hospital-alt"></i>
-                </div>
-                <span>HealthCare+</span>
-            </div>
-        </a>
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/about">About Us</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/services">Services & Departments</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/appointment">Appointment Booking</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/patient/login">Patient Login</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/contact">Contact Us</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav> -->
-
-<!-- Hero Section -->
-<div class="hero-section position-relative overflow-hidden">
-    <!-- Animated Background Elements -->
-    <div class="hero-bg-elements">
-        <div class="floating-element element-1">
-            <i class="fas fa-heartbeat"></i>
-        </div>
-        <div class="floating-element element-2">
-            <i class="fas fa-user-md"></i>
-        </div>
-        <div class="floating-element element-3">
-            <i class="fas fa-hospital"></i>
-        </div>
-        <div class="floating-element element-4">
-            <i class="fas fa-pills"></i>
-        </div>
-        <div class="floating-element element-5">
-            <i class="fas fa-stethoscope"></i>
-        </div>
-    </div>
+<div class="hero-section text-white position-relative"
+     style="background: url('{{ url_for('static', filename='image/home_page_bg.jpg') }}') center/cover no-repeat;">
     
-    <div class="container position-relative z-3">
+    <!-- Overlay -->
+    <div class="position-absolute top-0 start-0 w-100 h-100" 
+         style="background: rgba(40, 96, 178, 0.88); z-index: 0;">
+    </div>
+
+    <div class="container-fluid position-relative" style="z-index: 1;">
         <div class="row min-vh-100 align-items-center">
-            <div class="col-lg-6">
-                <div class="hero-content">
-                    <div class="hero-badge mb-4">
-                        <span class="badge bg-success bg-gradient px-4 py-2 rounded-pill fs-6">
-                            <i class="fas fa-award me-2"></i>
-                            Trusted Healthcare Since 2020
-                        </span>
+            <div class="col-lg-6 text-center text-lg-start p-5">
+                <span class="badge bg-success bg-gradient px-4 py-2 rounded-pill fs-6 mb-4">
+                    <i class="fas fa-award me-2"></i>
+                    Trusted Healthcare Since 2020
+                </span>
+                <h1 class="display-1 fw-bold mb-4">
+                    Your Health is Our
+                    <span class="text-warning">Mission</span>
+                </h1>
+                <p class="lead mb-5 fs-4" style="opacity: 0.9;">
+                    Experience exceptional healthcare with our state-of-the-art facilities, 
+                    expert medical professionals, and patient-centered approach to healing.
+                </p>
+
+                <div class="hero-stats row g-2 mb-5 text-center">
+                    <div class="col-4">
+                        <div class="stat-number display-6 fw-bold">50K+</div>
+                        <div class="stat-label text-white-50">Happy Patients</div>
                     </div>
-                    <h1 class="hero-title display-1 fw-bold mb-4">
-                        Your Health is Our
-                        <span class="text-gradient">Mission</span>
-                    </h1>
-                    <p class="hero-subtitle lead mb-5 fs-4">
-                        Experience exceptional healthcare with our state-of-the-art facilities, 
-                        expert medical professionals, and patient-centered approach to healing.
-                    </p>
-                    
-                    <!-- Quick Stats -->
-                    <div class="hero-stats row g-4 mb-5">
-                        <div class="col-4">
-                            <div class="stat-item text-center">
-                                <div class="stat-number display-6 fw-bold text-primary">50K+</div>
-                                <div class="stat-label text-muted">Happy Patients</div>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="stat-item text-center">
-                                <div class="stat-number display-6 fw-bold text-success">100+</div>
-                                <div class="stat-label text-muted">Expert Doctors</div>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="stat-item text-center">
-                                <div class="stat-number display-6 fw-bold text-info">24/7</div>
-                                <div class="stat-label text-muted">Emergency Care</div>
-                            </div>
-                        </div>
+                    <div class="col-4">
+                        <div class="stat-number display-6 fw-bold">100+</div>
+                        <div class="stat-label text-white-50">Expert Doctors</div>
                     </div>
-                    
-                    <div class="hero-actions d-flex flex-wrap gap-3">
-                        <a href="/patient/login" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-lg">
-                            <i class="fas fa-user me-2"></i>
-                            Access Patient Portal
-                        </a>
-                        <a href="/doctor/login" class="btn btn-outline-success btn-lg px-5 py-3 rounded-pill">
-                            <i class="fas fa-user-md me-2"></i>
-                            Doctor Portal
-                        </a>
-                        <a href="#services" class="btn btn-outline-primary btn-lg px-5 py-3 rounded-pill">
-                            <i class="fas fa-play me-2"></i>
-                            Explore Services
-                        </a>
+                    <div class="col-4">
+                        <div class="stat-number display-6 fw-bold">24/7</div>
+                        <div class="stat-label text-white-50">Emergency Care</div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="hero-image-container">
-                    <div class="hero-image-wrapper">
-                        <img src="{{ url_for('static', filename='images/home-page-dr.png') }}" 
-                             alt="Modern Healthcare Facility"
-                             style="height:600px; width:700px;">
-                    </div>
+
+                <div class="d-flex flex-column flex-sm-row flex-wrap gap-3 justify-content-center justify-content-lg-start">
+                    <a href="#services" class="btn btn-light btn-lg px-5 py-3 rounded-pill shadow-lg">
+                        <i class="fas fa-play me-2"></i>
+                        Explore Services
+                    </a>
                 </div>
             </div>
+            <div class="col-lg-6 d-none d-lg-flex justify-content-center align-items-center">
+                <img src="{{ url_for('static', filename='image/home_page_dr.png') }}" 
+                     alt="Modern Healthcare Facility"
+                     class="img-fluid"
+                     style="object-fit: contain; max-width: 135% !important;">
+            </div>
+
         </div>
     </div>
 </div>
 
-<!-- Services Section -->
-<section id="services" class="py-5 bg-light">
+
+<section id="services" class="py-5 bg-light-subtle">
     <div class="container">
         <div class="row text-center mb-5">
             <div class="col-lg-8 mx-auto">
@@ -147,145 +73,103 @@
         
         <div class="row g-4">
             <div class="col-lg-4 col-md-6">
-                <div class="service-card h-100">
-                    <div class="service-icon">
-                        <i class="fas fa-heartbeat"></i>
+                <div class="card h-100 text-center shadow-sm p-4 rounded-4 border-0 shadow-lg">
+                    <div class="p-3 bg-primary bg-gradient text-white rounded-3 d-inline-flex align-items-center justify-content-center mx-auto mb-4" style="width: 80px; height: 80px;">
+                        <i class="fas fa-heartbeat fs-2"></i>
                     </div>
-                    <h4 class="service-title">Cardiology</h4>
-                    <p class="service-description">Advanced heart care with state-of-the-art diagnostic equipment and experienced cardiologists.</p>
-                    <div class="service-features">
-                        <div class="feature-item">
-                            <i class="fas fa-check text-success me-2"></i>
-                            ECG & Echo Tests
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check text-success me-2"></i>
-                            Heart Surgery
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check text-success me-2"></i>
-                            24/7 Emergency Care
-                        </div>
+                    <div class="card-body">
+                        <h4 class="card-title fw-bold text-primary mb-3">Cardiology</h4>
+                        <p class="card-text text-muted mb-4">Advanced heart care with state-of-the-art diagnostic equipment and experienced cardiologists.</p>
+                        <ul class="list-unstyled text-start">
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> ECG & Echo Tests</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Heart Surgery</li>
+                            <li><i class="fas fa-check text-success me-2"></i> 24/7 Emergency Care</li>
+                        </ul>
                     </div>
                 </div>
             </div>
             
             <div class="col-lg-4 col-md-6">
-                <div class="service-card h-100">
-                    <div class="service-icon">
-                        <i class="fas fa-brain"></i>
+                <div class="card h-100 text-center shadow-sm p-4 rounded-4 border-0 shadow-lg">
+                    <div class="p-3 bg-primary bg-gradient text-white rounded-3 d-inline-flex align-items-center justify-content-center mx-auto mb-4" style="width: 80px; height: 80px;">
+                        <i class="fas fa-brain fs-2"></i>
                     </div>
-                    <h4 class="service-title">Neurology</h4>
-                    <p class="service-description">Expert neurological care for brain, spine, and nervous system disorders.</p>
-                    <div class="service-features">
-                        <div class="feature-item">
-                            <i class="fas fa-check text-success me-2"></i>
-                            MRI & CT Scans
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check text-success me-2"></i>
-                            Brain Surgery
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check text-success me-2"></i>
-                            Stroke Treatment
-                        </div>
+                    <div class="card-body">
+                        <h4 class="card-title fw-bold text-primary mb-3">Neurology</h4>
+                        <p class="card-text text-muted mb-4">Expert neurological care for brain, spine, and nervous system disorders.</p>
+                        <ul class="list-unstyled text-start">
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> MRI & CT Scans</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Brain Surgery</li>
+                            <li><i class="fas fa-check text-success me-2"></i> Stroke Treatment</li>
+                        </ul>
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-lg-4 col-md-6">
-                <div class="service-card h-100">
-                    <div class="service-icon">
-                        <i class="fas fa-baby"></i>
+                <div class="card h-100 text-center shadow-sm p-4 rounded-4 border-0 shadow-lg">
+                    <div class="p-3 bg-primary bg-gradient text-white rounded-3 d-inline-flex align-items-center justify-content-center mx-auto mb-4" style="width: 80px; height: 80px;">
+                        <i class="fas fa-baby fs-2"></i>
                     </div>
-                    <h4 class="service-title">Pediatrics</h4>
-                    <p class="service-description">Specialized healthcare for infants, children, and adolescents with compassionate care.</p>
-                    <div class="service-features">
-                        <div class="feature-item">
-                            <i class="fas fa-check text-success me-2"></i>
-                            Child-Friendly Environment
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check text-success me-2"></i>
-                            Vaccination Programs
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check text-success me-2"></i>
-                            Growth Monitoring
-                        </div>
+                    <div class="card-body">
+                        <h4 class="card-title fw-bold text-primary mb-3">Pediatrics</h4>
+                        <p class="card-text text-muted mb-4">Specialized healthcare for infants, children, and adolescents with compassionate care.</p>
+                        <ul class="list-unstyled text-start">
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Child-Friendly Environment</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Vaccination Programs</li>
+                            <li><i class="fas fa-check text-success me-2"></i> Growth Monitoring</li>
+                        </ul>
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-lg-4 col-md-6">
-                <div class="service-card h-100">
-                    <div class="service-icon">
-                        <i class="fas fa-bone"></i>
+                <div class="card h-100 text-center shadow-sm p-4 rounded-4 border-0 shadow-lg">
+                    <div class="p-3 bg-primary bg-gradient text-white rounded-3 d-inline-flex align-items-center justify-content-center mx-auto mb-4" style="width: 80px; height: 80px;">
+                        <i class="fas fa-bone fs-2"></i>
                     </div>
-                    <h4 class="service-title">Orthopedics</h4>
-                    <p class="service-description">Complete bone and joint care with advanced surgical and non-surgical treatments.</p>
-                    <div class="service-features">
-                        <div class="feature-item">
-                            <i class="fas fa-check text-success me-2"></i>
-                            Joint Replacement
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check text-success me-2"></i>
-                            Sports Medicine
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check text-success me-2"></i>
-                            Physiotherapy
-                        </div>
+                    <div class="card-body">
+                        <h4 class="card-title fw-bold text-primary mb-3">Orthopedics</h4>
+                        <p class="card-text text-muted mb-4">Complete bone and joint care with advanced surgical and non-surgical treatments.</p>
+                        <ul class="list-unstyled text-start">
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Joint Replacement</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Sports Medicine</li>
+                            <li><i class="fas fa-check text-success me-2"></i> Physiotherapy</li>
+                        </ul>
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-lg-4 col-md-6">
-                <div class="service-card h-100">
-                    <div class="service-icon">
-                        <i class="fas fa-eye"></i>
+                <div class="card h-100 text-center shadow-sm p-4 rounded-4 border-0 shadow-lg">
+                    <div class="p-3 bg-primary bg-gradient text-white rounded-3 d-inline-flex align-items-center justify-content-center mx-auto mb-4" style="width: 80px; height: 80px;">
+                        <i class="fas fa-eye fs-2"></i>
                     </div>
-                    <h4 class="service-title">Ophthalmology</h4>
-                    <p class="service-description">Comprehensive eye care services from routine check-ups to complex surgeries.</p>
-                    <div class="service-features">
-                        <div class="feature-item">
-                            <i class="fas fa-check text-success me-2"></i>
-                            Cataract Surgery
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check text-success me-2"></i>
-                            Retina Treatment
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check text-success me-2"></i>
-                            LASIK Surgery
-                        </div>
+                    <div class="card-body">
+                        <h4 class="card-title fw-bold text-primary mb-3">Ophthalmology</h4>
+                        <p class="card-text text-muted mb-4">Comprehensive eye care services from routine check-ups to complex surgeries.</p>
+                        <ul class="list-unstyled text-start">
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Cataract Surgery</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Retina Treatment</li>
+                            <li><i class="fas fa-check text-success me-2"></i> LASIK Surgery</li>
+                        </ul>
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-lg-4 col-md-6">
-                <div class="service-card h-100">
-                    <div class="service-icon">
-                        <i class="fas fa-lungs"></i>
+                <div class="card h-100 text-center shadow-sm p-4 rounded-4 border-0 shadow-lg">
+                    <div class="p-3 bg-primary bg-gradient text-white rounded-3 d-inline-flex align-items-center justify-content-center mx-auto mb-4" style="width: 80px; height: 80px;">
+                        <i class="fas fa-lungs fs-2"></i>
                     </div>
-                    <h4 class="service-title">Pulmonology</h4>
-                    <p class="service-description">Expert respiratory care for lung diseases and breathing disorders.</p>
-                    <div class="service-features">
-                        <div class="feature-item">
-                            <i class="fas fa-check text-success me-2"></i>
-                            Lung Function Tests
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check text-success me-2"></i>
-                            Asthma Treatment
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check text-success me-2"></i>
-                            Sleep Studies
-                        </div>
+                    <div class="card-body">
+                        <h4 class="card-title fw-bold text-primary mb-3">Pulmonology</h4>
+                        <p class="card-text text-muted mb-4">Expert respiratory care for lung diseases and breathing disorders.</p>
+                        <ul class="list-unstyled text-start">
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Lung Function Tests</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Asthma Treatment</li>
+                            <li><i class="fas fa-check text-success me-2"></i> Sleep Studies</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -293,151 +177,63 @@
     </div>
 </section>
 
-<!-- Why Choose Us Section -->
 <section class="py-5 bg-white">
     <div class="container">
-        <div class="row align-items-center">
+        <div class="row align-items-center g-5">
             <div class="col-lg-6">
-                <div class="why-choose-content">
-                    <h3 class="display-5 fw-bold text-primary mb-4">Why Patients Choose Us</h3>
-                    <p class="lead text-muted mb-5">
-                        We're committed to providing exceptional healthcare experiences that put patients first.
-                    </p>
-                    
-                    <div class="feature-list">
-                        <div class="feature-item-large mb-4">
-                            <div class="feature-icon-large bg-primary">
-                                <i class="fas fa-award text-white"></i>
-                            </div>
-                            <div class="feature-content">
-                                <h5 class="fw-bold mb-2">Award-Winning Care</h5>
-                                <p class="text-muted mb-0">Recognized for excellence in patient care and medical innovation.</p>
-                            </div>
+                <h3 class="display-5 fw-bold text-primary mb-4">Why Patients Choose Us</h3>
+                <p class="lead text-muted mb-5">
+                    We're committed to providing exceptional healthcare experiences that put patients first.
+                </p>
+                
+                <div class="d-flex align-items-start mb-4">
+                    <div class="flex-shrink-0">
+                        <div class="bg-primary text-white d-flex align-items-center justify-content-center rounded-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-award fs-3"></i>
                         </div>
-                        
-                        <div class="feature-item-large mb-4">
-                            <div class="feature-icon-large bg-success">
-                                <i class="fas fa-clock text-white"></i>
-                            </div>
-                            <div class="feature-content">
-                                <h5 class="fw-bold mb-2">Minimal Wait Times</h5>
-                                <p class="text-muted mb-0">Efficient scheduling and streamlined processes for your convenience.</p>
-                            </div>
+                    </div>
+                    <div class="ms-4">
+                        <h5 class="fw-bold mb-1">Award-Winning Care</h5>
+                        <p class="text-muted mb-0">Recognized for excellence in patient care and medical innovation.</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex align-items-start mb-4">
+                    <div class="flex-shrink-0">
+                        <div class="bg-success text-white d-flex align-items-center justify-content-center rounded-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-clock fs-3"></i>
                         </div>
-                        
-                        <div class="feature-item-large mb-4">
-                            <div class="feature-icon-large bg-info">
-                                <i class="fas fa-shield-alt text-white"></i>
-                            </div>
-                            <div class="feature-content">
-                                <h5 class="fw-bold mb-2">Safe & Secure</h5>
-                                <p class="text-muted mb-0">Advanced safety protocols and secure patient data management.</p>
-                            </div>
+                    </div>
+                    <div class="ms-4">
+                        <h5 class="fw-bold mb-1">Minimal Wait Times</h5>
+                        <p class="text-muted mb-0">Efficient scheduling and streamlined processes for your convenience.</p>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0">
+                        <div class="bg-info text-white d-flex align-items-center justify-content-center rounded-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-shield-alt fs-3"></i>
                         </div>
+                    </div>
+                    <div class="ms-4">
+                        <h5 class="fw-bold mb-1">Safe & Secure</h5>
+                        <p class="text-muted mb-0">Advanced safety protocols and secure patient data management.</p>
                     </div>
                 </div>
             </div>
             <div class="col-lg-6">
-                <div class="why-choose-image">
-                    <img src="/placeholder.svg?height=500&width=600" 
-                         alt="Happy Patients and Doctors" 
-                         class="img-fluid rounded-4 shadow-lg">
-                </div>
+                <img src="{{ url_for('static', filename='image/why_patient_choose.png') }}" 
+                     alt="Happy Patients and Doctors" 
+                     class="img-fluid">
             </div>
         </div>
     </div>
 </section>
 
-<!-- Testimonials Section -->
-<section class="py-5 bg-light">
+<section class="py-5 bg-primary bg-gradient text-white">
     <div class="container">
-        <div class="row text-center mb-5">
-            <div class="col-lg-8 mx-auto">
-                <h2 class="display-4 fw-bold text-primary mb-4">What Our Patients Say</h2>
-                <p class="lead text-muted">Real stories from real patients who trust us with their health</p>
-            </div>
-        </div>
-        
-        <div class="row g-4">
-            <div class="col-lg-4 col-md-6">
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <div class="stars mb-3">
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                        </div>
-                        <p class="testimonial-text">"The care I received was exceptional. The staff was professional, caring, and made me feel comfortable throughout my treatment."</p>
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">
-                            <img src="/placeholder.svg?height=60&width=60" alt="Sarah M." class="rounded-circle">
-                        </div>
-                        <div class="author-info">
-                            <div class="author-name fw-bold">Sarah M.</div>
-                            <div class="author-title text-muted">Cardiology Patient</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-6">
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <div class="stars mb-3">
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                        </div>
-                        <p class="testimonial-text">"Outstanding medical care with state-of-the-art facilities. The doctors are knowledgeable and truly care about their patients."</p>
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">
-                            <img src="/placeholder.svg?height=60&width=60" alt="John D." class="rounded-circle">
-                        </div>
-                        <div class="author-info">
-                            <div class="author-name fw-bold">John D.</div>
-                            <div class="author-title text-muted">Orthopedic Patient</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-6">
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <div class="stars mb-3">
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                        </div>
-                        <p class="testimonial-text">"From booking appointments to follow-up care, everything was seamless. Highly recommend this hospital to everyone."</p>
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">
-                            <img src="/placeholder.svg?height=60&width=60" alt="Mary L." class="rounded-circle">
-                        </div>
-                        <div class="author-info">
-                            <div class="author-name fw-bold">Mary L.</div>
-                            <div class="author-title text-muted">General Medicine</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- CTA Section -->
-<section class="py-5 bg-primary text-white">
-    <div class="container">
-        <div class="row align-items-center">
+        <div class="row align-items-center text-center text-lg-start gy-4">
             <div class="col-lg-8">
                 <h3 class="display-5 fw-bold mb-3">Ready to Experience Better Healthcare?</h3>
                 <p class="lead mb-0">Join thousands of satisfied patients who trust us with their health and wellness.</p>
@@ -452,7 +248,6 @@
     </div>
 </section>
 
-<!-- Contact Section -->
 <section id="contact" class="py-5 bg-white">
     <div class="container">
         <div class="row text-center mb-5">
@@ -464,641 +259,137 @@
         
         <div class="row g-4">
             <div class="col-lg-4">
-                <div class="contact-card text-center">
-                    <div class="contact-icon">
-                        <i class="fas fa-map-marker-alt"></i>
+                <div class="card h-100 text-center shadow-sm p-4 rounded-4 border-0 shadow-lg">
+                    <div class="p-3 bg-primary bg-gradient text-white rounded-3 d-inline-flex align-items-center justify-content-center mx-auto mb-4" style="width: 80px; height: 80px;">
+                        <i class="fas fa-map-marker-alt fs-2"></i>
                     </div>
                     <h5 class="fw-bold mb-3">Visit Us</h5>
-                    <p class="text-muted">123 Healthcare Street<br>Medical City, MC 12345</p>
+                    <p class="text-muted mb-0">123 Healthcare Street<br>Medical City, MC 12345</p>
                 </div>
             </div>
             
             <div class="col-lg-4">
-                <div class="contact-card text-center">
-                    <div class="contact-icon">
-                        <i class="fas fa-phone"></i>
+                <div class="card h-100 text-center shadow-sm p-4 rounded-4 border-0 shadow-lg">
+                    <div class="p-3 bg-primary bg-gradient text-white rounded-3 d-inline-flex align-items-center justify-content-center mx-auto mb-4" style="width: 80px; height: 80px;">
+                        <i class="fas fa-phone fs-2"></i>
                     </div>
                     <h5 class="fw-bold mb-3">Call Us</h5>
-                    <p class="text-muted">Emergency: (555) 911-HELP<br>General: (555) 123-4567</p>
+                    <p class="text-muted mb-0">Emergency: (555) 911-HELP<br>General: (555) 123-4567</p>
                 </div>
             </div>
             
             <div class="col-lg-4">
-                <div class="contact-card text-center">
-                    <div class="contact-icon">
-                        <i class="fas fa-envelope"></i>
+                <div class="card h-100 text-center shadow-sm p-4 rounded-4 border-0 shadow-lg">
+                    <div class="p-3 bg-primary bg-gradient text-white rounded-3 d-inline-flex align-items-center justify-content-center mx-auto mb-4" style="width: 80px; height: 80px;">
+                        <i class="fas fa-envelope fs-2"></i>
                     </div>
                     <h5 class="fw-bold mb-3">Email Us</h5>
-                    <p class="text-muted">info@healthcare.com<br>support@healthcare.com</p>
+                    <p class="text-muted mb-0">info@healthcare.com<br>support@healthcare.com</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Footer -->
 <footer class="bg-dark text-white py-5">
     <div class="container">
-        <div class="row g-4">
+        <div class="row g-5">
             <div class="col-lg-4">
-                <div class="footer-brand mb-4">
-                    <h4 class="fw-bold">
-                        <i class="fas fa-hospital-alt me-2"></i>
-                        HealthCare+
-                    </h4>
-                    <p class="text-light opacity-75">Providing exceptional healthcare services with advanced technology and compassionate care for over a decade.</p>
-                </div>
-                <div class="social-links">
-                    <a href="#" class="social-link me-3">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" class="social-link me-3">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a href="#" class="social-link me-3">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="#" class="social-link">
-                        <i class="fab fa-linkedin-in"></i>
-                    </a>
+                <h4 class="fw-bold mb-3">
+                    <i class="fas fa-hospital-alt me-2"></i>
+                    HealthCare+
+                </h4>
+                <p class="text-white-50">Providing exceptional healthcare services with advanced technology and compassionate care.</p>
+                <div>
+                    <a href="#" class="btn btn-outline-light btn-sm rounded-circle me-2" style="width: 40px; height: 40px;"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="btn btn-outline-light btn-sm rounded-circle me-2" style="width: 40px; height: 40px;"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="btn btn-outline-light btn-sm rounded-circle me-2" style="width: 40px; height: 40px;"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 40px; height: 40px;"><i class="fab fa-linkedin-in"></i></a>
                 </div>
             </div>
             
-            <div class="col-lg-2">
+            <div class="col-lg-2 col-md-4 col-6">
                 <h6 class="fw-bold mb-4">Quick Links</h6>
-                <ul class="footer-links">
-                    <li><a href="#services">Services</a></li>
-                    <li><a href="#about">About Us</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                    <li><a href="/patient/login">Patient Portal</a></li>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#services" class="text-white-50 text-decoration-none">Services</a></li>
+                    <li class="mb-2"><a href="#about" class="text-white-50 text-decoration-none">About Us</a></li>
+                    <li class="mb-2"><a href="#contact" class="text-white-50 text-decoration-none">Contact</a></li>
+                    <li><a href="/patient/login" class="text-white-50 text-decoration-none">Patient Portal</a></li>
                 </ul>
             </div>
             
-            <div class="col-lg-3">
+            <div class="col-lg-3 col-md-4 col-6">
                 <h6 class="fw-bold mb-4">Services</h6>
-                <ul class="footer-links">
-                    <li><a href="#">Emergency Care</a></li>
-                    <li><a href="#">Cardiology</a></li>
-                    <li><a href="#">Neurology</a></li>
-                    <li><a href="#">Pediatrics</a></li>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Emergency Care</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Cardiology</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Neurology</a></li>
+                    <li><a href="#" class="text-white-50 text-decoration-none">Pediatrics</a></li>
                 </ul>
             </div>
             
-            <div class="col-lg-3">
+            <div class="col-lg-3 col-md-4">
                 <h6 class="fw-bold mb-4">Contact Info</h6>
-                <div class="contact-info">
-                    <p class="text-light opacity-75 mb-2">
-                        <i class="fas fa-map-marker-alt me-2"></i>
-                        123 Healthcare St, Medical City
-                    </p>
-                    <p class="text-light opacity-75 mb-2">
-                        <i class="fas fa-phone me-2"></i>
-                        +1 (555) 123-4567
-                    </p>
-                    <p class="text-light opacity-75 mb-2">
-                        <i class="fas fa-envelope me-2"></i>
-                        info@healthcare.com
-                    </p>
-                </div>
+                <ul class="list-unstyled text-white-50">
+                    <li class="mb-2 d-flex"><i class="fas fa-map-marker-alt me-3 pt-1"></i><span>123 Healthcare St, Medical City</span></li>
+                    <li class="mb-2 d-flex"><i class="fas fa-phone me-3 pt-1"></i><span>+1 (555) 123-4567</span></li>
+                    <li class="mb-2 d-flex"><i class="fas fa-envelope me-3 pt-1"></i><span>info@healthcare.com</span></li>
+                </ul>
             </div>
         </div>
         
-        <hr class="my-4 opacity-25">
+        <hr class="my-4" style="color: #495057;">
         <div class="row align-items-center">
             <div class="col-md-6">
-                <p class="text-light opacity-75 mb-0">&copy; 2024 HealthCare+. All rights reserved.</p>
+                <p class="text-white-50 mb-0">&copy; {{ year }} HealthCare+. All rights reserved.</p>
             </div>
             <div class="col-md-6 text-md-end">
-                <a href="#" class="text-light opacity-75 text-decoration-none me-3">Privacy Policy</a>
-                <a href="#" class="text-light opacity-75 text-decoration-none">Terms of Service</a>
+                <a href="#" class="text-white-50 text-decoration-none me-3">Privacy Policy</a>
+                <a href="#" class="text-white-50 text-decoration-none">Terms of Service</a>
             </div>
         </div>
     </div>
 </footer>
 
-<style>
-/* Enhanced Styles */
-:root {
-    --primary-color: #667eea;
-    --secondary-color: #764ba2;
-    --success-color: #10b981;
-    --info-color: #3b82f6;
-    --warning-color: #f59e0b;
-    --danger-color: #ef4444;
-}
-
-body {
-    font-family: 'Inter', sans-serif;
-    line-height: 1.6;
-    scroll-behavior: smooth;
-}
-
-/* Navigation */
-.navbar {
-    backdrop-filter: blur(20px);
-    background-color: rgba(255, 255, 255, 0.95) !important;
-    transition: all 0.3s ease;
-}
-
-.logo-container {
-    transition: all 0.3s ease;
-}
-
-.logo-icon {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.2rem;
-}
-
-.nav-link {
-    color: #495057 !important;
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.nav-link:hover {
-    color: var(--primary-color) !important;
-    transform: translateY(-2px);
-}
-
-.nav-link::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: 0;
-    left: 50%;
-    background: var(--primary-color);
-    transition: all 0.3s ease;
-}
-
-.nav-link:hover::after {
-    width: 100%;
-    left: 0;
-}
-
-/* Hero Section */
-.hero-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    position: relative;
-    overflow: hidden;
-}
-
-.hero-bg-elements {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-}
-
-.floating-element {
-    position: absolute;
-    color: rgba(255, 255, 255, 0.1);
-    font-size: 4rem;
-    animation: float 20s ease-in-out infinite;
-}
-
-.element-1 { top: 10%; left: 10%; animation-delay: 0s; }
-.element-2 { top: 20%; right: 15%; animation-delay: 4s; }
-.element-3 { bottom: 30%; left: 5%; animation-delay: 8s; }
-.element-4 { bottom: 20%; right: 10%; animation-delay: 12s; }
-.element-5 { top: 60%; left: 80%; animation-delay: 16s; }
-
-@keyframes float {
-    0%, 100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.1; }
-    25% { transform: translateY(-30px) rotate(5deg) scale(1.1); opacity: 0.2; }
-    50% { transform: translateY(-15px) rotate(-3deg) scale(0.9); opacity: 0.15; }
-    75% { transform: translateY(-35px) rotate(8deg) scale(1.2); opacity: 0.25; }
-}
-
-.z-3 {
-    z-index: 3;
-}
-
-.hero-badge {
-    animation: fadeInUp 1s ease 0.2s both;
-}
-
-.hero-title {
-    animation: fadeInUp 1s ease 0.4s both;
-    line-height: 1.1;
-}
-
-.text-gradient {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.hero-subtitle {
-    animation: fadeInUp 1s ease 0.6s both;
-    opacity: 0.9;
-}
-
-.hero-stats {
-    animation: fadeInUp 1s ease 0.8s both;
-}
-
-.hero-actions {
-    animation: fadeInUp 1s ease 1s both;
-}
-
-.hero-image-container {
-    position: relative;
-    animation: fadeInRight 1s ease 0.6s both;
-}
-
-.hero-image-wrapper {
-    position: relative;
-}
-
-.hero-main-image {
-    border-radius: 20px;
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
-}
-
-.floating-card {
-    position: absolute;
-    animation: floatCard 6s ease-in-out infinite;
-}
-
-.card-1 {
-    top: 20%;
-    left: -10%;
-    animation-delay: 0s;
-}
-
-.card-2 {
-    top: 50%;
-    right: -15%;
-    animation-delay: 2s;
-}
-
-.card-3 {
-    bottom: 20%;
-    left: -5%;
-    animation-delay: 4s;
-}
-
-@keyframes floatCard {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-20px) scale(1.05); }
-}
-
-.icon-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Service Cards */
-.service-card {
-    background: white;
-    border-radius: 20px;
-    padding: 2.5rem 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    text-align: center;
-}
-
-.service-card:hover {
-    transform: translateY(-15px);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-}
-
-.service-icon {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 2rem;
-    margin: 0 auto 1.5rem;
-    transition: all 0.3s ease;
-}
-
-.service-card:hover .service-icon {
-    transform: scale(1.1) rotate(5deg);
-}
-
-.service-title {
-    color: var(--primary-color);
-    font-weight: 700;
-    margin-bottom: 1rem;
-}
-
-.service-description {
-    color: #6b7280;
-    margin-bottom: 1.5rem;
-}
-
-.service-features {
-    text-align: left;
-}
-
-.feature-item {
-    padding: 0.5rem 0;
-    color: #374151;
-    font-weight: 500;
-}
-
-/* Why Choose Us */
-.feature-item-large {
-    display: flex;
-    align-items: flex-start;
-}
-
-.feature-icon-large {
-    width: 60px;
-    height: 60px;
-    border-radius: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 1.5rem;
-    flex-shrink: 0;
-}
-
-.feature-content h5 {
-    color: var(--primary-color);
-}
-
-/* Testimonials */
-.testimonial-card {
-    background: white;
-    border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    height: 100%;
-}
-
-.testimonial-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-}
-
-.testimonial-text {
-    font-style: italic;
-    color: #374151;
-    margin-bottom: 1.5rem;
-    line-height: 1.7;
-}
-
-.testimonial-author {
-    display: flex;
-    align-items: center;
-}
-
-.author-avatar {
-    margin-right: 1rem;
-}
-
-.author-avatar img {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-}
-
-.author-name {
-    color: var(--primary-color);
-}
-
-/* Contact Cards */
-.contact-card {
-    padding: 2rem;
-    border-radius: 20px;
-    background: white;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-}
-
-.contact-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-}
-
-.contact-icon {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 2rem;
-    margin: 0 auto 1.5rem;
-}
-
-/* Footer */
-.footer-links {
-    list-style: none;
-    padding: 0;
-}
-
-.footer-links li {
-    margin-bottom: 0.5rem;
-}
-
-.footer-links a {
-    color: rgba(255, 255, 255, 0.75);
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.footer-links a:hover {
-    color: white;
-    padding-left: 5px;
-}
-
-.social-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border-radius: 10px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.social-link:hover {
-    background: var(--primary-color);
-    color: white;
-    transform: translateY(-3px);
-}
-
-/* Animations */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fadeInRight {
-    from {
-        opacity: 0;
-        transform: translateX(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* Button Enhancements */
-.btn {
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    transition: all 0.3s ease;
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    border: none;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
-
-.btn-primary:hover {
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-    background: linear-gradient(135deg, #5a6fd8, #6b5b95);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .hero-title {
-        font-size: 2.5rem;
-    }
-    
-    .floating-card {
-        display: none;
-    }
-    
-    .service-card {
-        padding: 2rem 1.5rem;
-    }
-    
-    .hero-stats .col-4 {
-        margin-bottom: 1rem;
-    }
-    
-    .floating-element {
-        font-size: 3rem;
-    }
-}
-
-@media (max-width: 576px) {
-    .hero-section {
-        padding: 2rem 0;
-    }
-    
-    .hero-title {
-        font-size: 2rem;
-    }
-    
-    .hero-actions {
-        flex-direction: column;
-    }
-    
-    .hero-actions .btn {
-        width: 100%;
-        margin-bottom: 1rem;
-    }
-}
-</style>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Smooth scrolling for navigation links
+    // Smooth scrolling for anchor links pointing to IDs on the same page
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
+            const href = this.getAttribute('href');
+            // Ensure it's a valid selector and not just "#"
+            if (href.length > 1 && document.querySelector(href)) {
+                e.preventDefault();
+                document.querySelector(href).scrollIntoView({
+                    behavior: 'smooth'
                 });
             }
         });
     });
-    
-    // Navbar background change on scroll
-    window.addEventListener('scroll', function() {
-        const navbar = document.querySelector('.navbar');
-        if (window.scrollY > 50) {
-            navbar.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
-            navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
-        } else {
-            navbar.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
-            navbar.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.05)';
-        }
-    });
-    
-    // Intersection Observer for animations
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-    
-    const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, observerOptions);
-    
-    // Observe service cards and testimonials
-    document.querySelectorAll('.service-card, .testimonial-card, .contact-card').forEach(card => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(30px)';
-        card.style.transition = 'all 0.6s ease';
-        observer.observe(card);
-    });
-    
+
     // Counter animation for stats
-    function animateCounter(element, target) {
+    function animateCounter(element, target, isK) {
         let current = 0;
-        const increment = target / 100;
+        const duration = 2000; // 2 seconds
+        const stepTime = 20;
+        const steps = duration / stepTime;
+        const increment = target / steps;
+        
         const timer = setInterval(() => {
             current += increment;
             if (current >= target) {
                 current = target;
                 clearInterval(timer);
             }
-            element.textContent = Math.floor(current) + (target >= 1000 ? 'K+' : target === 24 ? '/7' : '+');
-        }, 20);
+            // Format text based on original
+            if(isK) {
+                element.textContent = Math.floor(current) + 'K+';
+            } else if (target === 24) {
+                 element.textContent = '24/7';
+            } else {
+                 element.textContent = Math.floor(current) + '+';
+            }
+        }, stepTime);
     }
     
     // Trigger counter animation when stats come into view
@@ -1107,19 +398,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (entry.isIntersecting) {
                 const statNumbers = entry.target.querySelectorAll('.stat-number');
                 statNumbers.forEach(stat => {
-                    const text = stat.textContent;
-                    if (text.includes('50K+')) {
-                        animateCounter(stat, 50);
-                    } else if (text.includes('100+')) {
-                        animateCounter(stat, 100);
-                    } else if (text.includes('24/7')) {
-                        stat.textContent = '24/7';
+                    const text = stat.textContent.trim();
+                    if (text === '50K+') {
+                        animateCounter(stat, 50, true);
+                    } else if (text === '100+') {
+                        animateCounter(stat, 100, false);
                     }
+                    // '24/7' does not need animation
                 });
-                statsObserver.unobserve(entry.target);
+                statsObserver.unobserve(entry.target); // Animate only once
             }
         });
-    }, { threshold: 0.5 });
+    }, { threshold: 0.5 }); // Trigger when 50% of the element is visible
     
     const heroStats = document.querySelector('.hero-stats');
     if (heroStats) {
