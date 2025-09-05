@@ -1,49 +1,121 @@
 {% extends 'admin/base_admin.html' %}
+
 {% block page_title %}Payment Records{% endblock %}
+
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_dashboard') }}">Admin</a></li>
 <li class="breadcrumb-item active" aria-current="page">Payment Records</li>
 {% endblock %}
+
 {% block content %}
-<div class="admin-card mb-4">
-    <div class="admin-card-header d-flex justify-content-between align-items-center">
-        <h3 class="mb-0">Payment Records</h3>
-        <form class="d-flex" method="GET" action="">
-            <input type="text" name="search" class="form-control me-2" placeholder="Search by patient name" value="{{ request.args.get('search', '') }}">
-            <button class="btn btn-admin-primary" type="submit"><i class="fas fa-search"></i> Search</button>
-        </form>
+<div class="p-5">
+    <div class="card shadow-sm border-0">
+    <div class="card-header bg-light py-3">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <h3 class="mb-0 h5 text-primary-emphasis">
+                <i class="fas fa-file-invoice-dollar me-2"></i>Payment Records
+            </h3>
+            <form class="ms-auto" method="GET" action="" style="min-width: 250px;">
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control" placeholder="Search by patient..." value="{{ request.args.get('search', '') }}">
+                    <button class="btn btn-outline-primary" type="submit" id="button-addon2">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-    <div class="admin-card-body">
+    <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-bordered table-hover">
+            <table class="table table-striped table-hover align-middle mb-0">
                 <thead class="table-light">
-                    <tr>
-                        <th>Payment ID</th>
-                        <th>Patient Name</th>
-                        <th>Doctor Name</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                        <th>Razorpay Payment ID</th>
+                    <tr class="text-uppercase small text-muted">
+                        <th scope="col" class="px-3">Payment ID</th>
+                        <th scope="col">Patient Name</th>
+                        <th scope="col">Doctor Name</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col" class="text-center">Status</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Razorpay ID</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for payment in payments %}
                     <tr>
-                        <td>{{ payment.id }}</td>
+                        <td class="px-3">
+                            <span class="fw-bold">#{{ payment.id }}</span>
+                        </td>
                         <td>{{ payment.appointment.patient_name }}</td>
-                        <td>{{ payment.appointment.doctor.full_name }}</td>
-                        <td>₹{{ payment.amount }}</td>
-                        <td>{{ payment.status }}</td>
-                        <td>{{ payment.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                        <td>{{ payment.razorpay_payment_id }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-user-md me-2 text-muted"></i>
+                                <span>{{ payment.appointment.doctor.full_name }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <strong class="text-success-emphasis">₹{{ "%.2f"|format(payment.amount) }}</strong>
+                        </td>
+                        <td class="text-center">
+                            {# Use badges for better visual status representation #}
+                            {% if payment.status in ['Paid', 'captured'] %}
+                                <span class="badge rounded-pill bg-success-subtle border border-success-subtle text-success-emphasis">Paid</span>
+                            {% elif payment.status in ['Pending', 'created'] %}
+                                <span class="badge rounded-pill bg-warning-subtle border border-warning-subtle text-warning-emphasis">Pending</span>
+                            {% else %}
+                                <span class="badge rounded-pill bg-danger-subtle border border-danger-subtle text-danger-emphasis">{{ payment.status | capitalize }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="text-muted">{{ payment.created_at.strftime('%b %d, %Y') }}</span>
+                            <small class="d-block text-muted">{{ payment.created_at.strftime('%I:%M %p') }}</small>
+                        </td>
+                        <td>
+                            <code>{{ payment.razorpay_payment_id or 'N/A' }}</code>
+                        </td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="7" class="text-center">No payments found.</td></tr>
+                    <tr>
+                        <td colspan="7">
+                            <div class="text-center p-5">
+                                <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No Payments Found</h5>
+                                <p class="text-muted">There are no payment records to display at the moment.</p>
+                            </div>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+    {# Optional: Add pagination if you have it #}
+    {% if pagination and pagination.pages > 1 %}
+    <div class="card-footer bg-light">
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center mb-0">
+                <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('admin.payment_records', page=pagination.prev_num) }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% for page_num in pagination.iter_pages() %}
+                    {% if page_num %}
+                        <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('admin.payment_records', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+                <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('admin.payment_records', page=pagination.next_num) }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
 </div>
 {% endblock %}
