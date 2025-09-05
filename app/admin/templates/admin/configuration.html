@@ -4,151 +4,166 @@
 {% block page_title %}Configuration{% endblock %}
 
 {% block content %}
-<div class="configuration-content">
-    <!-- Removed Receptionist Theme Settings section completely -->
-    
-    <!-- Receptionist Authentication -->
-    <div class="admin-card mb-4">
-        <div class="admin-card-header">
-            <h5 class="mb-0">
-                <i class="fas fa-user-shield me-2"></i>
-                Receptionist Authentication
-            </h5>
-        </div>
-        <div class="admin-card-body">
-            <form id="authForm">
-                <div class="row">
-                    <div class="col-md-6">
+<div class="container-fluid py-4">
+    <div id="alert-container"></div>
+
+    <div class="row g-4">
+        <!-- Receptionist Authentication -->
+        <div class="col-lg-6">
+            <div class="card shadow-lg border-0 h-100">
+                <div class="card-header bg-gradient bg-primary text-white border-0">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <i class="fas fa-user-shield me-2"></i>
+                        Receptionist Authentication
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form id="authForm">
                         <div class="mb-3">
-                            <label for="receptionistUsername" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="receptionistUsername" value="amul" required>
+                            <label for="receptionistUsername" class="form-label fw-bold">Username</label>
+                            <input type="text" class="form-control form-control-lg" id="receptionistUsername" value="amul" required>
                         </div>
-                    </div>
-                    <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="receptionistPassword" class="form-label">Password</label>
-                            <div class="input-group">
+                            <label for="receptionistPassword" class="form-label fw-bold">Password</label>
+                            <div class="input-group input-group-lg">
                                 <input type="password" class="form-control" id="receptionistPassword" value="amul" required>
-                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                <button class="btn btn-outline-light" type="button" id="togglePassword">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
                         </div>
+                        <div class="alert alert-info d-flex align-items-center small" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Changing these credentials will require receptionist re-login.
+                        </div>
+                        <button type="submit" class="btn btn-lg btn-primary w-100">
+                            <i class="fas fa-key me-2"></i>
+                            Update Credentials
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Information -->
+        <div class="col-lg-6">
+            <div class="card shadow-lg border-0 h-100">
+                <div class="card-header bg-gradient bg-dark text-white border-0">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <i class="fas fa-cogs me-2"></i>
+                        System Information
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="p-3 rounded bg-secondary-subtle d-flex align-items-center justify-content-between">
+                                <span><i class="fas fa-box-open text-primary me-2"></i> HMS Version</span>
+                                <span class="fw-bold">1.0.0</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 rounded bg-secondary-subtle d-flex align-items-center justify-content-between">
+                                <span><i class="fas fa-database text-info me-2"></i> Database</span>
+                                <span class="fw-bold">SQLite</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 rounded bg-secondary-subtle d-flex align-items-center justify-content-between">
+                                <span><i class="fas fa-desktop text-success me-2"></i> Admin Panel</span>
+                                <span class="badge bg-success">Active</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 rounded bg-secondary-subtle d-flex align-items-center justify-content-between">
+                                <span><i class="fas fa-headset text-success me-2"></i> Receptionist Panel</span>
+                                <span class="badge bg-success">Active</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 rounded bg-secondary-subtle d-flex align-items-center justify-content-between">
+                                <span><i class="fas fa-user-md text-success me-2"></i> Doctor Portal</span>
+                                <span class="badge bg-success">Active</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 rounded bg-secondary-subtle d-flex align-items-center justify-content-between">
+                                <span><i class="fas fa-clock text-secondary me-2"></i> System Status</span>
+                                <span class="fw-bold text-dark">Running</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Changes will take effect immediately. The receptionist will need to log in again with the new credentials.
-                </div>
-                <button type="submit" class="btn btn-admin-primary">
-                    <i class="fas fa-key me-2"></i>
-                    Update Credentials
-                </button>
-            </form>
+            </div>
         </div>
     </div>
 
-    <!-- System Information -->
-    <div class="admin-card">
-        <div class="admin-card-header">
-            <h5 class="mb-0">
-                <i class="fas fa-info-circle me-2"></i>
-                System Information
-            </h5>
-        </div>
-        <div class="admin-card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong>HMS Version:</strong> 1.0.0</p>
-                    <p><strong>Database:</strong> SQLite</p>
-                    <p><strong>Last Updated:</strong> System Active</p>
-                </div>
-                <div class="col-md-6">
-                    <p><strong>Admin Panel:</strong> Active</p>
-                    <p><strong>Receptionist Panel:</strong> Active</p>
-                    <p><strong>Doctor Portal:</strong> Active</p>
-                </div>
-            </div>
+    <!-- Bottom Banner -->
+    <div class="mt-4">
+        <div class="bg-primary text-white text-center py-3 rounded shadow-sm">
+            <i class="fas fa-shield-alt me-2"></i> Receptionist Authentication & System Information
         </div>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Password toggle functionality
-    document.getElementById('togglePassword').addEventListener('click', function() {
-        const passwordField = document.getElementById('receptionistPassword');
-        const icon = this.querySelector('i');
-        
-        if (passwordField.type === 'password') {
-            passwordField.type = 'text';
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-        } else {
-            passwordField.type = 'password';
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
-        }
-    });
-
-    document.getElementById('authForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const username = document.getElementById('receptionistUsername').value;
-        const password = document.getElementById('receptionistPassword').value;
-        
-        // Show loading state
-        const submitBtn = this.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
-        submitBtn.disabled = true;
-        
-        // Send to backend API
-        fetch('{{ url_for("admin.update_receptionist_auth") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                username: username,
-                password: password
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showAlert(data.message, 'success');
+    const togglePassword = document.getElementById('togglePassword');
+    if (togglePassword) {
+        togglePassword.addEventListener('click', function() {
+            const passwordField = document.getElementById('receptionistPassword');
+            const icon = this.querySelector('i');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
             } else {
-                showAlert(data.message, 'danger');
+                passwordField.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
             }
-        })
-        .catch(error => {
-            showAlert('An error occurred while updating credentials.', 'danger');
-        })
-        .finally(() => {
-            // Reset button
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
         });
-    });
+    }
 
-    // Helper function to show alerts
+    const authForm = document.getElementById('authForm');
+    if (authForm) {
+        authForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('receptionistUsername').value;
+            const password = document.getElementById('receptionistPassword').value;
+            
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalHtml = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Updating...';
+            submitBtn.disabled = true;
+            
+            fetch('{{ url_for("admin.update_receptionist_auth") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(res => res.json())
+            .then(data => showAlert(data.message, data.success ? 'success' : 'danger'))
+            .catch(() => showAlert('An error occurred while updating credentials.', 'danger'))
+            .finally(() => {
+                submitBtn.innerHTML = originalHtml;
+                submitBtn.disabled = false;
+            });
+        });
+    }
+
     function showAlert(message, type) {
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-        alertDiv.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-        
-        const container = document.querySelector('.configuration-content');
-        container.insertBefore(alertDiv, container.firstChild);
-        
-        // Auto dismiss after 5 seconds
-        setTimeout(() => {
-            alertDiv.remove();
-        }, 5000);
+        const alertContainer = document.getElementById('alert-container');
+        if (!alertContainer) return;
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show mt-2" role="alert">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>`;
+        alertContainer.append(wrapper);
+        setTimeout(() => wrapper.remove(), 4000);
     }
 });
 </script>
