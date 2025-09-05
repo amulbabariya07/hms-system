@@ -8,89 +8,114 @@
 {% endblock %}
 
 {% block content %}
-<div class="admin-card">
-    <div class="admin-card-header">
-        <h4 class="mb-0">
-            <i class="fas fa-user-check me-2"></i>
-            Pending Doctor Approvals ({{ pending_doctors|length }})
-        </h4>
-    </div>
-    <div class="admin-card-body">
-        {% if pending_doctors %}
+<div class="container-fluid">
+    <div class="p-2">
         <div class="row">
-            {% for doctor in pending_doctors %}
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="kanban-card" onclick="showDoctorDetails({{ doctor.id }})">
-                    <div class="kanban-header">
-                        <div class="doctor-avatar">
-                            <i class="fas fa-user-md"></i>
+            <div class="col">
+                <div class="card shadow-sm border-0 rounded-3" style="background: linear-gradient(135deg, #4e73df, #224abe);">
+                    <div class="card-body d-flex justify-content-between align-items-center p-3 text-white">
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle bg-white text-primary me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                <i class="fas fa-user-md fa-lg"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0 fw-bold">Pending Doctor Approvals</h5>
+                                <small class="text-light opacity-75">Review and take action on new applications</small>
+                            </div>
                         </div>
-                        <div class="doctor-info">
-                            <h6 class="doctor-name">Dr. {{ doctor.full_name }}</h6>
-                            <p class="doctor-specialization">{{ doctor.specialization }}</p>
-                        </div>
-                    </div>
-                    <div class="kanban-body">
-                        <div class="info-item">
-                            <i class="fas fa-mobile-alt"></i>
-                            <span>{{ doctor.mobile_number }}</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-calendar-alt"></i>
-                            <span>{{ doctor.experience_years }} years exp.</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-clock"></i>
-                            <span>{{ doctor.created_at.strftime('%Y-%m-%d') }}</span>
-                        </div>
-                    </div>
-                    <div class="kanban-footer">
-                        <button type="button" class="btn btn-success btn-sm" onclick="event.stopPropagation(); approveDoctor({{ doctor.id }})">
-                            <i class="fas fa-check me-1"></i>
-                            Approve
-                        </button>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="event.stopPropagation(); rejectDoctor({{ doctor.id }})">
-                            <i class="fas fa-times me-1"></i>
-                            Reject
-                        </button>
+                        <span class="badge bg-warning text-dark fs-6 px-3 py-2 rounded-pill shadow-sm">
+                            {{ pending_doctors|length }} Pending
+                        </span>
                     </div>
                 </div>
             </div>
-            {% endfor %}
         </div>
-        {% else %}
-        <div class="text-center py-5">
-            <i class="fas fa-user-check fa-3x text-success mb-3"></i>
-            <h5 class="text-muted">No pending approvals</h5>
-            <p class="text-muted">All doctors have been approved. Great job!</p>
-        </div>
-        {% endif %}
     </div>
+
+    <div class="p-3">
+        {% if pending_doctors %}
+    <div class="row g-4">
+        {% for doctor in pending_doctors %}
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="card h-100 doctor-card">
+                <div class="card-header bg-light border-0 text-center pt-4">
+                    <div class="position-relative d-inline-block">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                            <i class="fas fa-user-md fs-2"></i>
+                        </div>
+                        <span class="position-absolute bottom-0 start-100 translate-middle p-2 bg-warning border border-light rounded-circle" title="Pending Approval">
+                            <span class="visually-hidden">Pending Approval</span>
+                        </span>
+                    </div>
+                    <h5 class="card-title mt-3 mb-0">Dr. {{ doctor.full_name }}</h5>
+                    <p class="text-muted mb-0">{{ doctor.specialization }}</p>
+                </div>
+
+                <div class="card-body pt-3">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted"><i class="fas fa-mobile-alt fa-fw me-2"></i>Mobile</span>
+                            <strong>{{ doctor.mobile_number }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted"><i class="fas fa-calendar-alt fa-fw me-2"></i>Experience</span>
+                            <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill">{{ doctor.experience_years }} years</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted"><i class="fas fa-clock fa-fw me-2"></i>Applied On</span>
+                            <strong>{{ doctor.created_at.strftime('%b %d, %Y') }}</strong>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card-footer bg-light border-0 p-3">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary btn-sm" onclick="showDoctorDetails({{ doctor.id }})">
+                            <i class="fas fa-eye me-1"></i> View Details
+                        </button>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-success btn-sm w-100" onclick="approveDoctor({{ doctor.id }})">
+                                <i class="fas fa-check me-1"></i> Approve
+                            </button>
+                            <button class="btn btn-danger btn-sm w-100" onclick="rejectDoctor({{ doctor.id }})">
+                                <i class="fas fa-times me-1"></i> Reject
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card border-0 bg-light">
+        <div class="card-body text-center p-5">
+             <i class="fas fa-shield-alt fa-4x text-success mb-4"></i>
+            <h4 class="text-muted">All Clear!</h4>
+            <p class="text-muted mb-0">There are no pending doctor approvals at the moment. Great job!</p>
+        </div>
+    </div>
+    {% endif %}
+    </div>
+    
 </div>
 
-<!-- Doctor Details Modal -->
 <div class="modal fade" id="doctorApprovalModal" tabindex="-1" aria-labelledby="doctorApprovalModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-warning text-dark">
-                <h5 class="modal-title" id="doctorApprovalModalLabel">
-                    <i class="fas fa-user-md me-2"></i>
-                    Doctor Approval Details
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-primary text-white border-0">
+                <h5 class="modal-title" id="doctorApprovalModalLabel"><i class="fas fa-user-md me-2"></i>Doctor Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="doctorApprovalContent">
-                <!-- Content will be loaded dynamically -->
-            </div>
-            <div class="modal-footer">
+            <div class="modal-body p-4" id="doctorApprovalContent">
+                </div>
+            <div class="modal-footer border-0 bg-light-subtle">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger" id="rejectBtn" onclick="rejectDoctorFromModal()">
-                    <i class="fas fa-times me-2"></i>
-                    Reject
+                <button type="button" class="btn btn-danger" onclick="rejectDoctorFromModal()">
+                    <i class="fas fa-times me-1"></i> Reject
                 </button>
-                <button type="button" class="btn btn-success" id="approveBtn" onclick="approveDoctorFromModal()">
-                    <i class="fas fa-check me-2"></i>
-                    Approve
+                <button type="button" class="btn btn-success" onclick="approveDoctorFromModal()">
+                    <i class="fas fa-check me-1"></i> Approve
                 </button>
             </div>
         </div>
@@ -98,123 +123,14 @@
 </div>
 
 <style>
-.kanban-card {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-    border: 2px solid #f8f9fa;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    overflow: hidden;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.kanban-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-    border-color: #3498db;
-}
-
-.kanban-header {
-    background: linear-gradient(135deg, #3498db, #2980b9);
-    color: white;
-    padding: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.doctor-avatar {
-    width: 50px;
-    height: 50px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    flex-shrink: 0;
-}
-
-.doctor-info {
-    flex: 1;
-}
-
-.doctor-name {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 700;
-}
-
-.doctor-specialization {
-    margin: 0;
-    opacity: 0.9;
-    font-size: 0.9rem;
-}
-
-.kanban-body {
-    padding: 1.5rem;
-    flex: 1;
-}
-
-.info-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-    color: #6c757d;
-    font-size: 0.9rem;
-}
-
-.info-item i {
-    width: 16px;
-    color: #3498db;
-}
-
-.kanban-footer {
-    padding: 1rem 1.5rem;
-    border-top: 1px solid #f8f9fa;
-    display: flex;
-    gap: 0.5rem;
-    justify-content: center;
-}
-
-.kanban-footer .btn {
-    flex: 1;
-    font-weight: 600;
-}
-
-.pending-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: #f39c12;
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.modal-header.bg-warning {
-    border-bottom: none;
-}
-
-.modal-footer {
-    border-top: none;
-}
-
-@media (max-width: 768px) {
-    .kanban-footer {
-        flex-direction: column;
+    .doctor-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        border: 1px solid var(--bs-border-color-translucent);
     }
-    
-    .kanban-footer .btn {
-        margin-bottom: 0.5rem;
+    .doctor-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
     }
-}
 </style>
 
 <script>
@@ -222,150 +138,129 @@ let currentDoctorId = null;
 
 function showDoctorDetails(doctorId) {
     currentDoctorId = doctorId;
-    
     fetch(`{{ url_for("admin.admin_doctor_details", doctor_id=0) }}`.replace('0', doctorId))
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             const doctor = data.doctor;
             const content = `
-                <div class="row">
-                    <div class="col-12 mb-4">
-                        <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            <strong>Pending Approval:</strong> This doctor is waiting for your approval to access the system.
-                        </div>
+                <div class="alert alert-warning d-flex align-items-center border-0">
+                    <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                    <div>
+                        <h6 class="alert-heading mb-0">This doctor is awaiting approval.</h6>
+                        Review their details below before taking action.
                     </div>
-                    <div class="col-md-6">
-                        <h6 class="text-primary mb-3">
-                            <i class="fas fa-user me-2"></i>
-                            Personal Information
-                        </h6>
-                        <div class="info-group">
-                            <p><strong>Full Name:</strong> Dr. ${doctor.full_name}</p>
-                            <p><strong>Mobile Number:</strong> ${doctor.mobile_number}</p>
-                            <p><strong>Email:</strong> ${doctor.email || 'Not provided'}</p>
-                        </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-lg-6">
+                        <h6 class="text-primary"><i class="fas fa-user-circle me-2"></i>Personal Information</h6>
+                        <hr class="mt-2">
+                        <dl class="row">
+                            <dt class="col-sm-5">Full Name</dt>
+                            <dd class="col-sm-7">: Dr. ${doctor.full_name}</dd>
+                            <dt class="col-sm-5">Mobile Number</dt>
+                            <dd class="col-sm-7">: ${doctor.mobile_number}</dd>
+                            <dt class="col-sm-5">Email</dt>
+                            <dd class="col-sm-7">: ${doctor.email || '<span class="text-muted">N/A</span>'}</dd>
+                        </dl>
                     </div>
-                    <div class="col-md-6">
-                        <h6 class="text-primary mb-3">
-                            <i class="fas fa-stethoscope me-2"></i>
-                            Professional Information
-                        </h6>
-                        <div class="info-group">
-                            <p><strong>Specialization:</strong> ${doctor.specialization}</p>
-                            <p><strong>License Number:</strong> ${doctor.license_number}</p>
-                            <p><strong>Experience:</strong> ${doctor.experience_years} years</p>
-                            <p><strong>Qualification:</strong> ${doctor.qualification}</p>
-                            <p><strong>Hospital/Clinic:</strong> ${doctor.hospital_affiliation || 'Not provided'}</p>
-                        </div>
+                    <div class="col-lg-6">
+                        <h6 class="text-primary"><i class="fas fa-stethoscope me-2"></i>Professional Information</h6>
+                        <hr class="mt-2">
+                        <dl class="row">
+                            <dt class="col-sm-5">Specialization</dt>
+                            <dd class="col-sm-7">: ${doctor.specialization}</dd>
+                            <dt class="col-sm-5">License No.</dt>
+                            <dd class="col-sm-7">: ${doctor.license_number}</dd>
+                            <dt class="col-sm-5">Experience</dt>
+                            <dd class="col-sm-7">: ${doctor.experience_years} years</dd>
+                            <dt class="col-sm-5">Qualification</dt>
+                            <dd class="col-sm-7">: ${doctor.qualification}</dd>
+                            <dt class="col-sm-5">Affiliation</dt>
+                            <dd class="col-sm-7">: ${doctor.hospital_affiliation || '<span class="text-muted">N/A</span>'}</dd>
+                        </dl>
                     </div>
-                    <div class="col-12">
-                        <h6 class="text-primary mb-3">
-                            <i class="fas fa-info-circle me-2"></i>
-                            Registration Information
-                        </h6>
-                        <div class="info-group">
-                            <p><strong>Registration Date:</strong> ${doctor.created_at}</p>
-                            <p><strong>Current Status:</strong> 
-                                <span class="badge bg-warning">
-                                    <i class="fas fa-clock me-1"></i>Pending Approval
-                                </span>
-                            </p>
-                        </div>
-                    </div>
+                </div>
+                <div class="mt-3 bg-light p-3 rounded">
+                     <h6 class="text-primary mb-2"><i class="fas fa-info-circle me-2"></i>Registration Details</h6>
+                     <p class="mb-0 small text-muted">
+                        Registered on <strong>${new Date(doctor.created_at).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}</strong>
+                        with status <span class="badge bg-warning text-dark">Pending Approval</span>.
+                     </p>
                 </div>
             `;
             document.getElementById('doctorApprovalContent').innerHTML = content;
-            const modal = new bootstrap.Modal(document.getElementById('doctorApprovalModal'));
-            modal.show();
+            new bootstrap.Modal(document.getElementById('doctorApprovalModal')).show();
         }
     });
 }
 
 function approveDoctor(doctorId) {
-    if (confirm('Are you sure you want to approve this doctor? They will be able to login and access the system.')) {
+    // Confirmation logic can be replaced with a nicer modal library like SweetAlert2
+    if (confirm('Are you sure you want to approve this doctor?')) {
         performApproval(doctorId);
     }
 }
 
 function rejectDoctor(doctorId) {
-    if (confirm('Are you sure you want to reject this doctor? This action will permanently remove their account.')) {
+    if (confirm('Are you sure you want to reject this doctor? This is permanent.')) {
         performRejection(doctorId);
     }
 }
 
 function approveDoctorFromModal() {
-    if (currentDoctorId && confirm('Are you sure you want to approve this doctor? They will be able to login and access the system.')) {
-        performApproval(currentDoctorId);
-        const modal = bootstrap.Modal.getInstance(document.getElementById('doctorApprovalModal'));
-        modal.hide();
-    }
+    performApproval(currentDoctorId);
+    bootstrap.Modal.getInstance(document.getElementById('doctorApprovalModal')).hide();
 }
 
 function rejectDoctorFromModal() {
-    if (currentDoctorId && confirm('Are you sure you want to reject this doctor? This action will permanently remove their account.')) {
-        performRejection(currentDoctorId);
-        const modal = bootstrap.Modal.getInstance(document.getElementById('doctorApprovalModal'));
-        modal.hide();
-    }
+    performRejection(currentDoctorId);
+    bootstrap.Modal.getInstance(document.getElementById('doctorApprovalModal')).hide();
 }
 
 function performApproval(doctorId) {
-    fetch(`{{ url_for("admin.admin_approve_doctor", doctor_id=0) }}`.replace('0', doctorId), {
-        method: 'POST'
-    })
+    fetch(`{{ url_for("admin.admin_approve_doctor", doctor_id=0) }}`.replace('0', doctorId), { method: 'POST' })
     .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showAlert('success', data.message);
-            setTimeout(() => {
-                location.reload();
-            }, 1500);
-        } else {
-            showAlert('danger', data.message);
-        }
-    })
-    .catch(error => {
-        showAlert('danger', 'An error occurred while approving the doctor.');
-    });
+    .then(data => handleResponse(data.success, data.message));
 }
 
 function performRejection(doctorId) {
-    fetch(`{{ url_for("admin.admin_reject_doctor", doctor_id=0) }}`.replace('0', doctorId), {
-        method: 'POST'
-    })
+    fetch(`{{ url_for("admin.admin_reject_doctor", doctor_id=0) }}`.replace('0', doctorId), { method: 'POST' })
     .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showAlert('success', data.message);
-            setTimeout(() => {
-                location.reload();
-            }, 1500);
-        } else {
-            showAlert('danger', data.message);
-        }
-    })
-    .catch(error => {
-        showAlert('danger', 'An error occurred while rejecting the doctor.');
-    });
+    .then(data => handleResponse(data.success, data.message));
+}
+
+function handleResponse(success, message) {
+    showAlert(success ? 'success' : 'danger', message);
+    if (success) {
+        setTimeout(() => location.reload(), 1500);
+    }
 }
 
 function showAlert(type, message) {
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-    alertDiv.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : (type === 'danger' ? 'exclamation-triangle' : 'info-circle')} me-2"></i>
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    const toastContainer = document.createElement('div');
+    toastContainer.style.position = 'fixed';
+    toastContainer.style.top = '20px';
+    toastContainer.style.right = '20px';
+    toastContainer.style.zIndex = '1090'; // Above modals
+    
+    const alertHtml = `
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-${type} text-white">
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'} me-2"></i>
+                <strong class="me-auto">${type === 'success' ? 'Success' : 'Error'}</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">${message}</div>
+        </div>
     `;
-    
-    const container = document.querySelector('.admin-content');
-    container.insertBefore(alertDiv, container.firstChild);
-    
-    // Auto remove after 5 seconds
+    toastContainer.innerHTML = alertHtml;
+    document.body.appendChild(toastContainer);
+
+    const toast = new bootstrap.Toast(toastContainer.querySelector('.toast'));
+    toast.show();
     setTimeout(() => {
-        alertDiv.remove();
+        toastContainer.remove();
     }, 5000);
 }
 </script>
