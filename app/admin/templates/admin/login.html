@@ -1,775 +1,152 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="admin-login-container">
-    <!-- Animated Medical Background -->
-    <div class="medical-background">
-        <!-- Floating Medical Icons -->
-        <div class="floating-medical-icons">
-            <div class="medical-icon icon-1">
-                <i class="fas fa-user-shield"></i>
-            </div>
-            <div class="medical-icon icon-2">
-                <i class="fas fa-hospital"></i>
-            </div>
-            <div class="medical-icon icon-3">
-                <i class="fas fa-chart-line"></i>
-            </div>
-            <div class="medical-icon icon-4">
-                <i class="fas fa-users-cog"></i>
-            </div>
-            <div class="medical-icon icon-5">
-                <i class="fas fa-clipboard-list"></i>
-            </div>
-            <div class="medical-icon icon-6">
-                <i class="fas fa-database"></i>
-            </div>
-        </div>
-        
-        <!-- Animated Grid Pattern -->
-        <div class="grid-pattern">
-            <div class="grid-line horizontal" style="top: 20%;"></div>
-            <div class="grid-line horizontal" style="top: 40%;"></div>
-            <div class="grid-line horizontal" style="top: 60%;"></div>
-            <div class="grid-line horizontal" style="top: 80%;"></div>
-            <div class="grid-line vertical" style="left: 20%;"></div>
-            <div class="grid-line vertical" style="left: 40%;"></div>
-            <div class="grid-line vertical" style="left: 60%;"></div>
-            <div class="grid-line vertical" style="left: 80%;"></div>
-        </div>
-        
-        <!-- Pulse Circles -->
-        <div class="pulse-circles">
-            <div class="pulse-circle circle-1"></div>
-            <div class="pulse-circle circle-2"></div>
-            <div class="pulse-circle circle-3"></div>
-        </div>
-    </div>
-    
-    <!-- Main Content -->
-    <div class="admin-content">
-        <div class="container-fluid h-100">
-            <div class="row h-100 align-items-center justify-content-center">
-                <div class="col-xl-4 col-lg-5 col-md-6 col-sm-8 col-10">
-                    {% if logged_in %}
-                    <!-- Success State -->
-                    <div class="login-form-container success-state">
-                        <div class="success-content text-center">
-                            <div class="success-icon mb-4">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            <h2 class="success-title mb-3">Login Successful!</h2>
-                            <p class="success-message mb-4">
-                                Welcome back, Administrator! You have successfully logged into the admin panel.
-                            </p>
-                            <div class="success-actions">
-                                <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-primary me-3">
-                                    <i class="fas fa-tachometer-alt me-2"></i>
-                                    Go to Dashboard
-                                </a>
-                                <a href="{{ url_for('admin.admin_logout') }}" class="btn btn-outline-primary me-3">
-                                    <i class="fas fa-sign-out-alt me-2"></i>
-                                    Logout
-                                </a>
-                                <a href="/" class="btn btn-outline-secondary">
-                                    <i class="fas fa-home me-2"></i>
-                                    Main Site
-                                </a>
-                            </div>
-                        </div>
+<div class="container-fluid vh-100 d-flex flex-column justify-content-center align-items-center"
+     style="background: linear-gradient(135deg, rgba(20, 108, 148, 0.85), rgba(30, 60, 114, 0.9)), 
+            url('{{ url_for('static', filename='image/admin_login_bg.jpg') }}'); 
+            background-size: cover; 
+            background-position: center;">
+
+    <div class="col-xl-4 col-lg-5 col-md-7 col-sm-9 col-11">
+
+        {% if logged_in %}
+        <div class="card shadow-lg border-0 rounded-4 animate__animated animate__fadeIn">
+            <div class="card-body p-4 p-md-5 text-center">
+
+                <div class="d-flex justify-content-center mb-4">
+                    <div class="bg-success text-white d-flex align-items-center justify-content-center rounded-circle" style="width:80px; height:80px;">
+                        <i class="fas fa-check-circle fa-3x"></i>
                     </div>
-                    {% else %}
-                    <!-- Login Form -->
-                    <div class="login-form-container">
-                        <!-- Header -->
-                        <div class="login-header text-center mb-5">
-                            <div class="admin-logo-circle mb-4">
-                                <i class="fas fa-user-shield"></i>
-                            </div>
-                            <h5 class="login-title">Administrator Access</h5>
-                            <!-- <p class="login-subtitle">Secure login to hospital management system</p> -->
-                        </div>
-                        
-                        <!-- Flash Messages -->
-                        {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                        {% for category, message in messages %}
-                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show admin-alert" role="alert">
-                            <i class="fas fa-{{ 'exclamation-triangle' if category == 'danger' else ('check-circle' if category == 'success' else 'info-circle') }} me-2"></i>
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                        {% endfor %}
-                        {% endif %}
-                        {% endwith %}
-                        
-                        <!-- Login Form -->
-                        <form method="POST" action="{{ url_for('admin.admin_login_post') }}" class="admin-login-form">
-                            <div class="form-group mb-4">
-                                <label class="form-label">Administrator Username</label>
-                                <div class="input-container">
-                                    <div class="input-icon">
-                                        <i class="fas fa-user-shield"></i>
-                                    </div>
-                                    <input type="text" 
-                                           class="form-control admin-input" 
-                                           name="username" 
-                                           placeholder="Enter admin username" 
-                                           required
-                                           autocomplete="username">
-                                    <div class="input-border"></div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group mb-4">
-                                <label class="form-label">Administrator Password</label>
-                                <div class="input-container">
-                                    <div class="input-icon">
-                                        <i class="fas fa-lock"></i>
-                                    </div>
-                                    <input type="password" 
-                                           class="form-control admin-input" 
-                                           name="password" 
-                                           placeholder="Enter admin password" 
-                                           required
-                                           autocomplete="current-password">
-                                    <div class="input-border"></div>
-                                    <div class="password-toggle" onclick="toggleAdminPassword(this)">
-                                        <i class="fas fa-eye"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- <div class="form-group mb-4">
-                                <div class="security-notice">
-                                    <i class="fas fa-shield-alt me-2"></i>
-                                    <span>This is a secure administrative area. All activities are logged.</span>
-                                </div>
-                            </div> -->
-                            
-                            <button type="submit" class="btn admin-login-btn w-100 mb-4">
-                                <span class="btn-content">
-                                    <i class="fas fa-sign-in-alt me-2"></i>
-                                    <span class="btn-text">Access Admin Panel</span>
-                                </span>
-                                <div class="btn-loader">
-                                    <div class="spinner"></div>
-                                </div>
-                            </button>
-                        </form>
-                        
-                        <!-- Footer -->
-                        <div class="login-footer text-center">
-                            <div class="back-to-home">
-                                <a href="/" class="text-decoration-none">
-                                    <i class="fas fa-arrow-left me-2"></i>
-                                    Back to Main Site
-                                </a>
-                            </div>
-                            <div class="security-info mt-3">
-                                <small class="text-muted">
-                                    <i class="fas fa-lock me-1"></i>
-                                    Protected by enterprise-grade security
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
                 </div>
+
+                <h2 class="fw-bold text-success mb-3">Login Successful!</h2>
+                <p class="text-muted mb-4">
+                    Welcome back, Administrator! You are now securely logged in.
+                </p>
+
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-primary btn-lg fw-semibold">
+                        <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                    </a>
+                </div>
+                <div class="d-flex justify-content-center gap-2 mt-3">
+                    <a href="{{ url_for('admin.admin_logout') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </a>
+                    <a href="/" class="btn btn-outline-secondary">
+                        <i class="fas fa-home me-2"></i>Main Site
+                    </a>
+                </div>
+
             </div>
         </div>
+
+        {% else %}
+        <div class="card shadow-lg border-0 rounded-4 animate__animated animate__fadeInUp">
+            <div class="card-body p-4 p-md-5">
+
+                <div class="text-center mb-4">
+                    <div class="bg-primary text-white d-flex align-items-center justify-content-center rounded-circle mx-auto mb-4" style="width:80px; height:80px;">
+                        <i class="fas fa-user-shield fa-2x"></i>
+                    </div>
+                    <h3 class="card-title fw-bold mb-1" style="color: #1e3c72;">Administrator Access</h3>
+                    <p class="text-muted">Sign in to manage the system</p>
+                </div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} d-flex align-items-center" role="alert">
+                    <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'info-circle' }} me-2"></i>
+                    <div>{{ message }}</div>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('admin.admin_login_post') }}" class="needs-validation" novalidate>
+                    <div class="input-group input-group-lg mb-4">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="fas fa-user-shield text-primary"></i>
+                        </span>
+                        <input type="text"
+                               class="form-control border-start-0"
+                               name="username"
+                               placeholder="Admin Username"
+                               required
+                               autocomplete="username">
+                    </div>
+
+                    <div class="input-group input-group-lg mb-4">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="fas fa-lock text-primary"></i>
+                        </span>
+                        <input type="password"
+                               class="form-control border-start-0 border-end-0"
+                               name="password"
+                               id="adminPassword"
+                               placeholder="Admin Password"
+                               required
+                               autocomplete="current-password">
+                        <button class="btn btn-outline-secondary border-start-0" type="button" id="togglePasswordBtn">
+                            <i class="fas fa-eye" id="togglePasswordIcon"></i>
+                        </button>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg fw-bold bg-gradient">
+                            <i class="fas fa-sign-in-alt me-2"></i>Access Admin Panel
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-4">
+                    <a href="/" class="text-decoration-none">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Main Site
+                    </a>
+                    <p class="text-muted small mt-3">
+                        <i class="fas fa-lock me-1"></i>All connections are secure and encrypted.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 
-<style>
-/* Admin Login Styles */
-.admin-login-container {
-    position: relative;
-    min-height: 100vh;
-    width: 100%;
-    overflow: hidden;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #667eea 50%, #764ba2 75%, #f093fb 100%);
-}
-
-/* Medical Background Animation */
-.medical-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-}
-
-.floating-medical-icons {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.medical-icon {
-    position: absolute;
-    color: rgba(255, 255, 255, 0.1);
-    font-size: 3rem;
-    animation: floatMedical 20s ease-in-out infinite;
-}
-
-.icon-1 { top: 10%; left: 5%; animation-delay: 0s; }
-.icon-2 { top: 20%; right: 10%; animation-delay: 3s; }
-.icon-3 { top: 60%; left: 8%; animation-delay: 6s; }
-.icon-4 { top: 70%; right: 15%; animation-delay: 9s; }
-.icon-5 { top: 30%; left: 85%; animation-delay: 12s; }
-.icon-6 { top: 80%; left: 50%; animation-delay: 15s; }
-
-@keyframes floatMedical {
-    0%, 100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.1; }
-    25% { transform: translateY(-30px) rotate(5deg) scale(1.1); opacity: 0.2; }
-    50% { transform: translateY(-15px) rotate(-3deg) scale(0.9); opacity: 0.15; }
-    75% { transform: translateY(-35px) rotate(8deg) scale(1.2); opacity: 0.25; }
-}
-
-/* Grid Pattern */
-.grid-pattern {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.grid-line {
-    position: absolute;
-    background: rgba(255, 255, 255, 0.05);
-    animation: gridPulse 8s ease-in-out infinite;
-}
-
-.grid-line.horizontal {
-    width: 100%;
-    height: 1px;
-}
-
-.grid-line.vertical {
-    width: 1px;
-    height: 100%;
-}
-
-@keyframes gridPulse {
-    0%, 100% { opacity: 0.05; }
-    50% { opacity: 0.15; }
-}
-
-/* Pulse Circles */
-.pulse-circles {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.pulse-circle {
-    position: absolute;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    animation: pulse 6s ease-in-out infinite;
-}
-
-.circle-1 {
-    width: 200px;
-    height: 200px;
-    top: 20%;
-    left: 10%;
-    animation-delay: 0s;
-}
-
-.circle-2 {
-    width: 150px;
-    height: 150px;
-    top: 60%;
-    right: 20%;
-    animation-delay: 2s;
-}
-
-.circle-3 {
-    width: 100px;
-    height: 100px;
-    bottom: 20%;
-    left: 60%;
-    animation-delay: 4s;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.1; }
-    50% { transform: scale(1.2); opacity: 0.3; }
-}
-
-/* Main Content */
-.admin-content {
-    position: relative;
-    z-index: 2;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 0;
-}
-
-.login-form-container {
-    width: 100%;
-    max-width: 550px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    border-radius: 25px;
-    padding: 3rem 2.5rem;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    margin: 0 auto;
-}
-
-/* Admin Logo */
-.admin-logo-circle {
-    width: 100px;
-    height: 100px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 2.5rem;
-    margin: 0 auto;
-    box-shadow: 0 15px 30px rgba(102, 126, 234, 0.3);
-    animation: logoFloat 6s ease-in-out infinite;
-}
-
-@keyframes logoFloat {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-10px) scale(1.05); }
-}
-
-/* Login Header */
-.login-title {
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: #1e3c72;
-    margin-bottom: 0.5rem;
-}
-
-.login-subtitle {
-    color: #667eea;
-    font-size: 1rem;
-    font-weight: 500;
-}
-
-/* Form Styles */
-.form-label {
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-}
-
-.input-container {
-    position: relative;
-    margin-bottom: 0.5rem;
-}
-
-.input-icon {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #667eea;
-    font-size: 1.2rem;
-    z-index: 2;
-}
-
-.admin-input {
-    height: 60px;
-    padding-left: 50px;
-    padding-right: 50px;
-    border-radius: 15px;
-    border: 2px solid #e5e7eb;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.9);
-    font-weight: 500;
-}
-
-.admin-input:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    background: white;
-    outline: none;
-}
-
-.input-border {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 3px;
-    width: 0;
-    background: linear-gradient(90deg, #667eea, #764ba2);
-    transition: width 0.3s ease;
-    border-radius: 0 0 15px 15px;
-}
-
-.admin-input:focus ~ .input-border {
-    width: 100%;
-}
-
-.password-toggle {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #9ca3af;
-    cursor: pointer;
-    font-size: 1.1rem;
-    transition: color 0.3s ease;
-    z-index: 2;
-}
-
-.password-toggle:hover {
-    color: #667eea;
-}
-
-/* Security Notice */
-.security-notice {
-    background: rgba(102, 126, 234, 0.1);
-    border: 1px solid rgba(102, 126, 234, 0.2);
-    border-radius: 10px;
-    padding: 1rem;
-    color: #667eea;
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-align: center;
-}
-
-/* Login Button */
-.admin-login-btn {
-    height: 60px;
-    border-radius: 15px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    font-size: 1.1rem;
-    font-weight: 700;
-    border: none;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.admin-login-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
-    background: linear-gradient(135deg, #5a6fd8 0%, #6b5b95 100%);
-}
-
-.admin-login-btn:active {
-    transform: translateY(-1px);
-}
-
-.btn-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-}
-
-.btn-loader {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.spinner {
-    width: 20px;
-    height: 20px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top: 2px solid white;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Success State */
-.success-state {
-    text-align: center;
-}
-
-.success-icon {
-    width: 100px;
-    height: 100px;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 3rem;
-    margin: 0 auto;
-    animation: successPulse 2s ease-in-out infinite;
-}
-
-@keyframes successPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-.success-title {
-    font-size: 2rem;
-    font-weight: 800;
-    color: #10b981;
-}
-
-.success-message {
-    color: #374151;
-    font-size: 1.1rem;
-    line-height: 1.6;
-}
-
-.success-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-/* Footer */
-.login-footer {
-    margin-top: 2rem;
-}
-
-.back-to-home a {
-    color: #667eea;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    font-size: 0.95rem;
-}
-
-.back-to-home a:hover {
-    color: #1e3c72;
-    transform: translateX(-5px);
-}
-
-.security-info {
-    color: #9ca3af;
-}
-
-/* Alert Styles */
-.admin-alert {
-    border-radius: 12px;
-    border: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    font-weight: 500;
-}
-
-.admin-alert.alert-success {
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: white;
-    border: none;
-}
-
-.admin-alert.alert-danger {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: white;
-    border: none;
-}
-
-.admin-alert.alert-warning {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    color: white;
-    border: none;
-}
-
-.admin-alert.alert-info {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    color: white;
-    border: none;
-}
-
-/* Responsive Design */
-@media (max-width: 576px) {
-    .admin-login-container {
-        padding: 1rem 0;
-    }
-    
-    .login-form-container {
-        padding: 2rem 1.5rem;
-        border-radius: 20px;
-        margin: 1rem;
-    }
-    
-    .admin-input {
-        height: 55px;
-        font-size: 0.95rem;
-    }
-    
-    .admin-login-btn {
-        height: 55px;
-        font-size: 1rem;
-    }
-    
-    .medical-icon {
-        font-size: 2.5rem;
-    }
-    
-    .login-title {
-        font-size: 1.8rem;
-    }
-    
-    .success-actions {
-        flex-direction: column;
-    }
-    
-    .success-actions .btn {
-        width: 100%;
-        margin-bottom: 0.5rem;
-    }
-}
-
-/* Loading State */
-.admin-login-btn.loading .btn-content {
-    opacity: 0;
-}
-
-.admin-login-btn.loading .btn-loader {
-    opacity: 1;
-}
-
-/* Form Validation */
-.admin-input.is-invalid {
-    border-color: #ef4444 !important;
-    box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25) !important;
-}
-
-.admin-input.is-valid {
-    border-color: #10b981 !important;
-    box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.25) !important;
-}
-</style>
-
 <script>
+// JavaScript for Password Toggle Functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Form validation
-    const form = document.querySelector('.admin-login-form');
-    if (form) {
-        const inputs = form.querySelectorAll('.admin-input');
-        const submitBtn = form.querySelector('.admin-login-btn');
-        
-        // Real-time validation
-        inputs.forEach(input => {
-            input.addEventListener('input', function() {
-                validateInput(this);
-            });
-            
-            input.addEventListener('blur', function() {
-                validateInput(this);
-            });
-        });
-        
-        function validateInput(input) {
-            const value = input.value.trim();
-            
-            if (value === '') {
-                input.classList.remove('is-valid');
-                input.classList.add('is-invalid');
-                return false;
-            } else {
-                input.classList.remove('is-invalid');
-                input.classList.add('is-valid');
-                return true;
-            }
-        }
-        
-        // Form submission with loading state
-        form.addEventListener('submit', function(e) {
-            let isValid = true;
-            
-            inputs.forEach(input => {
-                if (!validateInput(input)) {
-                    isValid = false;
-                }
-            });
-            
-            if (isValid) {
-                // Add loading state
-                submitBtn.classList.add('loading');
-                submitBtn.disabled = true;
-                
-                // Simulate processing time (remove in production)
-                setTimeout(() => {
-                    // Form will submit naturally
-                }, 500);
-            } else {
-                e.preventDefault();
-            }
-        });
-        
-        // Auto-focus first input
-        const firstInput = form.querySelector('.admin-input');
-        if (firstInput) {
-            firstInput.focus();
-        }
-        
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            // Alt + A to focus username field
-            if (e.altKey && e.key === 'a') {
-                e.preventDefault();
-                document.querySelector('input[name="username"]').focus();
-            }
-            
-            // Alt + P to focus password field
-            if (e.altKey && e.key === 'p') {
-                e.preventDefault();
-                document.querySelector('input[name="password"]').focus();
-            }
-        });
-    }
-    
-    // Enhanced security notice
-    const securityNotice = document.querySelector('.security-notice');
-    if (securityNotice) {
-        securityNotice.addEventListener('mouseenter', function() {
-            this.style.transform = 'scale(1.02)';
-            this.style.background = 'rgba(102, 126, 234, 0.15)';
-        });
-        
-        securityNotice.addEventListener('mouseleave', function() {
-            this.style.transform = 'scale(1)';
-            this.style.background = 'rgba(102, 126, 234, 0.1)';
-        });
-    }
-});
+    const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+    if (togglePasswordBtn) {
+        togglePasswordBtn.addEventListener('click', function () {
+            const passwordInput = document.getElementById('adminPassword');
+            const passwordIcon = document.getElementById('togglePasswordIcon');
 
-// Password toggle functionality
-function toggleAdminPassword(element) {
-    const input = element.parentElement.querySelector('input');
-    const icon = element.querySelector('i');
-    
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-        element.style.color = '#667eea';
-    } else {
-        input.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-        element.style.color = '#9ca3af';
+            // Toggle the type attribute
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+            // Toggle the icon
+            passwordIcon.classList.toggle('fa-eye');
+            passwordIcon.classList.toggle('fa-eye-slash');
+        });
     }
-}
+
+    // Standard Bootstrap 5 form validation script
+    // (This prevents submission if fields are invalid)
+    var forms = document.querySelectorAll('.needs-validation');
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+});
 </script>
 {% endblock %}
