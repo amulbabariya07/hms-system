@@ -1,289 +1,171 @@
 {% extends "admin/base_admin.html" %}
-
 {% block title %}Dashboard - Admin Panel{% endblock %}
 {% block page_title %}Dashboard{% endblock %}
-
 {% block content %}
-<div class="dashboard-content">
-    <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <div class="stat-card stat-card-primary">
-                <div class="stat-card-body">
-                    <div class="stat-icon">
-                        <i class="fas fa-calendar-day"></i>
-                    </div>
-                    <div class="stat-content">
-                        <h3 class="stat-number">{{ stats.today_appointments }}</h3>
-                        <p class="stat-label">Today's Appointments</p>
-                    </div>
-                </div>
+
+<!-- Page Background -->
+<div class="min-vh-100 p-5 bg-dark-subtle">
+
+  <div class="container-fluid">
+    <!-- Stats Section -->
+    <div class="row g-4 mb-4">
+      <div class="col-xl col-md-4 col-sm-6">
+        <div class="card h-100 shadow border-0 bg-white rounded-4">
+          <div class="card-body d-flex align-items-center">
+            <div class="bg-primary bg-gradient text-white p-3 rounded-3 me-3">
+              <i class="fas fa-calendar-day fa-2x"></i>
             </div>
-        </div>
-        
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <div class="stat-card stat-card-success">
-                <div class="stat-card-body">
-                    <div class="stat-icon">
-                        <i class="fas fa-calendar-alt"></i>
-                    </div>
-                    <div class="stat-content">
-                        <h3 class="stat-number">{{ stats.total_appointments }}</h3>
-                        <p class="stat-label">Total Appointments</p>
-                    </div>
-                </div>
+            <div>
+              <h4 class="fw-bold mb-0">{{ stats.today_appointments }}</h4>
+              <small class="text-muted">Today's Appointments</small>
             </div>
+          </div>
         </div>
-        
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <div class="stat-card stat-card-info">
-                <div class="stat-card-body">
-                    <div class="stat-icon">
-                        <i class="fas fa-user-md"></i>
-                    </div>
-                    <div class="stat-content">
-                        <h3 class="stat-number">{{ stats.total_doctors }}</h3>
-                        <p class="stat-label">Approved Doctors</p>
-                    </div>
-                </div>
+      </div>
+      <div class="col-xl col-md-4 col-sm-6">
+        <div class="card h-100 shadow border-0 bg-white rounded-4">
+          <div class="card-body d-flex align-items-center">
+            <div class="bg-success bg-gradient text-white p-3 rounded-3 me-3">
+              <i class="fas fa-calendar-alt fa-2x"></i>
             </div>
-        </div>
-        
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <div class="stat-card stat-card-warning">
-                <div class="stat-card-body">
-                    <div class="stat-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <div class="stat-content">
-                        <h3 class="stat-number">{{ stats.pending_doctors }}</h3>
-                        <p class="stat-label">Pending Approvals</p>
-                    </div>
-                </div>
+            <div>
+              <h4 class="fw-bold mb-0">{{ stats.total_appointments }}</h4>
+              <small class="text-muted">Total Appointments</small>
             </div>
+          </div>
         </div>
-        
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <div class="stat-card stat-card-secondary">
-                <div class="stat-card-body">
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="stat-content">
-                        <h3 class="stat-number">{{ stats.total_patients }}</h3>
-                        <p class="stat-label">Registered Patients</p>
-                    </div>
-                </div>
+      </div>
+      <div class="col-xl col-md-4 col-sm-6">
+        <div class="card h-100 shadow border-0 bg-white rounded-4">
+          <div class="card-body d-flex align-items-center">
+            <div class="bg-info bg-gradient text-white p-3 rounded-3 me-3">
+              <i class="fas fa-user-md fa-2x"></i>
             </div>
+            <div>
+              <h4 class="fw-bold mb-0">{{ stats.total_doctors }}</h4>
+              <small class="text-muted">Approved Doctors</small>
+            </div>
+          </div>
         </div>
+      </div>
+      <div class="col-xl col-md-4 col-sm-6">
+        <div class="card h-100 shadow border-0 bg-white rounded-4">
+          <div class="card-body d-flex align-items-center">
+            <div class="bg-warning bg-gradient text-white p-3 rounded-3 me-3">
+              <i class="fas fa-clock fa-2x"></i>
+            </div>
+            <div>
+              <h4 class="fw-bold mb-0">{{ stats.pending_doctors }}</h4>
+              <small class="text-muted">Pending Approvals</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl col-md-4 col-sm-6">
+        <div class="card h-100 shadow border-0 bg-white rounded-4">
+          <div class="card-body d-flex align-items-center">
+            <div class="bg-secondary bg-gradient text-white p-3 rounded-3 me-3">
+              <i class="fas fa-users fa-2x"></i>
+            </div>
+            <div>
+              <h4 class="fw-bold mb-0">{{ stats.total_patients }}</h4>
+              <small class="text-muted">Registered Patients</small>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="admin-card">
-                <div class="admin-card-header">
-                    <h5 class="mb-0">
-                        <i class="fas fa-bolt me-2"></i>
-                        Quick Actions
-                    </h5>
-                </div>
-                <div class="admin-card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ url_for('admin.admin_doctors') }}" class="btn btn-outline-primary w-100 py-3">
-                                <i class="fas fa-user-md fa-2x mb-2 d-block"></i>
-                                Manage Doctors
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ url_for('admin.admin_patients') }}" class="btn btn-outline-success w-100 py-3">
-                                <i class="fas fa-users fa-2x mb-2 d-block"></i>
-                                Manage Patients
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ url_for('admin.admin_appointments') }}" class="btn btn-outline-info w-100 py-3">
-                                <i class="fas fa-calendar-alt fa-2x mb-2 d-block"></i>
-                                View Appointments
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ url_for('admin.admin_doctors_approval') }}" class="btn btn-outline-warning w-100 py-3">
-                                <i class="fas fa-user-check fa-2x mb-2 d-block"></i>
-                                Doctor Approvals
-                                {% if stats.pending_doctors > 0 %}
-                                <span class="badge bg-danger ms-2">{{ stats.pending_doctors }}</span>
-                                {% endif %}
-                            </a>
-                        </div>
-                    </div>
-                </div>
+    <!-- Actions + Recent Activity -->
+    <div class="row g-4">
+      <!-- Quick Actions -->
+      <div class="col-lg-5">
+        <div class="card shadow border-0 h-100 rounded-4">
+          <div class="card-header bg-primary bg-gradient text-white fw-bold rounded-top">
+            <i class="fas fa-bolt me-2"></i> Quick Actions
+          </div>
+          <div class="card-body">
+            <div class="row row-cols-2 g-3">
+              <div class="col">
+                <a href="{{ url_for('admin.admin_doctors') }}" class="btn btn-outline-primary w-100 h-100 d-flex flex-column justify-content-center align-items-center p-3">
+                  <i class="fas fa-user-md fa-2x mb-2"></i>
+                  <span class="fw-semibold">Manage Doctors</span>
+                </a>
+              </div>
+              <div class="col">
+                <a href="{{ url_for('admin.admin_patients') }}" class="btn btn-outline-success w-100 h-100 d-flex flex-column justify-content-center align-items-center p-3">
+                  <i class="fas fa-users fa-2x mb-2"></i>
+                  <span class="fw-semibold">Manage Patients</span>
+                </a>
+              </div>
+              <div class="col">
+                <a href="{{ url_for('admin.admin_appointments') }}" class="btn btn-outline-info w-100 h-100 d-flex flex-column justify-content-center align-items-center p-3">
+                  <i class="fas fa-calendar-alt fa-2x mb-2"></i>
+                  <span class="fw-semibold">Appointments</span>
+                </a>
+              </div>
+              <div class="col position-relative">
+                <a href="{{ url_for('admin.admin_doctors_approval') }}" class="btn btn-outline-warning w-100 h-100 d-flex flex-column justify-content-center align-items-center p-3">
+                  <i class="fas fa-user-check fa-2x mb-2"></i>
+                  <span class="fw-semibold">Doctor Approvals</span>
+                  {% if stats.pending_doctors > 0 %}
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{ stats.pending_doctors }}
+                  </span>
+                  {% endif %}
+                </a>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="col-lg-7">
+        <div class="card shadow border-0 h-100 rounded-4">
+          <div class="card-header bg-success bg-gradient text-white fw-bold rounded-top">
+            <i class="fas fa-history me-2"></i> Recent Activity
+          </div>
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-0">Appointment: Anjali Sharma</h6>
+                  <small class="text-muted">With Dr. Vikram Singh - Cardiology</small>
+                </div>
+                <span class="badge bg-success rounded-pill">Confirmed</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-0">Appointment: Rohan Mehta</h6>
+                  <small class="text-muted">With Dr. Priya Desai - Pediatrics</small>
+                </div>
+                <span class="badge bg-warning rounded-pill">Pending</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-0">New Registration: Aisha Khan</h6>
+                  <small class="text-muted">New patient account created.</small>
+                </div>
+                <span class="text-muted small">5h ago</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-0">Doctor Approved: Dr. Arjun Patel</h6>
+                  <small class="text-muted">Neurology department</small>
+                </div>
+                <span class="text-muted small">1d ago</span>
+              </li>
+              <li class="list-group-item text-center">
+                <a href="#" class="btn btn-sm btn-outline-secondary">View All Activity</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Recent Activity -->
-    <div class="row">
-        <div class="col-md-6">
-            <div class="admin-card">
-                <div class="admin-card-header">
-                    <h5 class="mb-0">
-                        <i class="fas fa-clock me-2"></i>
-                        Recent Appointments
-                    </h5>
-                </div>
-                <div class="admin-card-body">
-                    <div class="text-center py-4">
-                        <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
-                        <p class="text-muted">Recent appointments will appear here</p>
-                        <a href="{{ url_for('admin.admin_appointments') }}" class="btn btn-sm btn-outline-primary">View All Appointments</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-6">
-            <div class="admin-card">
-                <div class="admin-card-header">
-                    <h5 class="mb-0">
-                        <i class="fas fa-user-plus me-2"></i>
-                        Recent Registrations
-                    </h5>
-                </div>
-                <div class="admin-card-body">
-                    <div class="text-center py-4">
-                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
-                        <p class="text-muted">Recent patient registrations will appear here</p>
-                        <a href="{{ url_for('admin.admin_patients') }}" class="btn btn-sm btn-outline-success">View All Patients</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
 
-<style>
-.stat-card {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: none;
-    overflow: hidden;
-}
-
-.stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-}
-
-.stat-card-body {
-    padding: 1.5rem;
-    display: flex;
-    align-items: center;
-}
-
-.stat-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    margin-right: 1rem;
-}
-
-.stat-content {
-    flex: 1;
-}
-
-.stat-number {
-    font-size: 2rem;
-    font-weight: bold;
-    margin: 0;
-    line-height: 1;
-}
-
-.stat-label {
-    font-size: 0.875rem;
-    margin: 0;
-    opacity: 0.8;
-}
-
-.stat-card-primary .stat-icon {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.stat-card-primary .stat-number {
-    color: #667eea;
-}
-
-.stat-card-success .stat-icon {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    color: white;
-}
-
-.stat-card-success .stat-number {
-    color: #4facfe;
-}
-
-.stat-card-info .stat-icon {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-    color: white;
-}
-
-.stat-card-info .stat-number {
-    color: #43e97b;
-}
-
-.stat-card-warning .stat-icon {
-    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-    color: white;
-}
-
-.stat-card-warning .stat-number {
-    color: #fa709a;
-}
-
-.stat-card-secondary .stat-icon {
-    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-    color: #666;
-}
-
-.stat-card-secondary .stat-number {
-    color: #666;
-}
-
-.dashboard-content {
-    padding: 0;
-}
-
-.admin-card {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    border: none;
-    margin-bottom: 1.5rem;
-}
-
-.admin-card-header {
-    padding: 1.5rem 1.5rem 0;
-    border-bottom: none;
-}
-
-.admin-card-body {
-    padding: 1.5rem;
-}
-
-.btn-outline-primary:hover,
-.btn-outline-success:hover,
-.btn-outline-info:hover,
-.btn-outline-warning:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
-</style>
 {% endblock %}
