@@ -4,133 +4,123 @@
 {% block page_title %}Patients Management{% endblock %}
 
 {% block content %}
-<div class="patients-content">
-    <!-- Header with Stats -->
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-users fa-2x text-primary me-3"></i>
-                <div>
-                    <h4 class="mb-0">Registered Patients</h4>
-                    <p class="text-muted mb-0">Manage all registered patients in the system</p>
+<div class="patients-content container-fluid p-4">
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-users fa-3x text-primary me-4"></i>
+                        <div>
+                            <h2 class="mb-1 fw-bold">Registered Patients</h2>
+                            <p class="text-muted mb-0">Manage all registered patients in the system.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <div class="card border-0 bg-primary-subtle">
+                         <div class="card-body p-3 text-center">
+                             <h5 class="mb-0 text-primary-emphasis">
+                                 <i class="fas fa-users me-2"></i>
+                                 Total Patients: <span class="fw-bolder">{{ patients|length }}</span>
+                             </h5>
+                         </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4 text-end">
-            <div class="stat-badge">
-                <span class="badge bg-primary fs-6 px-3 py-2">
-                    <i class="fas fa-users me-2"></i>
-                    Total: {{ patients|length }}
-                </span>
-            </div>
-        </div>
     </div>
 
-    <!-- Search and Filter -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="input-group">
-                <span class="input-group-text">
-                    <i class="fas fa-search"></i>
-                </span>
-                <input type="text" class="form-control" id="searchPatients" placeholder="Search patients by name, mobile, or email...">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-light-subtle border-0 py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">All Patients</h5>
+                <div class="input-group w-50" style="max-width: 400px;">
+                    <span class="input-group-text bg-light border-end-0">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" class="form-control border-start-0" id="searchPatients" placeholder="Search patients...">
+                </div>
             </div>
         </div>
-        <div class="col-md-6 text-end">
-            <button class="btn btn-outline-secondary" onclick="exportPatients()">
-                <i class="fas fa-download me-2"></i>Export
-            </button>
-        </div>
-    </div>
-
-    <!-- Patients Table -->
-    <div class="admin-card">
-        <div class="admin-card-body p-0">
+        <div class="card-body p-0">
             {% if patients %}
             <div class="table-responsive">
-                <table class="table table-hover mb-0" id="patientsTable">
+                <table class="table table-hover table-striped mb-0 align-middle" id="patientsTable">
                     <thead class="table-light">
                         <tr>
-                            <th>ID</th>
-                            <th>Patient Name</th>
-                            <th>Contact Info</th>
-                            <th>Age/Gender</th>
-                            <th>Registration Date</th>
-                            <th>Appointments</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th class="py-3 ps-4" style="width: 25%;">Patient</th>
+                            <th class="py-3">Mobile Number</th>
+                            <th class="py-3">Email Address</th>
+                            <th class="py-3">Age/Gender</th>
+                            <th class="py-3">Registration Date</th>
+                            <th class="py-3 text-center">Status</th>
+                            <th class="py-3 text-end pe-4">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for patient in patients %}
                         <tr>
-                            <td>
-                                <span class="badge bg-light text-dark">#{{ patient.id }}</span>
-                            </td>
-                            <td>
+                            <td class="ps-4">
                                 <div class="d-flex align-items-center">
-                                    <div class="avatar-circle me-3">
+                                    <div class="d-flex align-items-center justify-content-center fw-bold bg-primary text-white rounded-circle me-3" style="width: 45px; height: 45px; font-size: 1.1rem;">
                                         {{ patient.full_name[0].upper() }}
                                     </div>
                                     <div>
-                                        <strong>{{ patient.full_name }}</strong>
+                                        <a href="#" class="text-dark fw-bold text-decoration-none">{{ patient.full_name }}</a>
+                                        <small class="d-block text-muted">ID: #{{ patient.id }}</small>
                                     </div>
                                 </div>
                             </td>
                             <td>
-                                <div class="contact-info">
-                                    <div>
-                                        <i class="fas fa-phone text-primary me-2"></i>
-                                        {{ patient.mobile_number }}
-                                    </div>
-                                    {% if patient.email %}
-                                    <div class="text-muted small">
-                                        <i class="fas fa-envelope me-2"></i>
-                                        {{ patient.email }}
-                                    </div>
-                                    {% endif %}
-                                </div>
+                                <a href="tel:{{ patient.mobile_number }}" class="text-decoration-none text-muted d-flex align-items-center">
+                                    <i class="fas fa-phone-alt fa-sm me-2 text-primary"></i>
+                                    <span>{{ patient.mobile_number }}</span>
+                                </a>
                             </td>
                             <td>
-                                <div>
+                                {% if patient.email %}
+                                <a href="mailto:{{ patient.email }}" class="text-decoration-none text-muted d-flex align-items-center">
+                                    <i class="fas fa-envelope fa-sm me-2 text-primary"></i>
+                                    <span>{{ patient.email }}</span>
+                                </a>
+                                {% else %}
+                                <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="lh-sm">
                                     {% if patient.age %}
-                                    <span class="badge bg-info">{{ patient.age }} years</span>
+                                    <span class="badge text-bg-info fw-normal">{{ patient.age }} years</span>
                                     {% endif %}
                                     {% if patient.gender %}
-                                    <br><small class="text-muted">{{ patient.gender.title() }}</small>
+                                    <small class="text-muted d-block mt-1">{{ patient.gender.title() }}</small>
                                     {% endif %}
                                 </div>
                             </td>
                             <td>
-                                <div>
-                                    <strong>{{ patient.created_at.strftime('%d %b %Y') }}</strong>
-                                    <br><small class="text-muted">{{ patient.created_at.strftime('%I:%M %p') }}</small>
+                                <div class="lh-sm">
+                                    <strong class="text-dark">{{ patient.created_at.strftime('%d %b %Y') }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ patient.created_at.strftime('%I:%M %p') }}</small>
                                 </div>
                             </td>
-                            <td>
-                                <span class="badge bg-success">
-                                    {{ patient.appointments|length }} appointments
+                            <td class="text-center">
+                                <span class="badge bg-success-subtle text-success-emphasis rounded-pill fw-medium d-inline-flex align-items-center px-3 py-2">
+                                    <i class="fas fa-circle fa-xs me-2" style="font-size: 0.5rem; color: #198754;"></i>
+                                    Active
                                 </span>
                             </td>
-                            <td>
-                                <span class="badge bg-success">Active</span>
-                            </td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-sm btn-outline-primary" 
-                                            onclick="viewPatientDetails({{ patient.id }})" 
-                                            title="View Details">
+                            <td class="text-end pe-4">
+                                <div class="btn-group gap-1" role="group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="viewPatientDetails({{ patient.id }})" title="View Details">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    <!-- Added edit button for patient editing functionality -->
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" 
-                                            onclick="editPatient({{ patient.id }})" 
-                                            title="Edit Patient">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="editPatient({{ patient.id }})" title="Edit Patient">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-outline-info" 
-                                            onclick="viewPatientAppointments({{ patient.id }})" 
-                                            title="View Appointments">
+                                    <button type="button" class="btn btn-sm btn-outline-info" onclick="viewPatientAppointments({{ patient.id }})" title="View Appointments">
                                         <i class="fas fa-calendar-alt"></i>
                                     </button>
                                 </div>
@@ -151,20 +141,19 @@
     </div>
 </div>
 
-<!-- Patient Details Modal -->
 <div class="modal fade" id="patientDetailsModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header bg-info text-white">
+            <div class="modal-header bg-info text-white border-0">
                 <h5 class="modal-title">
-                    <i class="fas fa-user me-2"></i>
+                    <i class="fas fa-user-circle me-2"></i>
                     Patient Details
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" id="patientDetailsContent">
-                <div class="text-center py-4">
-                    <div class="spinner-border text-primary" role="status">
+            <div class="modal-body p-4" id="patientDetailsContent">
+                <div class="d-flex justify-content-center py-5">
+                    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
@@ -173,59 +162,57 @@
     </div>
 </div>
 
-<!-- Added Edit Patient Modal for editing patient information -->
-<!-- Edit Patient Modal -->
 <div class="modal fade" id="editPatientModal" tabindex="-1" aria-labelledby="editPatientModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header bg-warning text-dark">
+            <div class="modal-header bg-warning text-dark border-0">
                 <h5 class="modal-title" id="editPatientModalLabel">
                     <i class="fas fa-edit me-2"></i>
-                    Edit Patient
+                    Edit Patient Information
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 <form id="editPatientForm">
                     <input type="hidden" id="editPatientId" name="patient_id">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="editFullName" class="form-label">Full Name *</label>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="editFullName" class="form-label fw-bold">Full Name *</label>
                             <input type="text" class="form-control" id="editFullName" name="full_name" required>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="editMobileNumber" class="form-label">Mobile Number *</label>
+                        <div class="col-md-6">
+                            <label for="editMobileNumber" class="form-label fw-bold">Mobile Number *</label>
                             <input type="tel" class="form-control" id="editMobileNumber" name="mobile_number" required>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="editEmail" class="form-label">Email</label>
+                        <div class="col-md-6">
+                            <label for="editEmail" class="form-label fw-bold">Email</label>
                             <input type="email" class="form-control" id="editEmail" name="email">
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="editAge" class="form-label">Age</label>
+                        <div class="col-md-6">
+                            <label for="editAge" class="form-label fw-bold">Age</label>
                             <input type="number" class="form-control" id="editAge" name="age" min="1" max="120">
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="editGender" class="form-label">Gender</label>
-                            <select class="form-control" id="editGender" name="gender">
-                                <option value="">Select Gender</option>
+                        <div class="col-md-6">
+                            <label for="editGender" class="form-label fw-bold">Gender</label>
+                            <select class="form-select" id="editGender" name="gender">
+                                <option value="" selected>Select Gender</option>
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
                                 <option value="other">Other</option>
                             </select>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="editAddress" class="form-label">Address</label>
+                        <div class="col-md-6">
+                            <label for="editAddress" class="form-label fw-bold">Address</label>
                             <input type="text" class="form-control" id="editAddress" name="address">
                         </div>
-                        <div class="col-12 mb-3">
-                            <label for="editMedicalHistory" class="form-label">Medical History</label>
+                        <div class="col-12">
+                            <label for="editMedicalHistory" class="form-label fw-bold">Medical History</label>
                             <textarea class="form-control" id="editMedicalHistory" name="medical_history" rows="3" placeholder="Any relevant medical history..."></textarea>
                         </div>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer border-0 bg-light">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" onclick="submitEditPatient()">
                     <i class="fas fa-save me-2"></i>
@@ -235,92 +222,6 @@
         </div>
     </div>
 </div>
-
-<style>
-.patients-content {
-    padding: 0;
-}
-
-.admin-card {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    border: none;
-}
-
-.admin-card-body {
-    padding: 0;
-}
-
-.avatar-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 1.1rem;
-}
-
-.contact-info {
-    line-height: 1.4;
-}
-
-.stat-badge .badge {
-    font-size: 0.9rem;
-}
-
-.table th {
-    border-top: none;
-    font-weight: 600;
-    color: #495057;
-    background-color: #f8f9fa !important;
-}
-
-.table td {
-    vertical-align: middle;
-    border-color: #e9ecef;
-}
-
-.table-hover tbody tr:hover {
-    background-color: #f8f9fa;
-}
-
-.btn-group .btn {
-    border-radius: 4px;
-    margin-right: 2px;
-}
-
-.btn-group .btn:last-child {
-    margin-right: 0;
-}
-
-.input-group-text {
-    background-color: #f8f9fa;
-    border-color: #ced4da;
-}
-
-.form-control:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-}
-
-.form-label {
-    font-weight: 600;
-    color: #2c3e50;
-}
-
-.modal-header {
-    border-bottom: none;
-}
-
-.modal-footer {
-    border-top: none;
-}
-</style>
 
 <script>
 // Search functionality
@@ -339,99 +240,48 @@ function viewPatientDetails(patientId) {
     const modal = new bootstrap.Modal(document.getElementById('patientDetailsModal'));
     const content = document.getElementById('patientDetailsContent');
     
-    // Show loading
-    content.innerHTML = `
-        <div class="text-center py-4">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
-    `;
-    
+    content.innerHTML = `<div class="d-flex justify-content-center py-5"><div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"><span class="visually-hidden">Loading...</span></div></div>`;
     modal.show();
     
-    // Fetch patient details
     fetch(`{{ url_for("admin.admin_patient_details", patient_id=0) }}`.replace('0', patientId))
         .then(response => response.json())
         .then(data => {
             if (data.success) {
                 const patient = data.patient;
                 content.innerHTML = `
-                    <div class="row">
+                    <div class="row g-4">
                         <div class="col-md-6">
-                            <h6 class="text-primary mb-3">Personal Information</h6>
-                            <table class="table table-borderless">
-                                <tr>
-                                    <td><strong>Full Name:</strong></td>
-                                    <td>${patient.full_name}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Mobile:</strong></td>
-                                    <td>${patient.mobile_number}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Email:</strong></td>
-                                    <td>${patient.email || 'Not provided'}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Age:</strong></td>
-                                    <td>${patient.age || 'Not provided'}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Gender:</strong></td>
-                                    <td>${patient.gender ? patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1) : 'Not provided'}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Address:</strong></td>
-                                    <td>${patient.address || 'Not provided'}</td>
-                                </tr>
-                            </table>
+                            <h6 class="text-primary mb-3 fw-bold border-bottom pb-2">Personal Information</h6>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Full Name:</dt><dd class="col-sm-8">${patient.full_name}</dd>
+                                <dt class="col-sm-4">Mobile:</dt><dd class="col-sm-8">${patient.mobile_number}</dd>
+                                <dt class="col-sm-4">Email:</dt><dd class="col-sm-8">${patient.email || '<span class="text-muted">Not provided</span>'}</dd>
+                                <dt class="col-sm-4">Age:</dt><dd class="col-sm-8">${patient.age || '<span class="text-muted">Not provided</span>'}</dd>
+                                <dt class="col-sm-4">Gender:</dt><dd class="col-sm-8">${patient.gender ? patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1) : '<span class="text-muted">Not provided</span>'}</dd>
+                                <dt class="col-sm-4">Address:</dt><dd class="col-sm-8">${patient.address || '<span class="text-muted">Not provided</span>'}</dd>
+                            </dl>
                         </div>
                         <div class="col-md-6">
-                            <h6 class="text-primary mb-3">Account Information</h6>
-                            <table class="table table-borderless">
-                                <tr>
-                                    <td><strong>Patient ID:</strong></td>
-                                    <td>#${patient.id}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Registration Date:</strong></td>
-                                    <td>${patient.created_at}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Total Appointments:</strong></td>
-                                    <td>${patient.appointment_count || 0}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Status:</strong></td>
-                                    <td><span class="badge bg-success">Active</span></td>
-                                </tr>
-                            </table>
+                            <h6 class="text-primary mb-3 fw-bold border-bottom pb-2">Account Information</h6>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-5">Patient ID:</dt><dd class="col-sm-7">#${patient.id}</dd>
+                                <dt class="col-sm-5">Registered On:</dt><dd class="col-sm-7">${patient.created_at}</dd>
+                                <dt class="col-sm-5">Appointments:</dt><dd class="col-sm-7">${patient.appointment_count || 0}</dd>
+                                <dt class="col-sm-5">Status:</dt><dd class="col-sm-7"><span class="badge text-bg-success">Active</span></dd>
+                            </dl>
                         </div>
                         ${patient.medical_history ? `
                         <div class="col-12">
-                            <h6 class="text-primary mb-3">Medical History</h6>
-                            <p class="text-muted">${patient.medical_history}</p>
-                        </div>
-                        ` : ''}
-                    </div>
-                `;
+                            <h6 class="text-primary mb-3 fw-bold border-bottom pb-2">Medical History</h6>
+                            <p class="text-muted fst-italic bg-light p-3 rounded">${patient.medical_history}</p>
+                        </div>` : ''}
+                    </div>`;
             } else {
-                content.innerHTML = `
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        Error loading patient details: ${data.message}
-                    </div>
-                `;
+                content.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>Error loading patient details: ${data.message}</div>`;
             }
         })
         .catch(error => {
-            content.innerHTML = `
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    Error loading patient details. Please try again.
-                </div>
-            `;
+            content.innerHTML = `<div class="alert alert-danger"><i class="fas fa-server me-2"></i>A network error occurred. Please try again.</div>`;
         });
 }
 
@@ -442,7 +292,6 @@ function editPatient(patientId) {
         .then(data => {
             if (data.success) {
                 const patient = data.patient;
-                // Populate edit modal with patient data
                 document.getElementById('editPatientId').value = patient.id;
                 document.getElementById('editFullName').value = patient.full_name;
                 document.getElementById('editMobileNumber').value = patient.mobile_number;
@@ -451,7 +300,6 @@ function editPatient(patientId) {
                 document.getElementById('editGender').value = patient.gender || '';
                 document.getElementById('editAddress').value = patient.address || '';
                 document.getElementById('editMedicalHistory').value = patient.medical_history || '';
-                
                 const modal = new bootstrap.Modal(document.getElementById('editPatientModal'));
                 modal.show();
             } else {
@@ -459,7 +307,7 @@ function editPatient(patientId) {
             }
         })
         .catch(error => {
-            showAlert('danger', 'Error loading patient data. Please try again.');
+            showAlert('danger', 'A network error occurred while fetching patient data.');
         });
 }
 
@@ -468,11 +316,9 @@ function submitEditPatient() {
     const form = document.getElementById('editPatientForm');
     const formData = new FormData(form);
     const patientId = document.getElementById('editPatientId').value;
-    
-    // Show loading state
     const submitBtn = document.querySelector('#editPatientModal .btn-primary');
     const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Updating...';
     submitBtn.disabled = true;
     
     fetch(`{{ url_for("admin.admin_edit_patient", patient_id=0) }}`.replace('0', patientId), {
@@ -483,17 +329,14 @@ function submitEditPatient() {
     .then(data => {
         if (data.success) {
             showAlert('success', data.message);
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editPatientModal'));
-            modal.hide();
-            setTimeout(() => {
-                location.reload();
-            }, 1500);
+            bootstrap.Modal.getInstance(document.getElementById('editPatientModal')).hide();
+            setTimeout(() => { location.reload(); }, 1500);
         } else {
-            showAlert('danger', data.message);
+            showAlert('danger', data.message || 'An unknown error occurred.');
         }
     })
     .catch(error => {
-        showAlert('danger', 'An error occurred while updating the patient.');
+        showAlert('danger', 'A network error occurred while updating the patient.');
     })
     .finally(() => {
         submitBtn.innerHTML = originalText;
@@ -506,29 +349,19 @@ function viewPatientAppointments(patientId) {
     window.location.href = `/admin/appointments?patient_id=${patientId}`;
 }
 
-// Export patients
-function exportPatients() {
-    // Implement export functionality
-    alert('Export functionality will be implemented');
-}
-
 // Show alert messages
 function showAlert(type, message) {
     const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show shadow-lg position-fixed`;
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 1055; min-width: 300px;';
     alertDiv.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : (type === 'danger' ? 'exclamation-triangle' : 'info-circle')} me-2"></i>
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    
+        <div class="d-flex align-items-center">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2 fs-4"></i>
+            <div class="flex-grow-1">${message}</div>
+            <button type="button" class="btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`;
     document.body.appendChild(alertDiv);
-    
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-        alertDiv.remove();
-    }, 5000);
+    setTimeout(() => { bootstrap.Alert.getOrCreateInstance(alertDiv).close(); }, 5000);
 }
 </script>
 {% endblock %}
