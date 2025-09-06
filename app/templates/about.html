@@ -1,117 +1,103 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!-- Hero Section -->
-<div class="hero-section position-relative overflow-hidden">
-  <div class="hero-background"></div>
-  <div class="container py-5">
-    <div class="row align-items-center min-vh-50">
-      <div class="col-lg-6 mb-4 mb-lg-0">
-        <div class="hero-content">
-          <h1 class="display-4 fw-bold text-white mb-4 animate__animated animate__fadeInUp">
-            Caring for Your Health, <span class="text-accent">Every Step of the Way</span>
-          </h1>
-          <p class="lead text-white-75 mb-4 animate__animated animate__fadeInUp animate__delay-1s">
-            For over three decades, HealthCare+ has been at the forefront of medical excellence, combining cutting-edge technology with compassionate care to serve our community.
-          </p>
-          <a href="/services" class="btn btn-accent btn-lg px-4 py-3 animate__animated animate__fadeInUp animate__delay-2s">
-            <i class="fas fa-arrow-right me-2"></i>Explore Our Services
-          </a>
-        </div>
+<style>
+  body {
+    background-color: #f7f9fc;
+  }
+</style>
+
+<div class="bg-primary text-white bg-gradient">
+  <div class="container col-xxl-8 px-4 py-5">
+    <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+      <div class="col-10 col-sm-8 col-lg-6">
+        <img src="{{ url_for('static', filename='image/about_us_top_img.jpg') }}"
+             class="d-block mx-lg-auto img-fluid rounded-3 shadow-lg animate__animated animate__fadeInRight"
+             alt="Healthcare Excellence"
+             width="700"
+             height="500"
+             loading="lazy"/>
       </div>
       <div class="col-lg-6">
-        <div class="hero-image animate__animated animate__fadeInRight">
-          <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" class="img-fluid rounded-3 shadow-lg" alt="Healthcare Excellence">
+        <div class="hero-content">
+          <h1 class="display-4 fw-bold lh-1 mb-4 animate__animated animate__fadeInUp">
+            Caring for Your Health, <span class="text-success">Every Step of the Way</span>
+          </h1>
+          <p class="lead mb-4 animate__animated animate__fadeInUp animate__delay-1s">
+            For over three decades, HealthCare+ has been at the forefront of medical excellence, combining cutting-edge technology with compassionate care to serve our community.
+          </p>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-start animate__animated animate__fadeInUp animate__delay-2s">
+            <a href="/services" class="btn btn-success btn-lg px-4 py-3 me-md-2 fw-bold">
+              <i class="fas fa-arrow-right me-2"></i>Explore Our Services
+            </a>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Enhanced History Timeline Section -->
-<div class="timeline-section py-5 bg-light">
+<div class="py-5">
   <div class="container">
     <div class="text-center mb-5">
-      <!-- Redesigned Our Journey Through Time section with better visual appeal -->
       <h2 class="display-5 fw-bold text-primary mb-3">Our Legacy of Excellence</h2>
-      <p class="lead text-muted">Three decades of pioneering healthcare innovation and community service</p>
+      <p class="lead text-muted">Three decades of pioneering healthcare innovation and community service.</p>
     </div>
     
-    <div class="enhanced-timeline-container">
-      <div class="timeline-wrapper">
-        <div class="timeline-milestone" data-year="1990">
-          <div class="milestone-marker">
-            <div class="milestone-icon bg-primary">
-              <i class="fas fa-hospital"></i>
-            </div>
-            <div class="milestone-year">1990</div>
-          </div>
-          <div class="milestone-content">
-            <div class="milestone-card">
-              <h5 class="fw-bold text-primary mb-2">Foundation & Vision</h5>
-              <p class="text-muted mb-3">HealthCare+ was established with a revolutionary vision to provide world-class medical care accessible to our entire community, setting new standards in healthcare delivery.</p>
-              <div class="milestone-stats">
-                <span class="badge bg-primary">50 Beds</span>
-                <span class="badge bg-primary">25 Staff</span>
-              </div>
-            </div>
+    <div class="accordion shadow rounded-3" id="historyAccordion">
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="flush-headingOne">
+          <button class="accordion-button fw-bold fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="true" aria-controls="flush-collapseOne">
+            <i class="fas fa-hospital text-primary me-3"></i> 1990 - Foundation & Vision
+          </button>
+        </h2>
+        <div id="flush-collapseOne" class="accordion-collapse collapse show" aria-labelledby="flush-headingOne" data-bs-parent="#historyAccordion">
+          <div class="accordion-body">
+            <p class="text-muted">HealthCare+ was established with a revolutionary vision to provide world-class medical care accessible to our entire community, setting new standards in healthcare delivery.</p>
+            <span class="badge bg-primary me-1">50 Beds</span>
+            <span class="badge bg-primary">25 Staff</span>
           </div>
         </div>
-        
-        <div class="timeline-milestone" data-year="2000">
-          <div class="milestone-marker">
-            <div class="milestone-icon bg-accent">
-              <i class="fas fa-microscope"></i>
-            </div>
-            <div class="milestone-year">2000</div>
-          </div>
-          <div class="milestone-content">
-            <div class="milestone-card">
-              <h5 class="fw-bold text-primary mb-2">Research & Innovation</h5>
-              <p class="text-muted mb-3">Opened our state-of-the-art research facility, becoming a pioneer in medical research and advancing treatment methods through cutting-edge clinical trials.</p>
-              <div class="milestone-stats">
-                <span class="badge bg-accent">Research Center</span>
-                <span class="badge bg-accent">Clinical Trials</span>
-              </div>
-            </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="flush-headingTwo">
+          <button class="accordion-button collapsed fw-bold fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+            <i class="fas fa-microscope text-success me-3"></i> 2000 - Research & Innovation
+          </button>
+        </h2>
+        <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#historyAccordion">
+          <div class="accordion-body">
+            <p class="text-muted">Opened our state-of-the-art research facility, becoming a pioneer in medical research and advancing treatment methods through cutting-edge clinical trials.</p>
+            <span class="badge bg-success me-1">Research Center</span>
+            <span class="badge bg-success">Clinical Trials</span>
           </div>
         </div>
-        
-        <div class="timeline-milestone" data-year="2010">
-          <div class="milestone-marker">
-            <div class="milestone-icon bg-info">
-              <i class="fas fa-robot"></i>
-            </div>
-            <div class="milestone-year">2010</div>
-          </div>
-          <div class="milestone-content">
-            <div class="milestone-card">
-              <h5 class="fw-bold text-primary mb-2">Digital Transformation</h5>
-              <p class="text-muted mb-3">Implemented revolutionary digital health technologies and AI-assisted diagnostic systems, becoming the first hospital in the region to fully digitize patient care.</p>
-              <div class="milestone-stats">
-                <span class="badge bg-info">AI Diagnostics</span>
-                <span class="badge bg-info">Digital Records</span>
-              </div>
-            </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="flush-headingThree">
+          <button class="accordion-button collapsed fw-bold fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
+             <i class="fas fa-robot text-info me-3"></i> 2010 - Digital Transformation
+          </button>
+        </h2>
+        <div id="flush-collapseThree" class="accordion-collapse collapse" aria-labelledby="flush-headingThree" data-bs-parent="#historyAccordion">
+          <div class="accordion-body">
+             <p class="text-muted">Implemented revolutionary digital health technologies and AI-assisted diagnostic systems, becoming the first hospital in the region to fully digitize patient care.</p>
+            <span class="badge bg-info me-1">AI Diagnostics</span>
+            <span class="badge bg-info">Digital Records</span>
           </div>
         </div>
-        
-        <div class="timeline-milestone" data-year="2020">
-          <div class="milestone-marker">
-            <div class="milestone-icon bg-warning">
-              <i class="fas fa-award"></i>
-            </div>
-            <div class="milestone-year">2020</div>
-          </div>
-          <div class="milestone-content">
-            <div class="milestone-card">
-              <h5 class="fw-bold text-primary mb-2">Excellence Recognition</h5>
-              <p class="text-muted mb-3">Received national recognition as the "Best Regional Hospital" for outstanding patient care, safety standards, and community health initiatives during challenging times.</p>
-              <div class="milestone-stats">
-                <span class="badge bg-warning">National Award</span>
-                <span class="badge bg-warning">5-Star Rating</span>
-              </div>
-            </div>
+      </div>
+       <div class="accordion-item">
+        <h2 class="accordion-header" id="flush-headingFour">
+          <button class="accordion-button collapsed fw-bold fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseFour" aria-expanded="false" aria-controls="flush-collapseFour">
+            <i class="fas fa-award text-warning me-3"></i> 2020 - Excellence Recognition
+          </button>
+        </h2>
+        <div id="flush-collapseFour" class="accordion-collapse collapse" aria-labelledby="flush-headingFour" data-bs-parent="#historyAccordion">
+          <div class="accordion-body">
+            <p class="text-muted">Received national recognition as the "Best Regional Hospital" for outstanding patient care, safety standards, and community health initiatives during challenging times.</p>
+            <span class="badge bg-warning text-dark me-1">National Award</span>
+            <span class="badge bg-warning text-dark">5-Star Rating</span>
           </div>
         </div>
       </div>
@@ -119,139 +105,79 @@
   </div>
 </div>
 
-<!-- Mission, Vision, Values -->
-<div class="container py-5">
-  <div class="row g-4">
-    <div class="col-lg-4">
-      <div class="value-card h-100 text-center p-4">
-        <div class="value-icon mb-4">
-          <i class="fas fa-bullseye fa-3x text-primary"></i>
-        </div>
-        <h4 class="fw-bold mb-3">Our Mission</h4>
-        <p class="text-muted">To deliver exceptional, patient-centered healthcare through innovation, compassion, and clinical excellence, making quality medical care accessible to all.</p>
+<div class="container px-4 py-5">
+  <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+    <div class="col d-flex align-items-start">
+      <div class="p-3 bg-primary-subtle rounded-circle me-3">
+        <i class="fas fa-bullseye fa-2x text-primary"></i>
+      </div>
+      <div>
+        <h4 class="fw-bold mb-2">Our Mission</h4>
+        <p class="text-muted">To deliver exceptional, patient-centered healthcare through innovation, compassion, and clinical excellence.</p>
       </div>
     </div>
-    <div class="col-lg-4">
-      <div class="value-card h-100 text-center p-4">
-        <div class="value-icon mb-4">
-          <i class="fas fa-eye fa-3x text-accent"></i>
-        </div>
-        <h4 class="fw-bold mb-3">Our Vision</h4>
-        <p class="text-muted">To be the leading healthcare institution, setting new standards in medical excellence and community health, while fostering a culture of continuous learning and innovation.</p>
+    <div class="col d-flex align-items-start">
+      <div class="p-3 bg-success-subtle rounded-circle me-3">
+        <i class="fas fa-eye fa-2x text-success"></i>
+      </div>
+      <div>
+        <h4 class="fw-bold mb-2">Our Vision</h4>
+        <p class="text-muted">To be the leading healthcare institution, setting new standards in medical excellence and community health.</p>
       </div>
     </div>
-    <div class="col-lg-4">
-      <div class="value-card h-100 text-center p-4">
-        <div class="value-icon mb-4">
-          <i class="fas fa-heart fa-3x text-danger"></i>
-        </div>
-        <h4 class="fw-bold mb-3">Our Values</h4>
-        <p class="text-muted">Integrity, compassion, excellence, teamwork, and respect guide every interaction, ensuring that our patients receive care that honors their dignity and trust.</p>
+    <div class="col d-flex align-items-start">
+      <div class="p-3 bg-danger-subtle rounded-circle me-3">
+        <i class="fas fa-heart fa-2x text-danger"></i>
+      </div>
+      <div>
+        <h4 class="fw-bold mb-2">Our Values</h4>
+        <p class="text-muted">Integrity, compassion, excellence, and teamwork guide every interaction with our patients and community.</p>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Certifications Showcase -->
-<div class="certifications-section py-5 bg-light">
+<div class="py-5">
   <div class="container">
     <div class="text-center mb-5">
       <h2 class="display-5 fw-bold text-primary mb-3">Certifications & Accreditations</h2>
-      <p class="lead text-muted">Recognized excellence in healthcare standards and patient safety</p>
+      <p class="lead text-muted">Recognized excellence in healthcare standards and patient safety.</p>
     </div>
     
     <div class="row g-4">
-      <div class="col-md-3 col-sm-6">
-        <div class="certification-card text-center p-4">
-          <div class="cert-badge mb-3">
-            <i class="fas fa-certificate fa-3x text-primary"></i>
-          </div>
-          <h6 class="fw-bold">JCI Accredited</h6>
-          <p class="small text-muted">Joint Commission International certification for quality and patient safety</p>
-        </div>
-      </div>
-      <div class="col-md-3 col-sm-6">
-        <div class="certification-card text-center p-4">
-          <div class="cert-badge mb-3">
-            <i class="fas fa-shield-alt fa-3x text-accent"></i>
-          </div>
-          <h6 class="fw-bold">ISO 9001:2015</h6>
-          <p class="small text-muted">Quality management system certification for consistent service delivery</p>
-        </div>
-      </div>
-      <div class="col-md-3 col-sm-6">
-        <div class="certification-card text-center p-4">
-          <div class="cert-badge mb-3">
-            <i class="fas fa-leaf fa-3x text-success"></i>
-          </div>
-          <h6 class="fw-bold">Green Hospital</h6>
-          <p class="small text-muted">Environmental sustainability certification for eco-friendly practices</p>
-        </div>
-      </div>
-      <div class="col-md-3 col-sm-6">
-        <div class="certification-card text-center p-4">
-          <div class="cert-badge mb-3">
-            <i class="fas fa-star fa-3x text-warning"></i>
-          </div>
-          <h6 class="fw-bold">5-Star Rating</h6>
-          <p class="small text-muted">National healthcare quality rating for exceptional patient outcomes</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Technology Showcase -->
-<div class="technology-section py-5">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-6 mb-4 mb-lg-0">
-        <h2 class="display-5 fw-bold text-primary mb-4">Advanced Medical Technology</h2>
-        <div class="tech-features">
-          <div class="tech-item d-flex align-items-start mb-4">
-            <div class="tech-icon me-3">
-              <i class="fas fa-brain fa-2x text-accent"></i>
-            </div>
-            <div>
-              <h5 class="fw-bold mb-2">AI-Powered Diagnostics</h5>
-              <p class="text-muted">Machine learning algorithms assist our physicians in accurate diagnosis and treatment planning.</p>
-            </div>
-          </div>
-          <div class="tech-item d-flex align-items-start mb-4">
-            <div class="tech-icon me-3">
-              <i class="fas fa-heartbeat fa-2x text-danger"></i>
-            </div>
-            <div>
-              <h5 class="fw-bold mb-2">Robotic Surgery Systems</h5>
-              <p class="text-muted">Minimally invasive procedures with precision robotics for faster recovery times.</p>
-            </div>
-          </div>
-          <div class="tech-item d-flex align-items-start mb-4">
-            <div class="tech-icon me-3">
-              <i class="fas fa-mobile-alt fa-2x text-primary"></i>
-            </div>
-            <div>
-              <h5 class="fw-bold mb-2">Telemedicine Platform</h5>
-              <p class="text-muted">Remote consultations and monitoring for convenient, accessible healthcare delivery.</p>
-            </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 text-center shadow-sm border-top border-primary border-3">
+          <div class="card-body p-4">
+            <div class="mb-3"><i class="fas fa-certificate fa-3x text-primary"></i></div>
+            <h6 class="fw-bold">JCI Accredited</h6>
+            <p class="small text-muted">Joint Commission International certification for quality and patient safety.</p>
           </div>
         </div>
       </div>
-      <div class="col-lg-6">
-        <div class="tech-image-grid">
-          <div class="row g-3">
-            <div class="col-6">
-              <img src="https://images.unsplash.com/photo-1516549655169-df83a0774514?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="img-fluid rounded-3 shadow" alt="MRI Scanner">
-            </div>
-            <div class="col-6">
-              <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="img-fluid rounded-3 shadow" alt="Robotic Surgery">
-            </div>
-            <div class="col-6">
-              <img src="https://images.unsplash.com/photo-1504813184591-01572f98c85f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="img-fluid rounded-3 shadow" alt="Digital Monitoring">
-            </div>
-            <div class="col-6">
-              <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="img-fluid rounded-3 shadow" alt="Telemedicine">
-            </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 text-center shadow-sm border-top border-success border-3">
+          <div class="card-body p-4">
+            <div class="mb-3"><i class="fas fa-shield-alt fa-3x text-success"></i></div>
+            <h6 class="fw-bold">ISO 9001:2015</h6>
+            <p class="small text-muted">Quality management system certification for consistent service delivery.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 text-center shadow-sm border-top border-info border-3">
+          <div class="card-body p-4">
+            <div class="mb-3"><i class="fas fa-leaf fa-3x text-info"></i></div>
+            <h6 class="fw-bold">Green Hospital</h6>
+            <p class="small text-muted">Environmental sustainability certification for eco-friendly practices.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 text-center shadow-sm border-top border-warning border-3">
+          <div class="card-body p-4">
+            <div class="mb-3"><i class="fas fa-star fa-3x text-warning"></i></div>
+            <h6 class="fw-bold">5-Star Rating</h6>
+            <p class="small text-muted">National healthcare quality rating for exceptional patient outcomes.</p>
           </div>
         </div>
       </div>
@@ -259,105 +185,111 @@
   </div>
 </div>
 
-<!-- Patient Testimonials -->
-<div class="testimonials-section py-5 bg-gradient">
+<div class="container py-5">
+  <div class="row align-items-center g-5">
+    <div class="col-lg-6">
+      <h2 class="display-5 fw-bold text-primary mb-4">Advanced Medical Technology</h2>
+      <div class="d-flex align-items-start mb-4">
+        <div class="flex-shrink-0 me-3"><i class="fas fa-brain fa-2x text-success"></i></div>
+        <div>
+          <h5 class="fw-bold mb-1">AI-Powered Diagnostics</h5>
+          <p class="text-muted">Machine learning algorithms assist our physicians in accurate diagnosis and treatment planning.</p>
+        </div>
+      </div>
+      <div class="d-flex align-items-start mb-4">
+        <div class="flex-shrink-0 me-3"><i class="fas fa-heartbeat fa-2x text-danger"></i></div>
+        <div>
+          <h5 class="fw-bold mb-1">Robotic Surgery Systems</h5>
+          <p class="text-muted">Minimally invasive procedures with precision robotics for faster recovery times.</p>
+        </div>
+      </div>
+      <div class="d-flex align-items-start">
+        <div class="flex-shrink-0 me-3"><i class="fas fa-mobile-alt fa-2x text-primary"></i></div>
+        <div>
+          <h5 class="fw-bold mb-1">Telemedicine Platform</h5>
+          <p class="text-muted">Remote consultations and monitoring for convenient, accessible healthcare delivery.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="row g-3">
+        <div class="col-6">
+          <img src="https://images.unsplash.com/photo-1516549655169-df83a0774514?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="img-fluid rounded-3 shadow" alt="MRI Scanner">
+        </div>
+        <div class="col-6">
+          <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="img-fluid rounded-3 shadow" alt="Robotic Surgery">
+        </div>
+        <div class="col-6">
+          <img src="https://images.unsplash.com/photo-1504813184591-01572f98c85f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="img-fluid rounded-3 shadow" alt="Digital Monitoring">
+        </div>
+        <div class="col-6">
+          <img src="{{ url_for('static', filename='image/telemedicine.jpg') }}" class="img-fluid rounded-3 shadow" alt="Telemedicine">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="py-5">
   <div class="container">
     <div class="text-center mb-5">
-      <h2 class="display-5 fw-bold text-white mb-3">What Our Patients Say</h2>
-      <p class="lead text-white-75">Real stories from the families we've had the privilege to serve</p>
+      <h2 class="display-5 fw-bold text-primary mb-3">Our Commitment to the Community</h2>
+      <p class="lead text-muted">Extending our care and expertise beyond the hospital walls.</p>
     </div>
-    
-    <div id="testimonialsCarousel" class="carousel slide" data-bs-ride="carousel">
-      <div class="carousel-inner">
-        <div class="carousel-item active">
-          <div class="row justify-content-center">
-            <div class="col-lg-8">
-              <div class="testimonial-card text-center p-5">
-                <div class="testimonial-avatar mb-4">
-                  <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=80&q=80" class="rounded-circle" alt="Patient">
-                </div>
-                <blockquote class="blockquote mb-4">
-                  <p class="lead">"The care I received at HealthCare+ was exceptional. The staff was not only professional but genuinely caring. They made a difficult time much easier for my family and me."</p>
-                </blockquote>
-                <footer class="blockquote-footer">
-                  <strong>Sarah Johnson</strong> <cite title="Source Title">Cardiac Surgery Patient</cite>
-                </footer>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="carousel-item">
-          <div class="row justify-content-center">
-            <div class="col-lg-8">
-              <div class="testimonial-card text-center p-5">
-                <div class="testimonial-avatar mb-4">
-                  <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=80&q=80" class="rounded-circle" alt="Patient">
-                </div>
-                <blockquote class="blockquote mb-4">
-                  <p class="lead">"From the moment I walked in, I felt like I was in capable hands. The technology is impressive, but it's the human touch that makes HealthCare+ special."</p>
-                </blockquote>
-                <footer class="blockquote-footer">
-                  <strong>Robert Chen</strong> <cite title="Source Title">Orthopedic Patient</cite>
-                </footer>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="carousel-item">
-          <div class="row justify-content-center">
-            <div class="col-lg-8">
-              <div class="testimonial-card text-center p-5">
-                <div class="testimonial-avatar mb-4">
-                  <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=80&q=80" class="rounded-circle" alt="Patient">
-                </div>
-                <blockquote class="blockquote mb-4">
-                  <p class="lead">"The pediatric team was amazing with my daughter. They made her feel comfortable and explained everything in a way she could understand. Truly compassionate care."</p>
-                </blockquote>
-                <footer class="blockquote-footer">
-                  <strong>Maria Rodriguez</strong> <cite title="Source Title">Pediatric Patient Family</cite>
-                </footer>
-              </div>
-            </div>
+    <div class="row g-4">
+      <div class="col-lg-4 col-md-6">
+        <div class="card h-100 shadow-sm text-center border-top border-primary border-3">
+          <div class="card-body p-4">
+            <div class="mb-3"><i class="fas fa-clinic-medical fa-3x text-primary"></i></div>
+            <h5 class="card-title fw-bold">Community Health Camps</h5>
+            <p class="card-text text-muted">We regularly organize free health check-up and diagnostic camps in underserved areas to make quality healthcare accessible to all.</p>
           </div>
         </div>
       </div>
-      <button class="carousel-control-prev" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-      </button>
-      <button class="carousel-control-next" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-      </button>
+      <div class="col-lg-4 col-md-6">
+        <div class="card h-100 shadow-sm text-center border-top border-success border-3">
+          <div class="card-body p-4">
+            <div class="mb-3"><i class="fas fa-chalkboard-teacher fa-3x text-success"></i></div>
+            <h5 class="card-title fw-bold">Health & Wellness Education</h5>
+            <p class="card-text text-muted">Our experts conduct workshops on preventive care, nutrition, and mental well-being to foster a healthier society.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="card h-100 shadow-sm text-center border-top border-danger border-3">
+          <div class="card-body p-4">
+            <div class="mb-3"><i class="fas fa-tint fa-3x text-danger"></i></div>
+            <h5 class="card-title fw-bold">Lifesaving Blood Drives</h5>
+            <p class="card-text text-muted">We host regular blood donation drives to support patients in need and maintain a robust blood supply for emergencies.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Team Section -->
 <div class="team-section py-5">
   <div class="container">
     <div class="text-center mb-5">
       <h2 class="display-5 fw-bold text-primary mb-3">Meet Our Expert Team</h2>
-      <p class="lead text-muted">Dedicated professionals committed to your health and wellbeing</p>
+      <p class="lead text-muted">Dedicated professionals committed to your health and wellbeing.</p>
     </div>
     
     <div id="doctorCarousel" class="carousel slide" data-bs-ride="carousel">
       <div class="carousel-inner">
         {% for group in doctors|batch(3, '') %}
-        <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
+        <div class="carousel-item {% if loop.first %}active{% endif %}">
           <div class="row justify-content-center g-4">
             {% for doctor in group %}
             {% if doctor %}
             <div class="col-lg-4 col-md-6">
-              <div class="doctor-card h-100 text-center p-4">
-                <div class="doctor-image mb-4">
-                  <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=120&q=80" class="img-fluid rounded-circle" alt="Doctor">
-                </div>
-                <h5 class="fw-bold text-primary mb-2">{{ doctor.full_name }}</h5>
-                <p class="text-accent fw-semibold mb-2">{{ doctor.specialization }}</p>
-                <p class="text-muted small mb-3">{{ doctor.qualification }}</p>
-                <div class="doctor-stats">
-                  <span class="badge bg-primary">{{ doctor.experience_years }} Years Experience</span>
+              <div class="card h-100 text-center shadow-sm border-0">
+                <div class="card-body p-4">
+                  <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=120&q=80" class="rounded-circle mx-auto mb-3" alt="Doctor" style="width: 120px; height: 120px; object-fit: cover;">
+                  <h5 class="fw-bold text-primary mb-1">{{ doctor.full_name }}</h5>
+                  <p class="text-success fw-semibold mb-2">{{ doctor.specialization }}</p>
+                  <p class="text-muted small mb-3">{{ doctor.qualification }}</p>
+                  <span class="badge bg-primary-subtle border border-primary-subtle text-primary-emphasis rounded-pill">{{ doctor.experience_years }} Years Experience</span>
                 </div>
               </div>
             </div>
@@ -379,453 +311,55 @@
   </div>
 </div>
 
-<!-- Statistics Section -->
-<div class="stats-section py-5 bg-light">
+<div class="py-5">
   <div class="container">
     <div class="row text-center g-4">
       <div class="col-lg-3 col-md-6">
-        <div class="stat-item">
-          <div class="stat-icon mb-3">
-            <i class="fas fa-user-md fa-3x text-primary"></i>
-          </div>
-          <h3 class="fw-bold text-primary mb-2">150+</h3>
-          <p class="text-muted">Expert Physicians</p>
+        <div class="card h-100 shadow-sm border-0 card-body">
+            <i class="fas fa-user-md fa-3x text-primary mb-3"></i>
+            <h3 class="fw-bold text-dark mb-1">150+</h3>
+            <p class="text-muted mb-0">Expert Physicians</p>
         </div>
       </div>
       <div class="col-lg-3 col-md-6">
-        <div class="stat-item">
-          <div class="stat-icon mb-3">
-            <i class="fas fa-bed fa-3x text-accent"></i>
-          </div>
-          <h3 class="fw-bold text-primary mb-2">500+</h3>
-          <p class="text-muted">Hospital Beds</p>
+        <div class="card h-100 shadow-sm border-0 card-body">
+            <i class="fas fa-bed fa-3x text-success mb-3"></i>
+            <h3 class="fw-bold text-dark mb-1">500+</h3>
+            <p class="text-muted mb-0">Hospital Beds</p>
         </div>
       </div>
       <div class="col-lg-3 col-md-6">
-        <div class="stat-item">
-          <div class="stat-icon mb-3">
-            <i class="fas fa-procedures fa-3x text-success"></i>
-          </div>
-          <h3 class="fw-bold text-primary mb-2">25,000+</h3>
-          <p class="text-muted">Successful Surgeries</p>
+        <div class="card h-100 shadow-sm border-0 card-body">
+            <i class="fas fa-procedures fa-3x text-info mb-3"></i>
+            <h3 class="fw-bold text-dark mb-1">25,000+</h3>
+            <p class="text-muted mb-0">Successful Surgeries</p>
         </div>
       </div>
       <div class="col-lg-3 col-md-6">
-        <div class="stat-item">
-          <div class="stat-icon mb-3">
-            <i class="fas fa-smile fa-3x text-warning"></i>
-          </div>
-          <h3 class="fw-bold text-primary mb-2">98%</h3>
-          <p class="text-muted">Patient Satisfaction</p>
+        <div class="card h-100 shadow-sm border-0 card-body">
+            <i class="fas fa-smile fa-3x text-warning mb-3"></i>
+            <h3 class="fw-bold text-dark mb-1">98%</h3>
+            <p class="text-muted mb-0">Patient Satisfaction</p>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Call to Action -->
-<div class="cta-section py-5 bg-primary">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-8">
-        <h3 class="fw-bold text-white mb-3">Ready to Experience Excellence in Healthcare?</h3>
-        <p class="text-white-75 mb-0">Join thousands of satisfied patients who trust HealthCare+ for their medical needs.</p>
-      </div>
-      <div class="col-lg-4 text-lg-end">
-        <a href="/appointment" class="btn btn-accent btn-lg px-4 py-3">
-          <i class="fas fa-calendar-check me-2"></i>Book Appointment
-        </a>
-      </div>
+<div class="container my-5">
+    <div class="p-5 text-center text-white bg-primary bg-gradient rounded-3 shadow-lg">
+        <i class="fas fa-hospital-user fa-3x mb-3"></i>
+        <h3 class="fw-bold">Ready to Experience Excellence in Healthcare?</h3>
+        <p class="col-lg-8 mx-auto fs-5 text-white-75">
+            Join thousands of satisfied patients who trust HealthCare+ for their medical needs. Schedule your consultation today.
+        </p>
+        <div class="d-inline-flex gap-2 mt-4">
+            <a href="/appointment" class="btn btn-success btn-lg px-4 py-3 rounded-pill fw-bold">
+                <i class="fas fa-calendar-check me-2"></i>Book Appointment
+            </a>
+        </div>
     </div>
-  </div>
 </div>
-
+{% include "footer.html" %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-
-<style>
-/* Updated color scheme and enhanced styling for modern hospital about page */
-:root {
-  --primary-color: #164e63;
-  --accent-color: #84cc16;
-  --light-bg: #ecfeff;
-  --text-muted: #475569;
-}
-
-.hero-section {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #0891b2 100%);
-  min-height: 60vh;
-}
-
-.hero-background::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80') center/cover;
-  opacity: 0.1;
-  z-index: -1;
-}
-
-.text-accent {
-  color: var(--accent-color) !important;
-}
-
-.btn-accent {
-  background: var(--accent-color);
-  border-color: var(--accent-color);
-  color: white;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.btn-accent:hover {
-  background: #65a30d;
-  border-color: #65a30d;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(132, 204, 22, 0.3);
-}
-
-.text-white-75 {
-  color: rgba(255, 255, 255, 0.75) !important;
-}
-
-.min-vh-50 {
-  min-height: 50vh;
-}
-
-/* Enhanced Timeline Styles */
-.enhanced-timeline-container {
-  position: relative;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem 0;
-}
-
-.timeline-wrapper {
-  position: relative;
-}
-
-.timeline-wrapper::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background: linear-gradient(180deg, var(--primary-color), var(--accent-color), #17a2b8, #ffc107);
-  transform: translateX(-50%);
-  border-radius: 2px;
-}
-
-.timeline-milestone {
-  position: relative;
-  margin-bottom: 4rem;
-  display: flex;
-  align-items: center;
-}
-
-.timeline-milestone:nth-child(odd) {
-  flex-direction: row;
-}
-
-.timeline-milestone:nth-child(even) {
-  flex-direction: row-reverse;
-}
-
-.milestone-marker {
-  position: relative;
-  z-index: 3;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0 2rem;
-}
-
-.milestone-icon {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 2rem;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-  border: 4px solid white;
-  transition: transform 0.3s ease;
-}
-
-.milestone-icon:hover {
-  transform: scale(1.1);
-}
-
-.milestone-year {
-  background: white;
-  color: var(--primary-color);
-  padding: 0.5rem 1.5rem;
-  border-radius: 25px;
-  font-weight: bold;
-  margin-top: 1rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  border: 2px solid var(--accent-color);
-}
-
-.milestone-content {
-  flex: 1;
-  max-width: 400px;
-}
-
-.milestone-card {
-  background: white;
-  padding: 2.5rem;
-  border-radius: 20px;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(132, 204, 22, 0.1);
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.milestone-card::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  width: 20px;
-  height: 20px;
-  background: white;
-  border: 2px solid var(--accent-color);
-  transform: translateY(-50%) rotate(45deg);
-}
-
-.timeline-milestone:nth-child(odd) .milestone-card::before {
-  right: -10px;
-}
-
-.timeline-milestone:nth-child(even) .milestone-card::before {
-  left: -10px;
-}
-
-.milestone-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-}
-
-.milestone-stats .badge {
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
-  padding: 0.5rem 1rem;
-  font-size: 0.8rem;
-}
-
-/* Responsive Timeline */
-@media (max-width: 768px) {
-  .timeline-wrapper::before {
-    left: 40px;
-  }
-  
-  .timeline-milestone {
-    flex-direction: row !important;
-    margin-left: 0;
-  }
-  
-  .timeline-milestone:nth-child(even) {
-    flex-direction: row !important;
-  }
-  
-  .milestone-marker {
-    margin: 0 1rem 0 0;
-    position: absolute;
-    left: 0;
-  }
-  
-  .milestone-content {
-    margin-left: 100px;
-    max-width: none;
-  }
-  
-  .milestone-card::before {
-    left: -10px !important;
-  }
-}
-
-/* Value Cards */
-.value-card {
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-}
-
-.value-card:hover {
-  transform: translateY(-10px);
-  border-color: var(--accent-color);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-}
-
-.value-icon {
-  transition: transform 0.3s ease;
-}
-
-.value-card:hover .value-icon {
-  transform: scale(1.1);
-}
-
-/* Certification Cards */
-.certification-card {
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.certification-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-}
-
-.cert-badge {
-  transition: transform 0.3s ease;
-}
-
-.certification-card:hover .cert-badge {
-  transform: scale(1.1);
-}
-
-/* Technology Section */
-.tech-item {
-  padding: 1.5rem;
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-}
-
-.tech-item:hover {
-  transform: translateX(10px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
-
-.tech-icon {
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(132, 204, 22, 0.1);
-  border-radius: 15px;
-}
-
-/* Testimonials */
-.testimonials-section {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #0891b2 100%);
-}
-
-.testimonial-card {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 20px;
-  backdrop-filter: blur(10px);
-}
-
-.testimonial-avatar img {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-}
-
-/* Doctor Cards */
-.doctor-card {
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.doctor-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-}
-
-.doctor-image img {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.doctor-card:hover .doctor-image img {
-  transform: scale(1.05);
-}
-
-/* Statistics */
-.stat-item {
-  padding: 2rem 1rem;
-}
-
-.stat-icon {
-  transition: transform 0.3s ease;
-}
-
-.stat-item:hover .stat-icon {
-  transform: scale(1.1);
-}
-
-/* Carousel Controls */
-.carousel-control-prev,
-.carousel-control-next {
-  width: 50px;
-  height: 50px;
-  background: var(--primary-color);
-  border-radius: 50%;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.carousel-control-prev {
-  left: -25px;
-}
-
-.carousel-control-next {
-  right: -25px;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .timeline-track {
-    flex-direction: column;
-    gap: 2rem;
-  }
-  
-  .timeline-track::before {
-    display: none;
-  }
-  
-  .timeline-content {
-    margin-top: 0;
-  }
-  
-  .timeline-item::before {
-    position: static;
-    transform: none;
-    display: inline-block;
-    margin-bottom: 1rem;
-  }
-  
-  .hero-section {
-    min-height: 70vh;
-  }
-  
-  .display-4 {
-    font-size: 2rem;
-  }
-}
-
-.bg-gradient {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #0891b2 100%);
-}
-</style>
-
 {% endblock %}
