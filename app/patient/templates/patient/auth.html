@@ -1,715 +1,174 @@
 {% extends "base.html" %}
+{% block title %}MediConnect Patient Portal{% endblock %}
+
+{% block head_extra %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
-<div class="auth-container">
-    <!-- Animated Background -->
-    <div class="animated-background">
-        <!-- Medical Equipment Floating Animation -->
-        <div class="floating-medical-equipment">
-            <div class="medical-equipment equipment-1">
-                <i class="fas fa-heartbeat"></i>
+<div class="auth-wrapper-modern">
+    <div class="auth-card-modern">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-primary">HealthCare+</h2>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+            <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else ('check-circle' if category == 'success' else 'info-circle') }} me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- Tabs -->
+        <ul class="nav nav-pills nav-justified mb-4" id="authTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="login-tab-btn" data-bs-toggle="tab" data-bs-target="#login-tab-pane" type="button" role="tab">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="signup-tab-btn" data-bs-toggle="tab" data-bs-target="#signup-tab-pane" type="button" role="tab">
+                    <i class="fas fa-user-plus me-2"></i>Sign Up
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="authTabContent">
+            <!-- Login -->
+            <div class="tab-pane fade show active" id="login-tab-pane" role="tabpanel">
+                <form method="POST" action="{{ url_for('patient.patient_login_post') }}" class="needs-validation" novalidate>
+                    <input type="hidden" name="form_type" value="login">
+                    <div class="form-floating mb-3">
+                        <input type="tel" class="form-control" id="login_mobile_number" name="mobile_number" placeholder="Mobile Number" required pattern="\d{10}">
+                        <label for="login_mobile_number"><i class="fas fa-mobile-alt me-2"></i>Mobile Number</label>
+                        <div class="invalid-feedback">Enter a valid 10-digit mobile number.</div>
+                    </div>
+                    <div class="input-group mb-4">
+                        <div class="form-floating flex-grow-1">
+                            <input type="password" class="form-control" id="login_password" name="password" placeholder="Password" required>
+                            <label for="login_password"><i class="fas fa-lock me-2"></i>Password</label>
+                            <div class="invalid-feedback">Enter your password.</div>
+                        </div>
+                        <button class="btn btn-outline-secondary password-toggle" type="button" onclick="togglePassword(this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm">Sign In</button>
+                    </div>
+                </form>
             </div>
-            <div class="medical-equipment equipment-2">
-                <i class="fas fa-stethoscope"></i>
-            </div>
-            <div class="medical-equipment equipment-3">
-                <i class="fas fa-user-md"></i>
-            </div>
-            <div class="medical-equipment equipment-4">
-                <i class="fas fa-hospital"></i>
-            </div>
-            <div class="medical-equipment equipment-5">
-                <i class="fas fa-pills"></i>
+
+            <!-- Signup -->
+            <div class="tab-pane fade" id="signup-tab-pane" role="tabpanel">
+                <form method="POST" action="{{ url_for('patient.patient_signup') }}" class="needs-validation" novalidate>
+                    <input type="hidden" name="form_type" value="signup">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="signup_full_name" name="full_name" placeholder="Full Name" required>
+                        <label for="signup_full_name"><i class="fas fa-user me-2"></i>Full Name</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="tel" class="form-control" id="signup_mobile_number" name="mobile_number" placeholder="Mobile Number" required pattern="\d{10}">
+                        <label for="signup_mobile_number"><i class="fas fa-mobile-alt me-2"></i>Mobile Number</label>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="form-floating flex-grow-1">
+                            <input type="password" class="form-control" id="signup_password" name="password" placeholder="Password" required minlength="6">
+                            <label for="signup_password"><i class="fas fa-lock me-2"></i>Password</label>
+                        </div>
+                        <button class="btn btn-outline-secondary password-toggle" type="button" onclick="togglePassword(this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="input-group mb-4">
+                        <div class="form-floating flex-grow-1">
+                            <input type="password" class="form-control" id="signup_confirm_password" name="confirm_password" placeholder="Confirm Password" required>
+                            <label for="signup_confirm_password"><i class="fas fa-check-circle me-2"></i>Confirm Password</label>
+                        </div>
+                        <button class="btn btn-outline-secondary password-toggle" type="button" onclick="togglePassword(this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg fw-bold shadow-sm">Create Account</button>
+                    </div>
+                </form>
             </div>
         </div>
-    </div>
-    <!-- Main Content -->
-    <div class="auth-content">
-        <div class="container-fluid h-100">
-            <div class="row h-100 align-items-center justify-content-center">
-                <div class="col-xl-4 col-lg-5 col-md-6 col-sm-8 col-10">
-                    <div class="auth-card">
-                        <!-- Header -->
-                        <div class="auth-header text-center mb-4">
-                            <div class="logo-container mb-3">
-                                <div class="logo-circle">
-                                    <i class="fas fa-user-injured"></i>
-                                </div>
-                            </div>
-                            <h2 class="auth-title">Patient Portal</h2>
-                            <p class="auth-subtitle">Your Health, Our Priority</p>
-                        </div>
-                        <!-- Flash Messages -->
-                        {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                        {% for category, message in messages %}
-                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show custom-alert" role="alert">
-                            <i class="fas fa-{{ 'exclamation-triangle' if category == 'danger' else ('check-circle' if category == 'success' else 'info-circle') }} me-2"></i>
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                        {% endfor %}
-                        {% endif %}
-                        {% endwith %}
-                        <!-- Tab Navigation -->
-                        <div class="auth-tabs mb-4">
-                            <div class="tab-buttons">
-                                <button class="tab-btn active" data-tab="login">
-                                    <i class="fas fa-sign-in-alt me-2"></i>
-                                    Login
-                                </button>
-                                <button class="tab-btn" data-tab="signup">
-                                    <i class="fas fa-user-plus me-2"></i>
-                                    Sign Up
-                                </button>
-                            </div>
-                            <div class="tab-indicator"></div>
-                        </div>
-                        <!-- Login Form -->
-                        <div class="tab-content active" id="login-tab">
-                            <form method="POST" action="{{ url_for('patient.patient_login_post') }}" class="auth-form">
-                                <!-- Hidden field to identify form -->
-                                <input type="hidden" name="form_type" value="login">
-                                <div class="form-group mb-3">
-                                    <div class="input-container">
-                                        <div class="input-icon">
-                                            <i class="fas fa-mobile-alt"></i>
-                                        </div>
-                                        <input type="tel" class="form-control custom-input" name="mobile_number" placeholder="Mobile Number" required>
-                                        <div class="input-border"></div>
-                                    </div>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <div class="input-container">
-                                        <div class="input-icon">
-                                            <i class="fas fa-lock"></i>
-                                        </div>
-                                        <input type="password" class="form-control custom-input" name="password" placeholder="Password" required>
-                                        <div class="input-border"></div>
-                                        <div class="password-toggle" onclick="togglePassword(this)">
-                                            <i class="fas fa-eye"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn auth-btn w-100 mb-3">
-                                    <span class="btn-text">Sign In</span>
-                                </button>
-                            </form>
-                        </div>
-                        <!-- Signup Form -->
-                        <div class="tab-content" id="signup-tab">
-                            <form method="POST" action="{{ url_for('patient.patient_signup') }}" class="auth-form">
-                                <!-- Hidden field to identify form -->
-                                <input type="hidden" name="form_type" value="signup">
-                                <div class="form-group mb-3">
-                                    <div class="input-container">
-                                        <div class="input-icon">
-                                            <i class="fas fa-user"></i>
-                                        </div>
-                                        <input type="text" class="form-control custom-input" name="full_name" placeholder="Full Name" required>
-                                        <div class="input-border"></div>
-                                    </div>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <div class="input-container">
-                                        <div class="input-icon">
-                                            <i class="fas fa-mobile-alt"></i>
-                                        </div>
-                                        <input type="tel" class="form-control custom-input" name="mobile_number" placeholder="Mobile Number" required>
-                                        <div class="input-border"></div>
-                                    </div>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <div class="input-container">
-                                        <div class="input-icon">
-                                            <i class="fas fa-envelope"></i>
-                                        </div>
-                                        <input type="email" class="form-control custom-input" name="email" placeholder="Email Address (Optional)">
-                                        <div class="input-border"></div>
-                                    </div>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <div class="input-container">
-                                        <div class="input-icon">
-                                            <i class="fas fa-lock"></i>
-                                        </div>
-                                        <input type="password" class="form-control custom-input" name="password" placeholder="Password" required>
-                                        <div class="input-border"></div>
-                                        <div class="password-toggle" onclick="togglePassword(this)">
-                                            <i class="fas fa-eye"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group mb-4">
-                                    <div class="input-container">
-                                        <div class="input-icon">
-                                            <i class="fas fa-lock"></i>
-                                        </div>
-                                        <input type="password" class="form-control custom-input" name="confirm_password" placeholder="Confirm Password" required>
-                                        <div class="input-border"></div>
-                                        <div class="password-toggle" onclick="togglePassword(this)">
-                                            <i class="fas fa-eye"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn auth-btn w-100 mb-3">
-                                    <span class="btn-text">Create Account</span>
-                                </button>
-                            </form>
-                        </div>
-                        <!-- Footer -->
-                        <div class="auth-footer text-center">
-                            <div class="back-to-home">
-                                <a href="/" class="text-decoration-none">
-                                    <i class="fas fa-arrow-left me-2"></i>
-                                    Back to Home
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-4 pt-3 border-top small">
+            <a href="/" class="text-decoration-none text-muted">
+                <i class="fas fa-arrow-left me-2"></i>Back to Home
+            </a>
         </div>
     </div>
 </div>
+
 <style>
-/* Base Styles */
-.auth-container {
-    position: relative;
+/* Background with gradient & floating shapes */
+.auth-wrapper-modern {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     min-height: 100vh;
+    padding: 2rem;
+    background: linear-gradient(135deg, #dff1f9, #e8f5ff, #f5faff);
+}
+
+/* Card with glassmorphism effect */
+.auth-card-modern {
     width: 100%;
-    overflow: hidden;
-    background: linear-gradient(135deg, #e8f5e8 0%, #e3f2fd 25%, #f3e5f5 50%, #fff3e0 75%, #e0f2f1 100%);
+    max-width: 480px;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    animation: slideUp 0.6s ease;
 }
 
-/* Medical Equipment Animation */
-.floating-medical-equipment {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.medical-equipment {
-    position: absolute;
-    color: rgba(76, 175, 80, 0.3);
-    font-size: 3rem;
-    animation: floatMedicalEquipment 15s ease-in-out infinite;
-}
-
-.equipment-1 {
-    top: 8%;
-    left: 12%;
-    animation-delay: 0s;
-    color: rgba(244, 67, 54, 0.4);
-}
-
-.equipment-2 {
-    top: 15%;
-    right: 18%;
-    animation-delay: 2s;
-    color: rgba(33, 150, 243, 0.4);
-}
-
-.equipment-3 {
-    top: 65%;
-    left: 8%;
-    animation-delay: 4s;
-    color: rgba(76, 175, 80, 0.4);
-}
-
-.equipment-4 {
-    top: 75%;
-    right: 12%;
-    animation-delay: 6s;
-    color: rgba(255, 152, 0, 0.4);
-}
-
-.equipment-5 {
-    top: 25%;
-    left: 85%;
-    animation-delay: 8s;
-    color: rgba(156, 39, 176, 0.4);
-}
-
-@keyframes floatMedicalEquipment {
-
-    0%,
-    100% {
-        transform: translateY(0) rotate(0deg) scale(1);
-        opacity: 0.3;
-    }
-
-    25% {
-        transform: translateY(-30px) rotate(5deg) scale(1.1);
-        opacity: 0.5;
-    }
-
-    50% {
-        transform: translateY(-15px) rotate(-3deg) scale(0.9);
-        opacity: 0.4;
-    }
-
-    75% {
-        transform: translateY(-35px) rotate(8deg) scale(1.2);
-        opacity: 0.6;
-    }
-}
-
-.animated-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-}
-
-.auth-content {
-    position: relative;
-    z-index: 2;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 0;
-}
-
-.auth-card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    border-radius: 20px;
-    padding: 2.5rem;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    width: 100%;
-    max-width: 450px;
-    margin: 0 auto;
-}
-
-.logo-circle {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, #4caf50 0%, #2196f3 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 2rem;
-    box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
-    animation: logoPulse 3s ease-in-out infinite;
-    margin: 0 auto;
-}
-
-@keyframes logoPulse {
-
-    0%,
-    100% {
-        transform: scale(1);
-        box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
-    }
-
-    50% {
-        transform: scale(1.05);
-        box-shadow: 0 15px 40px rgba(76, 175, 80, 0.4);
-    }
-}
-
-.auth-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #2e7d32;
-    margin-bottom: 0.5rem;
-}
-
-.auth-subtitle {
-    color: #4caf50;
-    font-size: 1rem;
-    font-weight: 500;
-}
-
-/* Tab Navigation */
-.auth-tabs {
-    position: relative;
-}
-
-.tab-buttons {
-    display: flex;
-    background: #f5f5f5;
-    border-radius: 12px;
-    padding: 4px;
-    position: relative;
-}
-
-.tab-btn {
-    flex: 1;
-    background: none;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
+/* Tab pills */
+.nav-pills .nav-link {
+    border-radius: 0.5rem;
     font-weight: 600;
-    color: #666;
-    transition: all 0.3s ease;
-    position: relative;
-    z-index: 2;
+    color: #495057;
+    transition: all 0.3s;
+}
+.nav-pills .nav-link.active {
+    background: #0d6efd;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
 }
 
-.tab-btn.active {
-    color: #4caf50;
+/* Inputs */
+.form-control {
+    border-radius: 0.5rem;
+    height: 56px;
+}
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
 }
 
-.tab-indicator {
-    position: absolute;
-    top: 4px;
-    left: 4px;
-    width: calc(50% - 4px);
-    height: calc(100% - 8px);
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Buttons */
+.btn-lg {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
 }
 
-.tab-indicator.move-right {
-    transform: translateX(100%);
-}
-
-/* Form Styles */
-.tab-content {
-    display: none;
-    animation: fadeInUp 0.5s ease;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.input-container {
-    position: relative;
-    margin-bottom: 1rem;
-}
-
-.input-icon {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #4caf50;
-    font-size: 1.2rem;
-    z-index: 2;
-}
-
-.custom-input {
-    height: 55px;
-    padding-left: 45px;
-    padding-right: 45px;
-    border-radius: 12px;
-    border: 2px solid #e8f5e8;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.8);
-}
-
-.custom-input:focus {
-    border-color: #4caf50;
-    box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
-    background: white;
-}
-
-.input-border {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 2px;
-    width: 0;
-    background: linear-gradient(90deg, #4caf50, #2196f3);
-    transition: width 0.3s ease;
-    border-radius: 0 0 12px 12px;
-}
-
-.custom-input:focus~.input-border {
-    width: 100%;
-}
-
-.password-toggle {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #999;
-    cursor: pointer;
-    font-size: 1.1rem;
-    transition: color 0.3s ease;
-}
-
-.password-toggle:hover {
-    color: #4caf50;
-}
-
-/* Form Options */
-.form-options {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.custom-checkbox {
-    width: 18px;
-    height: 18px;
-    border-radius: 4px;
-    border: 2px solid #4caf50;
-}
-
-.custom-checkbox:checked {
-    background-color: #4caf50;
-    border-color: #4caf50;
-}
-
-.forgot-password {
-    color: #4caf50;
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: color 0.3s ease;
-}
-
-.forgot-password:hover {
-    color: #2e7d32;
-    text-decoration: underline;
-}
-
-/* Button Styles */
-.auth-btn {
-    height: 55px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #4caf50 0%, #2196f3 100%);
-    color: white;
-    font-size: 1.1rem;
-    font-weight: 600;
-    border: none;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.auth-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(76, 175, 80, 0.3);
-    background: linear-gradient(135deg, #66bb6a 0%, #42a5f5 100%);
-}
-
-.auth-btn:active {
-    transform: translateY(0);
-}
-
-/* Footer */
-.auth-footer {
-    margin-top: 2rem;
-}
-
-.back-to-home a {
-    color: #4caf50;
-    font-weight: 500;
-    transition: color 0.3s ease;
-}
-
-.back-to-home a:hover {
-    color: #2e7d32;
-}
-
-/* Custom Alert */
-.custom-alert {
-    border-radius: 12px;
-    border: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .auth-card {
-        padding: 2rem 1.5rem;
-        margin: 1rem;
-        border-radius: 16px;
-    }
-
-    .auth-title {
-        font-size: 1.8rem;
-    }
-
-    .logo-circle {
-        width: 70px;
-        height: 70px;
-        font-size: 1.8rem;
-    }
-
-    .medical-equipment {
-        font-size: 2.5rem;
-    }
-}
-
-@media (max-width: 576px) {
-    .auth-card {
-        padding: 1.5rem 1rem;
-    }
-
-    .tab-btn {
-        padding: 10px 16px;
-        font-size: 0.9rem;
-    }
-
-    .custom-input {
-        height: 50px;
-        font-size: 0.95rem;
-    }
-
-    .auth-btn {
-        height: 50px;
-        font-size: 1rem;
-    }
-
-    .medical-equipment {
-        font-size: 2rem;
-    }
-}
-
-.is-invalid {
-    border-color: #dc3545 !important;
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+/* Animation */
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 </style>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Tab switching functionality
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
-    const tabIndicator = document.querySelector('.tab-indicator');
-
-    tabButtons.forEach((button, index) => {
-        button.addEventListener('click', () => {
-            // Remove active class from all buttons and contents
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            tabContents.forEach(content => content.classList.remove('active'));
-
-            // Add active class to clicked button and corresponding content
-            button.classList.add('active');
-            const tabId = button.getAttribute('data-tab');
-            document.getElementById(tabId + '-tab').classList.add('active');
-
-            // Move indicator
-            if (index === 1) {
-                tabIndicator.classList.add('move-right');
-            } else {
-                tabIndicator.classList.remove('move-right');
-            }
-        });
-    });
-
-    // Phone number formatting
-    const phoneInputs = document.querySelectorAll('input[name="mobile_number"]');
-    phoneInputs.forEach(input => {
-        input.addEventListener('input', function(e) {
-            // Only keep digits
-            let value = e.target.value.replace(/\D/g, '');
-            // Limit to 10 digits
-            if (value.length > 10) {
-                value = value.substring(0, 10);
-            }
-            e.target.value = value;
-        });
-    });
-
-    // Form validation
-    const forms = document.querySelectorAll('form');
-    forms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-            const inputs = form.querySelectorAll('input[required]');
-            let isValid = true;
-
-            inputs.forEach(input => {
-                if (!input.value.trim()) {
-                    isValid = false;
-                    input.classList.add('is-invalid');
-                } else {
-                    input.classList.remove('is-invalid');
-                }
-            });
-
-            // Validate mobile number
-            const mobileInput = form.querySelector('input[name="mobile_number"]');
-            if (mobileInput && mobileInput.value.replace(/\D/g, '').length < 10) {
-                isValid = false;
-                mobileInput.classList.add('is-invalid');
-                if (!document.querySelector('.mobile-error')) {
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'mobile-error text-danger small mt-1';
-                    errorDiv.textContent = 'Mobile number must be 10 digits';
-                    mobileInput.parentElement.appendChild(errorDiv);
-                }
-            } else if (mobileInput) {
-                mobileInput.classList.remove('is-invalid');
-                const errorDiv = document.querySelector('.mobile-error');
-                if (errorDiv) errorDiv.remove();
-            }
-
-            // Password validation for signup
-            if (form.querySelector('input[name="confirm_password"]')) {
-                const passwordInput = form.querySelector('input[name="password"]');
-                const confirmPasswordInput = form.querySelector('input[name="confirm_password"]');
-
-                if (passwordInput.value !== confirmPasswordInput.value) {
-                    isValid = false;
-                    confirmPasswordInput.classList.add('is-invalid');
-                    if (!document.querySelector('.password-error')) {
-                        const errorDiv = document.createElement('div');
-                        errorDiv.className = 'password-error text-danger small mt-1';
-                        errorDiv.textContent = 'Passwords do not match';
-                        confirmPasswordInput.parentElement.appendChild(errorDiv);
-                    }
-                } else {
-                    confirmPasswordInput.classList.remove('is-invalid');
-                    const errorDiv = document.querySelector('.password-error');
-                    if (errorDiv) errorDiv.remove();
-                }
-            }
-
-            if (!isValid) {
-                e.preventDefault();
-            }
-        });
-    });
-});
-
-// Password toggle functionality
-function togglePassword(element) {
-    const input = element.parentElement.querySelector('input');
-    const icon = element.querySelector('i');
-
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-    } else {
-        input.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-    }
-}
-</script>
 {% endblock %}
