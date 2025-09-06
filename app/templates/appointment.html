@@ -5,7 +5,7 @@
 <!-- Hero Section -->
 <div class="appointment-hero-section position-relative overflow-hidden">
   <div class="hero-overlay"></div>
-  <div class="container py-5">
+  <div class="container">
     <div class="row align-items-center min-vh-50">
       <div class="col-lg-8 mx-auto text-center">
         <h1 class="display-4 fw-bold text-white mb-4 animate__animated animate__fadeInUp">
@@ -14,20 +14,6 @@
         <p class="lead text-white-75 mb-4 animate__animated animate__fadeInUp animate__delay-1s">
           Experience world-class healthcare with our expert medical professionals. Schedule your consultation today and take the first step towards better health.
         </p>
-        <div class="hero-stats d-flex justify-content-center gap-4 flex-wrap animate__animated animate__fadeInUp animate__delay-2s">
-          <div class="stat-item text-center">
-            <h4 class="fw-bold text-accent mb-1">24/7</h4>
-            <p class="text-white-75 small mb-0">Emergency Care</p>
-          </div>
-          <div class="stat-item text-center">
-            <h4 class="fw-bold text-accent mb-1">150+</h4>
-            <p class="text-white-75 small mb-0">Expert Doctors</p>
-          </div>
-          <div class="stat-item text-center">
-            <h4 class="fw-bold text-accent mb-1">Same Day</h4>
-            <p class="text-white-75 small mb-0">Appointments</p>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -240,7 +226,7 @@
     </div>
   </div>
 </div>
-
+{% include "footer.html" %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
 <style>
@@ -311,7 +297,7 @@
 
 .step-number {
   position: absolute;
-  top: -15px;
+  top: 10px;
   right: 20px;
   width: 40px;
   height: 40px;
