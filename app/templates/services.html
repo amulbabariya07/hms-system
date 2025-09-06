@@ -1,626 +1,496 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!-- Hero Section -->
-<div class="services-hero-section position-relative overflow-hidden">
-  <div class="hero-overlay"></div>
-  <div class="container py-5">
-    <div class="row align-items-center min-vh-50">
-      <div class="col-lg-8 mx-auto text-center">
-        <h1 class="display-4 fw-bold text-white mb-4 animate__animated animate__fadeInUp">
-          Comprehensive Healthcare Services
-        </h1>
-        <p class="lead text-white-75 mb-4 animate__animated animate__fadeInUp animate__delay-1s">
-          From emergency care to specialized treatments, we provide world-class medical services with cutting-edge technology and compassionate care.
-        </p>
-        <div class="hero-stats d-flex justify-content-center gap-4 flex-wrap animate__animated animate__fadeInUp animate__delay-2s">
-          <div class="stat-item text-center">
-            <h3 class="fw-bold text-accent mb-1">25+</h3>
-            <p class="text-white-75 small mb-0">Specialties</p>
-          </div>
-          <div class="stat-item text-center">
-            <h3 class="fw-bold text-accent mb-1">24/7</h3>
-            <p class="text-white-75 small mb-0">Emergency Care</p>
-          </div>
-          <div class="stat-item text-center">
-            <h3 class="fw-bold text-accent mb-1">150+</h3>
-            <p class="text-white-75 small mb-0">Expert Doctors</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Enhanced services grid with detailed descriptions and features -->
-<div class="services-section py-5">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="display-5 fw-bold text-primary mb-3">Our Medical Specialties</h2>
-      <p class="lead text-muted">Comprehensive healthcare services delivered by expert medical professionals</p>
-    </div>
-
-    <div class="row g-4">
-      <!-- Cardiology -->
-      <div class="col-lg-4 col-md-6">
-        <div class="service-card h-100">
-          <div class="service-icon">
-            <i class="fas fa-heartbeat"></i>
-          </div>
-          <div class="service-content">
-            <h5 class="fw-bold mb-3">Cardiology</h5>
-            <p class="text-muted mb-3">Advanced cardiac care including diagnostics, interventional procedures, and heart surgery with state-of-the-art equipment.</p>
-            <ul class="service-features">
-              <li><i class="fas fa-check text-accent me-2"></i>Cardiac Catheterization</li>
-              <li><i class="fas fa-check text-accent me-2"></i>Echocardiography</li>
-              <li><i class="fas fa-check text-accent me-2"></i>Heart Surgery</li>
-              <li><i class="fas fa-check text-accent me-2"></i>Pacemaker Implantation</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- Neurology -->
-      <div class="col-lg-4 col-md-6">
-        <div class="service-card h-100">
-          <div class="service-icon">
-            <i class="fas fa-brain"></i>
-          </div>
-          <div class="service-content">
-            <h5 class="fw-bold mb-3">Neurology</h5>
-            <p class="text-muted mb-3">Comprehensive neurological care for brain, spine, and nervous system disorders with advanced diagnostic capabilities.</p>
-            <ul class="service-features">
-              <li><i class="fas fa-check text-accent me-2"></i>Brain MRI & CT Scans</li>
-              <li><i class="fas fa-check text-accent me-2"></i>Stroke Treatment</li>
-              <li><i class="fas fa-check text-accent me-2"></i>Epilepsy Management</li>
-              <li><i class="fas fa-check text-accent me-2"></i>Neurosurgery</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- Emergency Medicine -->
-      <div class="col-lg-4 col-md-6">
-        <div class="service-card h-100 featured-service">
-          <div class="service-badge">24/7</div>
-          <div class="service-icon">
-            <i class="fas fa-ambulance"></i>
-          </div>
-          <div class="service-content">
-            <h5 class="fw-bold mb-3">Emergency Medicine</h5>
-            <p class="text-muted mb-3">Round-the-clock emergency care with rapid response teams and advanced life support systems.</p>
-            <ul class="service-features">
-              <li><i class="fas fa-check text-accent me-2"></i>Trauma Center</li>
-              <li><i class="fas fa-check text-accent me-2"></i>Critical Care Unit</li>
-              <li><i class="fas fa-check text-accent me-2"></i>Emergency Surgery</li>
-              <li><i class="fas fa-check text-accent me-2"></i>Ambulance Service</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- Pediatrics -->
-      <div class="col-lg-4 col-md-6">
-        <div class="service-card h-100">
-          <div class="service-icon">
-            <i class="fas fa-child"></i>
-          </div>
-          <div class="service-content">
-            <h5 class="fw-bold mb-3">Pediatrics</h5>
-            <p class="text-muted mb-3">Specialized healthcare for infants, children, and adolescents with child-friendly facilities and expert pediatricians.</p>
-            <ul class="service-features">
-              <li><i class="fas fa-check text-accent me-2"></i>Newborn Care</li>
-              <li><i class="fas fa-check text-accent me-2"></i>Vaccination Programs</li>
-              <li><i class="fas fa-check text-accent me-2"></i>Pediatric Surgery</li>
-              <li><i class="fas fa-check text-accent me-2"></i>Child Development</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- Orthopedics -->
-      <div class="col-lg-4 col-md-6">
-        <div class="service-card h-100">
-          <div class="service-icon">
-            <i class="fas fa-bone"></i>
-          </div>
-          <div class="service-content">
-            <h5 class="fw-bold mb-3">Orthopedics</h5>
-            <p class="text-muted mb-3">Complete bone, joint, and musculoskeletal care including sports medicine and rehabilitation services.</p>
-            <ul class="service-features">
-              <li><i class="fas fa-check text-accent me-2"></i>Joint Replacement</li>
-              <li><i class="fas fa-check text-accent me-2"></i>Sports Medicine</li>
-              <li><i class="fas fa-check text-accent me-2"></i>Fracture Treatment</li>
-              <li><i class="fas fa-check text-accent me-2"></i>Physical Therapy</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- Radiology -->
-      <div class="col-lg-4 col-md-6">
-        <div class="service-card h-100">
-          <div class="service-icon">
-            <i class="fas fa-x-ray"></i>
-          </div>
-          <div class="service-content">
-            <h5 class="fw-bold mb-3">Radiology & Imaging</h5>
-            <p class="text-muted mb-3">Advanced diagnostic imaging services with the latest technology for accurate diagnosis and treatment planning.</p>
-            <ul class="service-features">
-              <li><i class="fas fa-check text-accent me-2"></i>MRI & CT Scans</li>
-              <li><i class="fas fa-check text-accent me-2"></i>Digital X-Ray</li>
-              <li><i class="fas fa-check text-accent me-2"></i>Ultrasound</li>
-              <li><i class="fas fa-check text-accent me-2"></i>Mammography</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- New specialized centers section -->
-<div class="centers-section py-5 bg-light">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="display-5 fw-bold text-primary mb-3">Centers of Excellence</h2>
-      <p class="lead text-muted">Specialized treatment centers providing comprehensive care for complex conditions</p>
-    </div>
-
-    <div class="row g-4">
-      <div class="col-lg-6">
-        <div class="center-card">
-          <div class="center-image">
-            <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=300&q=80" class="img-fluid" alt="Cancer Center">
-          </div>
-          <div class="center-content">
-            <h4 class="fw-bold text-primary mb-3">
-              <i class="fas fa-ribbon text-danger me-2"></i>Cancer Care Center
-            </h4>
-            <p class="text-muted mb-3">Comprehensive oncology services including chemotherapy, radiation therapy, and surgical oncology with multidisciplinary care teams.</p>
-            <div class="center-features">
-              <span class="badge bg-primary me-2 mb-2">Medical Oncology</span>
-              <span class="badge bg-primary me-2 mb-2">Radiation Therapy</span>
-              <span class="badge bg-primary me-2 mb-2">Surgical Oncology</span>
-              <span class="badge bg-primary me-2 mb-2">Palliative Care</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-6">
-        <div class="center-card">
-          <div class="center-image">
-            <img src="https://images.unsplash.com/photo-1584515933487-779824d29309?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=300&q=80" class="img-fluid" alt="Women & Children Center">
-          </div>
-          <div class="center-content">
-            <h4 class="fw-bold text-primary mb-3">
-              <i class="fas fa-female text-pink me-2"></i>Women & Children Center
-            </h4>
-            <p class="text-muted mb-3">Dedicated care for women's health, maternity services, and pediatric care with specialized facilities and expert staff.</p>
-            <div class="center-features">
-              <span class="badge bg-accent me-2 mb-2">Maternity Care</span>
-              <span class="badge bg-accent me-2 mb-2">Gynecology</span>
-              <span class="badge bg-accent me-2 mb-2">NICU</span>
-              <span class="badge bg-accent me-2 mb-2">Pediatric ICU</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Enhanced facilities and technology section -->
-<div class="facilities-section py-5">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-6 mb-4 mb-lg-0">
-        <h2 class="display-5 fw-bold text-primary mb-4">State-of-the-Art Facilities</h2>
-        <p class="lead text-muted mb-4">Our hospital is equipped with the latest medical technology and modern facilities to ensure the best possible care for our patients.</p>
-        
-        <div class="facility-grid">
-          <div class="facility-item">
-            <div class="facility-icon">
-              <i class="fas fa-procedures text-primary"></i>
-            </div>
-            <div class="facility-content">
-              <h6 class="fw-bold mb-1">Advanced Operating Theaters</h6>
-              <p class="text-muted small mb-0">12 fully equipped surgical suites with robotic surgery capabilities</p>
-            </div>
-          </div>
-          
-          <div class="facility-item">
-            <div class="facility-icon">
-              <i class="fas fa-bed text-accent"></i>
-            </div>
-            <div class="facility-content">
-              <h6 class="fw-bold mb-1">Private Patient Rooms</h6>
-              <p class="text-muted small mb-0">500+ comfortable rooms with modern amenities and family areas</p>
-            </div>
-          </div>
-          
-          <div class="facility-item">
-            <div class="facility-icon">
-              <i class="fas fa-microscope text-success"></i>
-            </div>
-            <div class="facility-content">
-              <h6 class="fw-bold mb-1">Advanced Laboratory</h6>
-              <p class="text-muted small mb-0">24/7 lab services with rapid diagnostic capabilities</p>
-            </div>
-          </div>
-          
-          <div class="facility-item">
-            <div class="facility-icon">
-              <i class="fas fa-wifi text-info"></i>
-            </div>
-            <div class="facility-content">
-              <h6 class="fw-bold mb-1">Digital Health Records</h6>
-              <p class="text-muted small mb-0">Integrated electronic health records and telemedicine</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="col-lg-6">
-        <div class="facilities-image-grid">
-          <div class="row g-3">
-            <div class="col-6">
-              <img src="https://images.unsplash.com/photo-1551190822-a9333d879b1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=250&q=80" class="img-fluid rounded-3 shadow" alt="Operating Room">
-            </div>
-            <div class="col-6">
-              <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=250&q=80" class="img-fluid rounded-3 shadow" alt="Patient Room">
-            </div>
-            <div class="col-6">
-              <img src="https://images.unsplash.com/photo-1582719471384-894fbb16e074?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=250&q=80" class="img-fluid rounded-3 shadow" alt="Laboratory">
-            </div>
-            <div class="col-6">
-              <img src="https://images.unsplash.com/photo-1551190822-a9333d879b1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=250&q=80" class="img-fluid rounded-3 shadow" alt="ICU">
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Enhanced why choose us section with more compelling content -->
-<div class="why-choose-section py-5 bg-gradient">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="display-5 fw-bold text-white mb-3">Why Choose HealthCare+?</h2>
-      <p class="lead text-white-75">Experience the difference that quality healthcare makes</p>
-    </div>
-
-    <div class="row g-4">
-      <div class="col-lg-4 col-md-6">
-        <div class="why-card text-center">
-          <div class="why-icon mb-4">
-            <i class="fas fa-award fa-3x text-accent"></i>
-          </div>
-          <h5 class="fw-bold mb-3">Award-Winning Care</h5>
-          <p class="text-muted">Recognized nationally for excellence in patient care and safety standards with multiple healthcare awards.</p>
-          <div class="why-stats">
-            <span class="badge bg-accent">15+ Awards</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6">
-        <div class="why-card text-center">
-          <div class="why-icon mb-4">
-            <i class="fas fa-user-md fa-3x text-primary"></i>
-          </div>
-          <h5 class="fw-bold mb-3">Expert Medical Team</h5>
-          <p class="text-muted">Board-certified physicians and specialists with years of experience and continuous medical education.</p>
-          <div class="why-stats">
-            <span class="badge bg-primary">150+ Doctors</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6">
-        <div class="why-card text-center">
-          <div class="why-icon mb-4">
-            <i class="fas fa-clock fa-3x text-success"></i>
-          </div>
-          <h5 class="fw-bold mb-3">24/7 Availability</h5>
-          <p class="text-muted">Round-the-clock emergency services, critical care, and patient support whenever you need us most.</p>
-          <div class="why-stats">
-            <span class="badge bg-success">Always Open</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6">
-        <div class="why-card text-center">
-          <div class="why-icon mb-4">
-            <i class="fas fa-heart fa-3x text-danger"></i>
-          </div>
-          <h5 class="fw-bold mb-3">Patient-Centered Care</h5>
-          <p class="text-muted">Personalized treatment plans focused on your individual needs, comfort, and recovery journey.</p>
-          <div class="why-stats">
-            <span class="badge bg-danger">98% Satisfaction</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6">
-        <div class="why-card text-center">
-          <div class="why-icon mb-4">
-            <i class="fas fa-shield-alt fa-3x text-info"></i>
-          </div>
-          <h5 class="fw-bold mb-3">Safety First</h5>
-          <p class="text-muted">Rigorous safety protocols, infection control measures, and quality assurance for your protection.</p>
-          <div class="why-stats">
-            <span class="badge bg-info">Zero Tolerance</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6">
-        <div class="why-card text-center">
-          <div class="why-icon mb-4">
-            <i class="fas fa-dollar-sign fa-3x text-warning"></i>
-          </div>
-          <h5 class="fw-bold mb-3">Affordable Healthcare</h5>
-          <p class="text-muted">Transparent pricing, insurance acceptance, and financial assistance programs to make healthcare accessible.</p>
-          <div class="why-stats">
-            <span class="badge bg-warning">Multiple Plans</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- New appointment booking call-to-action section -->
-<div class="appointment-cta py-5">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-8">
-        <h3 class="fw-bold text-primary mb-3">Ready to Experience Quality Healthcare?</h3>
-        <p class="lead text-muted mb-0">Book your appointment today and take the first step towards better health with our expert medical team.</p>
-      </div>
-      <div class="col-lg-4 text-lg-end">
-        <a href="/appointment" class="btn btn-accent btn-lg px-4 py-3 me-3">
-          <i class="fas fa-calendar-check me-2"></i>Book Appointment
-        </a>
-        <a href="/contact" class="btn btn-outline-primary btn-lg px-4 py-3">
-          <i class="fas fa-phone me-2"></i>Contact Us
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
+<div class="services-page-wrapper">
+
+  <div class="services-hero-section position-relative overflow-hidden text-center">
+    <div class="hero-overlay"></div>
+    <div class="container col-xl-10 col-xxl-8 px-4 py-5">
+      <div class="row align-items-center g-lg-5 py-5">
+        <div class="col-lg-10 mx-auto">
+          <h1 class="display-3 fw-bold lh-1 text-white mb-4 animate__animated animate__fadeInUp">
+            Comprehensive & Compassionate Healthcare
+          </h1>
+          <p class="fs-4 text-white-75 mb-5 animate__animated animate__fadeInUp animate__delay-1s">
+            From emergency care to specialized treatments, we provide world-class medical services with cutting-edge technology and compassionate care.
+          </p>
+          <div class="d-flex justify-content-center flex-wrap gap-4 animate__animated animate__fadeInUp animate__delay-2s">
+            <div class="text-center">
+              <h2 class="fw-bold text-accent mb-1">25+</h2>
+              <p class="text-white-75 small mb-0 fw-medium">Specialties</p>
+            </div>
+            <div class="text-center">
+              <h2 class="fw-bold text-accent mb-1">24/7</h2>
+              <p class="text-white-75 small mb-0 fw-medium">Emergency Care</p>
+            </div>
+            <div class="text-center">
+              <h2 class="fw-bold text-accent mb-1">150+</h2>
+              <p class="text-white-75 small mb-0 fw-medium">Expert Doctors</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="services-section py-5">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold text-primary">Our Medical Specialties</h2>
+        <p class="lead text-muted">Comprehensive healthcare services delivered by expert medical professionals.</p>
+      </div>
+
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div class="col">
+          <div class="card service-card h-100">
+            <div class="card-body d-flex flex-column">
+              <div class="service-icon mb-4"><i class="fas fa-heartbeat"></i></div>
+              <h5 class="card-title fw-bold mb-3">Cardiology</h5>
+              <p class="text-muted mb-4">Advanced cardiac care including diagnostics, interventional procedures, and heart surgery.</p>
+              <ul class="service-features mt-auto">
+                <li><i class="fas fa-check text-accent me-2"></i>Cardiac Catheterization</li>
+                <li><i class="fas fa-check text-accent me-2"></i>Echocardiography</li>
+                <li><i class="fas fa-check text-accent me-2"></i>Pacemaker Implantation</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card service-card h-100">
+            <div class="card-body d-flex flex-column">
+              <div class="service-icon mb-4"><i class="fas fa-brain"></i></div>
+              <h5 class="card-title fw-bold mb-3">Neurology</h5>
+              <p class="text-muted mb-4">Comprehensive care for brain, spine, and nervous system disorders with advanced diagnostics.</p>
+              <ul class="service-features mt-auto">
+                <li><i class="fas fa-check text-accent me-2"></i>Brain MRI & CT Scans</li>
+                <li><i class="fas fa-check text-accent me-2"></i>Stroke Treatment</li>
+                <li><i class="fas fa-check text-accent me-2"></i>Epilepsy Management</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card service-card h-100 featured-service">
+            <div class="service-badge">24/7 Available</div>
+            <div class="card-body d-flex flex-column">
+              <div class="service-icon mb-4"><i class="fas fa-ambulance"></i></div>
+              <h5 class="card-title fw-bold mb-3">Emergency Medicine</h5>
+              <p class="text-muted mb-4">Round-the-clock emergency care with rapid response teams and advanced life support.</p>
+              <ul class="service-features mt-auto">
+                <li><i class="fas fa-check text-accent me-2"></i>Level I Trauma Center</li>
+                <li><i class="fas fa-check text-accent me-2"></i>Critical Care Unit</li>
+                <li><i class="fas fa-check text-accent me-2"></i>Ambulance Service</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card service-card h-100">
+            <div class="card-body d-flex flex-column">
+              <div class="service-icon mb-4"><i class="fas fa-child"></i></div>
+              <h5 class="card-title fw-bold mb-3">Pediatrics</h5>
+              <p class="text-muted mb-4">Specialized healthcare for infants, children, and adolescents in a child-friendly environment.</p>
+              <ul class="service-features mt-auto">
+                <li><i class="fas fa-check text-accent me-2"></i>Newborn Care (NICU)</li>
+                <li><i class="fas fa-check text-accent me-2"></i>Vaccination Programs</li>
+                <li><i class="fas fa-check text-accent me-2"></i>Child Development</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card service-card h-100">
+            <div class="card-body d-flex flex-column">
+              <div class="service-icon mb-4"><i class="fas fa-bone"></i></div>
+              <h5 class="card-title fw-bold mb-3">Orthopedics</h5>
+              <p class="text-muted mb-4">Complete bone, joint, and musculoskeletal care including sports medicine and rehabilitation.</p>
+              <ul class="service-features mt-auto">
+                <li><i class="fas fa-check text-accent me-2"></i>Joint Replacement</li>
+                <li><i class="fas fa-check text-accent me-2"></i>Sports Medicine</li>
+                <li><i class="fas fa-check text-accent me-2"></i>Physical Therapy</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card service-card h-100">
+            <div class="card-body d-flex flex-column">
+              <div class="service-icon mb-4"><i class="fas fa-x-ray"></i></div>
+              <h5 class="card-title fw-bold mb-3">Radiology & Imaging</h5>
+              <p class="text-muted mb-4">Advanced diagnostic imaging with the latest technology for accurate diagnosis.</p>
+              <ul class="service-features mt-auto">
+                <li><i class="fas fa-check text-accent me-2"></i>MRI, CT & PET Scans</li>
+                <li><i class="fas fa-check text-accent me-2"></i>Digital X-Ray</li>
+                <li><i class="fas fa-check text-accent me-2"></i>3D Mammography</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="centers-section py-5">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold text-primary">Centers of Excellence</h2>
+        <p class="lead text-muted">Specialized centers providing comprehensive care for complex conditions.</p>
+      </div>
+      <div class="row g-4 g-lg-5">
+        <div class="col-lg-6">
+          <div class="card center-card overflow-hidden h-100">
+            <div class="row g-0">
+              <div class="col-md-5 center-image">
+                <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80" class="img-fluid" alt="Cancer Center">
+              </div>
+              <div class="col-md-7 d-flex align-items-center">
+                <div class="card-body p-4">
+                  <h4 class="fw-bold text-primary mb-3">
+                    <i class="fas fa-ribbon text-danger me-2"></i>Cancer Care Center
+                  </h4>
+                  <p class="text-muted mb-3">Comprehensive oncology services with multidisciplinary care teams.</p>
+                  <div class="center-features">
+                    <span class="badge bg-primary-soft me-1 mb-2">Medical Oncology</span>
+                    <span class="badge bg-primary-soft me-1 mb-2">Radiation Therapy</span>
+                    <span class="badge bg-primary-soft me-1 mb-2">Surgical Oncology</span>
+                    <span class="badge bg-primary-soft me-1 mb-2">Palliative Care</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="card center-card overflow-hidden h-100">
+            <div class="row g-0">
+              <div class="col-md-5 center-image">
+                <img src="https://images.unsplash.com/photo-1584515933487-779824d29309?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80" class="img-fluid" alt="Women & Children Center">
+              </div>
+              <div class="col-md-7 d-flex align-items-center">
+                <div class="card-body p-4">
+                  <h4 class="fw-bold text-primary mb-3">
+                    <i class="fas fa-female text-pink me-2"></i>Women & Children Center
+                  </h4>
+                  <p class="text-muted mb-3">Dedicated care for women's health, maternity, and pediatric services.</p>
+                  <div class="center-features">
+                    <span class="badge bg-accent-soft me-1 mb-2">Maternity Care</span>
+                    <span class="badge bg-accent-soft me-1 mb-2">Gynecology</span>
+                    <span class="badge bg-accent-soft me-1 mb-2">NICU</span>
+                    <span class="badge bg-accent-soft me-1 mb-2">Pediatric ICU</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="facilities-section py-5">
+    <div class="container">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+          <h2 class="display-5 fw-bold text-primary mb-4">State-of-the-Art Facilities</h2>
+          <p class="lead text-muted mb-4">Our hospital is equipped with the latest medical technology to ensure the best possible care for our patients.</p>
+          <div class="vstack gap-4">
+            <div class="d-flex align-items-start gap-3">
+              <div class="facility-icon"><i class="fas fa-procedures text-primary"></i></div>
+              <div>
+                <h6 class="fw-bold mb-1">Advanced Operating Theaters</h6>
+                <p class="text-muted small mb-0">12 fully equipped surgical suites with robotic surgery capabilities.</p>
+              </div>
+            </div>
+            <div class="d-flex align-items-start gap-3">
+              <div class="facility-icon"><i class="fas fa-bed text-accent"></i></div>
+              <div>
+                <h6 class="fw-bold mb-1">Private Patient Rooms</h6>
+                <p class="text-muted small mb-0">500+ comfortable rooms with modern amenities and family areas.</p>
+              </div>
+            </div>
+            <div class="d-flex align-items-start gap-3">
+              <div class="facility-icon"><i class="fas fa-microscope text-success"></i></div>
+              <div>
+                <h6 class="fw-bold mb-1">Advanced Laboratory</h6>
+                <p class="text-muted small mb-0">24/7 lab services with rapid diagnostic capabilities for quick results.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="row g-3">
+            <div class="col-6">
+              <img src="https://images.unsplash.com/photo-1551190822-a9333d879b1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=350&q=80" class="img-fluid rounded-4 shadow-lg facility-image" alt="Operating Room">
+            </div>
+            <div class="col-6">
+              <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=350&q=80" class="img-fluid rounded-4 shadow-lg facility-image" alt="Patient Room">
+            </div>
+            <div class="col-12">
+              <img src="https://images.unsplash.com/photo-1582719471384-894fbb16e074?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400&q=80" class="img-fluid rounded-4 shadow-lg facility-image" alt="Laboratory">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="why-choose-section py-5 bg-gradient text-white">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold text-white">Why Choose HealthCare+?</h2>
+        <p class="lead text-white-75">Experience the difference that quality healthcare makes.</p>
+      </div>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div class="col">
+          <div class="card why-card h-100 text-center">
+            <div class="card-body">
+              <div class="why-icon mb-4"><i class="fas fa-award fa-3x text-accent"></i></div>
+              <h5 class="fw-bold text-primary mb-3">Award-Winning Care</h5>
+              <p class="text-muted">Recognized nationally for excellence in patient care and safety standards.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card why-card h-100 text-center">
+            <div class="card-body">
+              <div class="why-icon mb-4"><i class="fas fa-user-md fa-3x text-primary"></i></div>
+              <h5 class="fw-bold text-primary mb-3">Expert Medical Team</h5>
+              <p class="text-muted">Board-certified physicians and specialists with years of experience.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card why-card h-100 text-center">
+            <div class="card-body">
+              <div class="why-icon mb-4"><i class="fas fa-heart fa-3x text-danger"></i></div>
+              <h5 class="fw-bold text-primary mb-3">Patient-Centered Care</h5>
+              <p class="text-muted">Personalized treatment plans focused on your needs, comfort, and recovery.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="appointment-cta py-5">
+    <div class="container">
+      <div class="row g-4 align-items-center">
+        <div class="col-lg-8 text-center text-lg-start">
+          <h3 class="fw-bold text-primary mb-2">Ready to Experience Quality Healthcare?</h3>
+          <p class="lead text-muted mb-0">Book your appointment today and take the first step towards better health.</p>
+        </div>
+        <div class="col-lg-4 text-center text-lg-end">
+          <a href="/appointment" class="btn btn-accent btn-lg px-4 py-3 shadow">
+            <i class="fas fa-calendar-check me-2"></i>Book Appointment
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>{% include "footer.html" %}
+
 <style>
-/* Updated color scheme and enhanced styling */
+/* ===============================
+   GLOBAL STYLES & COLOR PALETTE
+  ================================ */
 :root {
-  --primary-color: #164e63;
-  --accent-color: #84cc16;
-  --light-bg: #ecfeff;
-  --text-muted: #475569;
+  --primary-color: #005A8D;  /* Professional Blue */
+  --primary-dark: #00446A;
+  --accent-color: #10B981;   /* Emerald Green */
+  --accent-dark: #059669;
+  --bg-light: #F0F7FF;      /* Very Light Blue */
+  --text-muted: #6c757d;
+  --text-primary: #212529;
+  --pink: #ec4899;
+  --border-radius-lg: 1rem; /* 16px */
+  --border-radius-md: 0.5rem; /* 8px */
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-/* Hero Section */
+body {
+  font-family: 'Inter', sans-serif; /* Recommended to add this font in base.html */
+  color: var(--text-primary);
+}
+
+/* General & Responsive */
+.display-3, .display-4, .display-5 {
+  font-weight: 800; /* Bolder headings */
+}
+.text-accent { color: var(--accent-color) !important; }
+.text-primary { color: var(--primary-color) !important; }
+.text-pink { color: var(--pink) !important; }
+.text-white-75 { color: rgba(255, 255, 255, 0.75) !important; }
+
+/* ===============================
+   HERO SECTION STYLES
+  ================================ */
 .services-hero-section {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #0891b2 100%);
-  min-height: 60vh;
-  position: relative;
+  background-color: var(--primary-dark);
 }
-
 .hero-overlay::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('https://images.unsplash.com/photo-1538108149393-fbbd81895907?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600&q=80') center/cover;
-  opacity: 0.1;
-  z-index: -1;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 50%),
+                    url('https://images.unsplash.com/photo-1538108149393-fbbd81895907?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600&q=80');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.3;
+  z-index: 0;
 }
-
-.text-accent {
-  color: var(--accent-color) !important;
-}
-
-.text-white-75 {
-  color: rgba(255, 255, 255, 0.75) !important;
-}
-
-.min-vh-50 {
-  min-height: 50vh;
-}
-
-.hero-stats .stat-item {
-  padding: 1rem;
-}
-
-/* Enhanced Service Cards */
-.service-card {
-  background: white;
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+.services-hero-section .container {
   position: relative;
+  z-index: 1;
+}
+.stat-item {
+  border-left: 3px solid var(--accent-color);
+  padding-left: 1rem;
+}
+
+/* ===============================
+   SERVICES SECTION STYLES
+  ================================ */
+.services-section {
+  background-color: white;
+}
+.service-card {
+  border: 1px solid #e2e8f0;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   overflow: hidden;
+  border-top: 4px solid var(--primary-color);
 }
-
-.service-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-}
-
 .service-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
 }
-
 .service-icon {
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-  border-radius: 20px;
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  border-radius: var(--border-radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.5rem;
-  transition: transform 0.3s ease;
-}
-
-.service-icon i {
-  font-size: 2rem;
   color: white;
+  font-size: 1.75rem;
+  box-shadow: 0 4px 12px rgba(0, 90, 141, 0.3);
 }
-
-.service-card:hover .service-icon {
-  transform: scale(1.1);
-}
-
 .service-features {
   list-style: none;
   padding: 0;
   margin: 0;
+  font-size: 0.9rem;
 }
-
-.service-features li {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.service-features li:last-child {
-  border-bottom: none;
-}
-
+.service-features li { padding: 0.3rem 0; }
 .featured-service {
-  border: 2px solid var(--accent-color);
-  position: relative;
+  border-top-color: var(--accent-color);
 }
-
 .service-badge {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 1rem; right: -40px;
   background: var(--accent-color);
   color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: bold;
+  padding: 0.4rem 4rem;
+  transform: rotate(45deg);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* Centers of Excellence */
+/* ===============================
+   CENTERS OF EXCELLENCE STYLES
+  ================================ */
+.centers-section { background-color: var(--bg-light); }
 .center-card {
-  background: white;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  border: 0;
+  box-shadow: var(--shadow-md);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  border-radius: var(--border-radius-lg);
 }
-
 .center-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-lg);
 }
-
-.center-image {
-  height: 200px;
-  overflow: hidden;
-}
-
 .center-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform 0.4s ease;
 }
-
-.center-card:hover .center-image img {
-  transform: scale(1.05);
-}
-
-.center-content {
-  padding: 2rem;
-}
-
+.center-card:hover .center-image img { transform: scale(1.05); }
 .center-features .badge {
-  font-size: 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.5em 0.9em;
 }
+.bg-primary-soft { background-color: #cfe2ff; color: #004085; }
+.bg-accent-soft { background-color: #d1fae5; color: #065f46; }
 
-/* Facilities Section */
-.facility-item {
-  display: flex;
-  align-items: start;
-  gap: 1rem;
-  padding: 1.5rem;
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-  margin-bottom: 1rem;
-  transition: all 0.3s ease;
-}
-
-.facility-item:hover {
-  transform: translateX(10px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
-
+/* ===============================
+   FACILITIES SECTION STYLES
+  ================================ */
+.facilities-section { background-color: white; }
 .facility-icon {
-  width: 50px;
-  height: 50px;
-  background: rgba(132, 204, 22, 0.1);
-  border-radius: 12px;
+  width: 50px; height: 50px;
+  background: var(--bg-light);
+  border-radius: var(--border-radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-}
-
-.facility-icon i {
   font-size: 1.5rem;
 }
+.facility-image {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.facility-image:hover {
+  transform: scale(1.03) translateY(-5px);
+  box-shadow: var(--shadow-lg) !important;
+}
+.rounded-4 { border-radius: 1.25rem; }
 
-/* Why Choose Us Section */
+/* ===============================
+   WHY CHOOSE US SECTION STYLES
+  ================================ */
 .why-choose-section {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #0891b2 100%);
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
 }
-
 .why-card {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 20px;
-  padding: 2rem;
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius-lg);
   transition: all 0.3s ease;
+  color: var(--text-primary) !important; /* Overwrite for text inside */
 }
-
+/* Glassmorphism effect */
+@supports (backdrop-filter: blur(15px)) {
+  .why-card {
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+  }
+}
 .why-card:hover {
   transform: translateY(-10px);
-  background: white;
+  background: rgba(255, 255, 255, 0.9);
+  border-color: transparent;
+  box-shadow: var(--shadow-lg);
 }
-
-.why-icon {
-  transition: transform 0.3s ease;
+.why-card .card-body {
+    background: white;
+    border-radius: var(--border-radius-lg);
 }
+.why-icon { transition: transform 0.3s ease; }
+.why-card:hover .why-icon { transform: scale(1.1) rotate(-5deg); }
 
-.why-card:hover .why-icon {
-  transform: scale(1.1);
-}
-
-.why-stats {
-  margin-top: 1rem;
-}
-
-/* Buttons */
+/* ===============================
+   CTA & BUTTON STYLES
+  ================================ */
+.appointment-cta { background-color: var(--bg-light); }
 .btn-accent {
   background: var(--accent-color);
   border-color: var(--accent-color);
@@ -628,66 +498,34 @@
   font-weight: 600;
   transition: all 0.3s ease;
 }
-
 .btn-accent:hover {
-  background: #65a30d;
-  border-color: #65a30d;
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
   color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(132, 204, 22, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4) !important;
 }
 
-.btn-outline-primary {
-  border-color: var(--primary-color);
-  color: var(--primary-color);
-  font-weight: 600;
+/* ===============================
+   MEDIA QUERIES FOR RESPONSIVENESS
+  ================================ */
+@media (max-width: 767.98px) {
+  .display-3 { font-size: 2.5rem; }
+  .display-5 { font-size: 2rem; }
+  .center-image {
+    height: 200px;
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+  }
+  .center-card .row .col-md-7 {
+    border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+  }
+  .service-badge { right: -50px; }
 }
 
-.btn-outline-primary:hover {
-  background: var(--primary-color);
-  border-color: var(--primary-color);
-  color: white;
-}
-
-/* Appointment CTA */
-.appointment-cta {
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .services-hero-section {
-    min-height: 70vh;
-  }
-  
-  .display-4 {
-    font-size: 2rem;
-  }
-  
-  .hero-stats {
-    gap: 1rem !important;
-  }
-  
-  .service-card {
-    padding: 1.5rem;
-  }
-  
-  .center-content {
-    padding: 1.5rem;
-  }
-  
-  .why-card {
-    padding: 1.5rem;
-  }
-  
-  .facility-item {
-    padding: 1rem;
-  }
-}
-
-.bg-gradient {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #0891b2 100%);
+@media (min-width: 768px) {
+    .center-image img {
+        border-radius: var(--border-radius-lg) 0 0 var(--border-radius-lg);
+    }
 }
 </style>
 
