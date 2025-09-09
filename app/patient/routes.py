@@ -4,6 +4,10 @@ from app.models import User, Doctor, Appointment
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, date, time
 import re
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from app.models import MailSetting
 
 def clean_mobile_number(number):
     return re.sub(r'\D', '', number)
@@ -241,3 +245,103 @@ def logout():
     session.clear()
     flash('You have been logged out successfully.', 'info')
     return redirect(url_for('home'))
+
+@patient_bp.route('/my-profile')
+def my_profile():
+    if 'user_id' not in session:
+        flash('Please login to view your profile.', 'warning')
+        return redirect(url_for('patient.patient_login'))
+
+    patient = User.query.get(session['user_id'])
+    return render_template('patient/my_profile.html', patient=patient)
+
+
+@patient_bp.route('/update-profile', methods=['POST'])
+def update_profile():
+    if 'user_id' not in session:
+        flash('Please login to update your profile.', 'warning')
+        return redirect(url_for('patient.patient_login'))
+
+    patient = User.query.get(session['user_id'])
+    if not patient:
+        flash('User not found.', 'danger')
+        return redirect(url_for('patient.my_profile'))
+
+    # Store old info for email
+    old_full_name = patient.full_name
+    old_email = patient.email
+    old_mobile = patient.mobile_number
+    password_changed = False
+
+    # Update fields
+    patient.full_name = request.form.get('full_name')
+    patient.email = request.form.get('email')
+    patient.mobile_number = request.form.get('mobile_number')
+
+    password = request.form.get('password')
+    if password:  # only update if new password entered
+        patient.password = generate_password_hash(password)
+        password_changed = True
+        new_password = password  # store the actual new password to send in email
+    else:
+        new_password = None
+
+
+    db.session.commit()
+    session['user_name'] = patient.full_name  # keep session in sync
+
+    # Send profile update email
+    send_profile_update_email(
+        patient,
+        old_full_name=old_full_name,
+        old_email=old_email,
+        old_mobile=old_mobile,
+        password_changed=password_changed,
+        new_password=new_password
+    )
+
+    flash('Profile updated successfully!', 'success')
+    return redirect(url_for('patient.my_profile'))
+
+
+def send_profile_update_email(patient, old_full_name, old_email, old_mobile, password_changed=False, new_password=None):
+    from app.models import MailSetting
+
+    mail_config = MailSetting.query.first()
+    if not mail_config:
+        print("Mail settings not configured!")
+        return
+
+    sender_email = mail_config.mail_default_email or mail_config.mail_username
+    receiver_email = patient.email
+    if not receiver_email:
+        return
+
+    html_content = render_template(
+        'email/profile_update.html',
+        full_name=patient.full_name,
+        email=patient.email,
+        mobile_number=patient.mobile_number,
+        old_full_name=old_full_name,
+        old_email=old_email,
+        old_mobile=old_mobile,
+        password_changed=password_changed,
+        new_password=new_password
+    )
+
+
+    msg = MIMEMultipart("alternative")
+    msg['Subject'] = "Your Profile Has Been Updated"
+    msg['From'] = sender_email
+    msg['To'] = receiver_email
+    msg.attach(MIMEText(html_content, "html"))
+
+    try:
+        with smtplib.SMTP(mail_config.mail_server, mail_config.mail_port) as server:
+            if mail_config.mail_use_tls:
+                server.starttls()
+            server.login(mail_config.mail_username, mail_config.mail_password)
+            server.sendmail(sender_email, receiver_email, msg.as_string())
+        print(f"Profile update email sent to {receiver_email}")
+    except Exception as e:
+        print("Failed to send email:", e)

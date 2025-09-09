@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% include "patient/header.html" %}
+
+<style>
+.profile-section {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative; /* needed for overlay */
+    overflow: hidden;
+    background: url('{{ url_for('static', filename='image/update_profile.jpg') }}') center/cover no-repeat;
+}
+
+/* Blue transparent overlay */
+.profile-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 123, 255, 0.4); /* semi-transparent blue */
+    z-index: 1;
+}
+
+.profile-card {
+    position: relative; /* above overlay */
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.profile-card h3 {
+    font-weight: 700;
+    color: #0d6efd;
+}
+.profile-card label {
+    font-weight: 600;
+}
+</style>
+
+
+<div class="profile-section" style="background: url('{{ url_for('static', filename='image/update_profile.jpg') }}') center/cover no-repeat;">
+    <div class="profile-card">
+        <h3 class="text-center mb-4"><i class="fas fa-user-circle me-2"></i> My Profile</h3>
+        <p class="text-center text-muted mb-4">View and edit your personal information</p>
+
+        <!-- Profile Display -->
+        <div id="profile-view">
+            <p><strong>Full Name:</strong> {{ patient.full_name }}</p>
+            <p><strong>Email:</strong> {{ patient.email }}</p>
+            <p><strong>Mobile Number:</strong> {{ patient.mobile_number }}</p>
+
+            <div class="d-grid mt-4">
+                <button class="btn btn-primary btn-lg rounded-pill" onclick="toggleEdit(true)">
+                    <i class="fas fa-edit me-2"></i> Edit Profile
+                </button>
+            </div>
+        </div>
+
+        <!-- Profile Edit Form (Hidden initially) -->
+        <div id="profile-edit" style="display:none;">
+            <form method="POST" action="{{ url_for('patient.update_profile') }}">
+                
+                <!-- Full Name -->
+                <div class="mb-3">
+                    <label for="full_name" class="form-label">Full Name</label>
+                    <input type="text" class="form-control form-control-lg" id="full_name" 
+                           name="full_name" value="{{ patient.full_name }}" required>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control form-control-lg" id="email" 
+                           name="email" value="{{ patient.email }}">
+                </div>
+
+                <!-- Mobile Number -->
+                <div class="mb-3">
+                    <label for="mobile_number" class="form-label">Mobile Number</label>
+                    <input type="text" class="form-control form-control-lg" id="mobile_number" 
+                           name="mobile_number" value="{{ patient.mobile_number }}" required>
+                </div>
+
+                <!-- Password -->
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control form-control-lg" id="password" 
+                           name="password" placeholder="Enter new password (leave blank to keep current)">
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-secondary btn-lg rounded-pill" 
+                            onclick="toggleEdit(false)">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-success btn-lg rounded-pill">
+                        <i class="fas fa-save me-2"></i> Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleEdit(editMode) {
+    document.getElementById("profile-view").style.display = editMode ? "none" : "block";
+    document.getElementById("profile-edit").style.display = editMode ? "block" : "none";
+}
+</script>
+
+{% endblock %}
