@@ -1,0 +1,45 @@
+<nav class="navbar navbar-expand-lg shadow-sm sticky-top bg-white">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold fs-3 text-primary" href="/">
+            <i class="fas fa-heart-pulse me-2"></i>
+            HelthCare+
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/"><i class="fas fa-home me-1"></i>Home</a>
+                </li>
+
+                <!-- ✅ New Menu Items -->
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/appointment/book">
+                        <i class="fas fa-calendar-plus me-1"></i>Book Appointment
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/appointment/view">
+                        <i class="fas fa-calendar-check me-1"></i>View Appointment
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/medical/records">
+                        <i class="fas fa-file-medical me-1"></i>View Medical Record
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="{{ url_for('patient.my_profile') }}">
+                        <i class="fas fa-user me-1"></i>My Profile
+                    </a>
+                </li>
+                <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
+                    <a href="/patient/logout" class="btn btn-outline-danger rounded-pill px-4">
+                        <i class="fas fa-sign-out-alt me-1"></i>Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
