@@ -8,6 +8,9 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from app.models import MailSetting
+import random
+from flask import session
+from app.models import User, MailSetting
 
 def clean_mobile_number(number):
     return re.sub(r'\D', '', number)
@@ -345,3 +348,105 @@ def send_profile_update_email(patient, old_full_name, old_email, old_mobile, pas
         print(f"Profile update email sent to {receiver_email}")
     except Exception as e:
         print("Failed to send email:", e)
+
+
+@patient_bp.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    step = 'enter_number'
+    
+    if request.method == 'POST':
+        # Step 1: Send verification code
+        if 'mobile_number' in request.form and 'verification_code' not in request.form and 'password' not in request.form:
+            mobile_number = clean_mobile_number(request.form['mobile_number'])
+            user = User.query.filter_by(mobile_number=mobile_number).first()
+            if not user:
+                flash('This mobile number is not registered.', 'danger')
+                return render_template('patient/forgot_password.html', step='enter_number')
+
+            # Generate 6-digit code
+            code = '{:06d}'.format(random.randint(0, 999999))
+            session['forgot_password_code'] = code
+            session['forgot_password_mobile'] = mobile_number
+
+            # Send email
+            send_forgot_password_email(user.email, user.full_name, code)
+
+            flash('A 6-digit verification code has been sent to your registered email.', 'info')
+            return render_template('patient/forgot_password.html', step='enter_code', mobile_number=mobile_number)
+
+        # Step 2: Verify code
+        elif 'verification_code' in request.form:
+            mobile_number = clean_mobile_number(request.form['mobile_number'])
+            entered_code = request.form['verification_code']
+            code = session.get('forgot_password_code')
+            mobile_session = session.get('forgot_password_mobile')
+
+            if code != entered_code or mobile_number != mobile_session:
+                flash('Invalid verification code.', 'danger')
+                return render_template('patient/forgot_password.html', step='enter_code', mobile_number=mobile_number)
+
+            flash('Code verified. Enter your new password.', 'info')
+            return render_template('patient/forgot_password.html', step='reset_password', mobile_number=mobile_number)
+
+        # Step 3: Update password
+        elif 'password' in request.form:
+            mobile_number = clean_mobile_number(request.form['mobile_number'])
+            password = request.form['password']
+            confirm_password = request.form['confirm_password']
+
+            if password != confirm_password:
+                flash('Passwords do not match.', 'danger')
+                return render_template('patient/forgot_password.html', step='reset_password', mobile_number=mobile_number)
+
+            user = User.query.filter_by(mobile_number=mobile_number).first()
+            if not user:
+                flash('User not found.', 'danger')
+                return redirect(url_for('patient.patient_login'))
+
+            from werkzeug.security import generate_password_hash
+            user.password = generate_password_hash(password)
+            db.session.commit()
+
+            # Clear session codes
+            session.pop('forgot_password_code', None)
+            session.pop('forgot_password_mobile', None)
+
+            flash('Password updated successfully! Please login.', 'success')
+            return redirect(url_for('patient.patient_login'))
+
+    return render_template('patient/forgot_password.html', step=step)
+
+
+def send_forgot_password_email(receiver_email, full_name, code):
+    mail_config = MailSetting.query.first()
+    if not mail_config or not receiver_email:
+        print("Mail settings missing or email not available!")
+        return
+
+    sender_email = mail_config.mail_default_email or mail_config.mail_username
+
+    html_content = render_template(
+        'email/forgot_password.html',
+        full_name=full_name,
+        code=code
+    )
+
+    msg = MIMEMultipart("alternative")
+    msg['Subject'] = "Your Password Reset Code"
+    msg['From'] = sender_email
+    msg['To'] = receiver_email
+    msg.attach(MIMEText(html_content, "html"))
+
+    try:
+        with smtplib.SMTP(mail_config.mail_server, mail_config.mail_port) as server:
+            if mail_config.mail_use_tls:
+                server.starttls()
+            server.login(mail_config.mail_username, mail_config.mail_password)
+            server.sendmail(sender_email, receiver_email, msg.as_string())
+        print("\n\n\n")
+        print(f"Forgot password code sent to {receiver_email}")
+        print("\n\n\n")
+    except Exception as e:
+        print('\n\n\n')
+        print("Failed to send email:", e)
+        print('\n\n\n')
