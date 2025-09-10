@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Profile Updated</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #eaeaea;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        h2 {
+            color: #0d6efd;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        .label {
+            font-weight: bold;
+            width: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Your Profile Has Been Updated</h2>
+        <p>Hi {{ full_name }},</p>
+        <p>Here’s a summary of your profile information (old vs. new):</p>
+
+        <table>
+            <tr>
+                <td class="label">Full Name:</td>
+                <td>{{ old_full_name }} → {{ full_name }}</td>
+            </tr>
+
+            <tr>
+                <td class="label">Email:</td>
+                <td>{{ old_email or "Not Set" }} → {{ email or "Not Set" }}</td>
+            </tr>
+
+            <tr>
+                <td class="label">Mobile Number:</td>
+                <td>{{ old_mobile or "Not Set" }} → {{ mobile_number or "Not Set" }}</td>
+            </tr>
+            <tr>
+                <td class="label">Password:</td>
+                <td>
+                    {% if password_changed %}
+                        {{ new_password }}
+                    {% else %}
+                        Unchanged
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+
+        <p>If you did not make these changes, please contact our support immediately.</p>
+        <p>Thank you,<br>HelthCare+ Team</p>
+    </div>
+</body>
+</html>
