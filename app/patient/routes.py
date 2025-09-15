@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, send_file, abort
 from app import db
 from app.models import User, Doctor, Appointment
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -11,6 +11,13 @@ from app.models import MailSetting
 import random
 from flask import session
 from app.models import User, MailSetting
+import io
+from flask import send_file
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from app.models import Appointment
 
 def clean_mobile_number(number):
     return re.sub(r'\D', '', number)
@@ -109,98 +116,74 @@ def book_appointment():
 
 @patient_bp.route('/book-appointment', methods=['POST'])
 def book_appointment_post():
+    """Handle booking an appointment after Razorpay payment success."""
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
     if 'user_id' not in session:
+        if is_ajax:
+            return jsonify(success=False, message="Please login to book an appointment.")
         flash('Please login to book an appointment.', 'warning')
         return redirect(url_for('patient.patient_login'))
-    
 
     try:
         doctor_id = request.form.get('doctor_id')
         appointment_date = request.form.get('appointment_date')
         appointment_time = request.form.get('appointment_time')
-        reason = request.form.get('reason', '')
 
-        # Payment info from Razorpay
-        razorpay_payment_id = request.form.get('razorpay_payment_id')
-        razorpay_order_id = request.form.get('razorpay_order_id')
-        razorpay_signature = request.form.get('razorpay_signature')
-        amount = request.form.get('amount')
-
-        # Validation
-        if not all([doctor_id, appointment_date, appointment_time, razorpay_payment_id, razorpay_order_id, razorpay_signature, amount]):
-            flash('Payment or appointment details missing.', 'danger')
+        if not doctor_id or not appointment_date or not appointment_time:
+            if is_ajax:
+                return jsonify(success=False, message="Missing appointment details.")
+            flash("Please provide all appointment details.", "danger")
             return redirect(url_for('patient.book_appointment'))
 
-        # Check if doctor exists
+        # convert
+        appointment_datetime = datetime.strptime(
+            f"{appointment_date} {appointment_time}", "%Y-%m-%d %H:%M"
+        )
+
+        patient = User.query.get(session['user_id'])
         doctor = Doctor.query.get(doctor_id)
-        if not doctor:
-            flash('Selected doctor not found.', 'danger')
+
+        if not doctor or not patient:
+            if is_ajax:
+                return jsonify(success=False, message="Invalid doctor or patient.")
+            flash("Invalid doctor or patient.", "danger")
             return redirect(url_for('patient.book_appointment'))
 
-        # Parse date and time
-        try:
-            appt_date = datetime.strptime(appointment_date, '%Y-%m-%d').date()
-            appt_time = datetime.strptime(appointment_time, '%H:%M').time()
-        except ValueError:
-            flash('Invalid date or time format.', 'danger')
-            return redirect(url_for('patient.book_appointment'))
-
-        # Check if appointment date is in the future
-        if appt_date < date.today():
-            flash('Appointment date must be in the future.', 'danger')
-            return redirect(url_for('patient.book_appointment'))
-
-        # Check if appointment already exists for the same doctor, date, and time
-        existing_appointment = Appointment.query.filter_by(
-            doctor_id=doctor_id,
-            appointment_date=appt_date,
-            appointment_time=appt_time,
-            status='scheduled'
-        ).first()
-
-        if existing_appointment:
-            flash('This time slot is already booked. Please choose a different time.', 'danger')
-            return redirect(url_for('patient.book_appointment'))
-
-        # Verify Razorpay payment
-        from app.payment.razorpay_utils import verify_payment
-        payment_verified = verify_payment(razorpay_payment_id, razorpay_order_id, razorpay_signature)
-        if not payment_verified:
-            flash('Payment verification failed. Please try again.', 'danger')
-            return redirect(url_for('patient.book_appointment'))
-
-        # Create new appointment
-        new_appointment = Appointment(
-            patient_id=session['user_id'],
-            doctor_id=doctor_id,
-            patient_name=session['user_name'],
-            appointment_date=appt_date,
-            appointment_time=appt_time,
-            reason=reason,
-            status='scheduled'
+        appointment = Appointment(
+            doctor_id=doctor.id,
+            patient_id=patient.id,
+            patient_name=patient.full_name,
+            appointment_date=appointment_datetime.date(),
+            appointment_time=appointment_datetime.time(),
+            status="scheduled",
         )
-        db.session.add(new_appointment)
+        db.session.add(appointment)
         db.session.commit()
 
-        # Store payment record
-        from app.models import Payment
-        payment = Payment(
-            appointment_id=new_appointment.id,
-            razorpay_payment_id=razorpay_payment_id,
-            amount=float(amount),
-            currency='INR',
-            status='success',
-        )
-        db.session.add(payment)
-        db.session.commit()
+        # Send appointment confirmation email
+        if patient.email:  # only send if email exists
+            send_appointment_email(
+                patient_email=patient.email,
+                patient_name=patient.full_name,
+                doctor_name=f"Dr. {doctor.full_name}",
+                appointment_date=appointment.appointment_date.strftime('%d %B %Y'),
+                appointment_time=appointment.appointment_time.strftime('%I:%M %p')
+            )
 
-        flash('Appointment booked and payment successful!', 'success')
+        if is_ajax:
+            return jsonify(success=True, redirect_url=url_for('patient.my_appointments'))
+        flash("Appointment booked and confirmation email sent!", "success")
         return redirect(url_for('patient.my_appointments'))
 
     except Exception as e:
         db.session.rollback()
-        flash('An error occurred while booking the appointment. Please try again.', 'danger')
+        print("Error while booking appointment:", str(e))
+        if is_ajax:
+            return jsonify(success=False, message="An error occurred while booking your appointment.")
+        flash("An error occurred while booking the appointment. Please try again.", "danger")
         return redirect(url_for('patient.book_appointment'))
+
 
 @patient_bp.route('/my-appointments')
 def my_appointments():
@@ -450,3 +433,198 @@ def send_forgot_password_email(receiver_email, full_name, code):
         print('\n\n\n')
         print("Failed to send email:", e)
         print('\n\n\n')
+
+import io
+from flask import send_file
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from app.models import Appointment
+
+@patient_bp.route('/appointments/<int:appointment_id>/download')
+def download_appointment(appointment_id):
+    appointment = Appointment.query.get_or_404(appointment_id)
+
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
+
+    # ---------------- HEADER ----------------
+    c.setFillColor(colors.HexColor("#007BFF"))
+    c.rect(0, height - 80, width, 80, stroke=0, fill=1)
+
+    c.setFillColor(colors.white)
+    c.setFont("Helvetica-Bold", 24)
+    c.drawString(70, height - 50, "HelthCare+")
+    c.setFont("Helvetica", 10)
+    c.drawString(400, height - 40, "Your Health, Our Priority")
+
+    # ---------------- TITLE ----------------
+    c.setFillColor(colors.black)
+    c.setFont("Helvetica-Bold", 16)
+    c.drawCentredString(width / 2, height - 120, "Appointment Details")
+
+    # ---------------- DETAILS ----------------
+    y = height - 170
+    line_height = 20
+
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(80, y, "Appointment ID:")
+    c.setFont("Helvetica", 12)
+    c.drawString(200, y, str(appointment.id))
+
+    y -= line_height
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(80, y, "Patient Name:")
+    c.setFont("Helvetica", 12)
+    c.drawString(200, y, appointment.user.full_name)   # Assuming relation with User model
+
+    y -= line_height
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(80, y, "Doctor:")
+    c.setFont("Helvetica", 12)
+    c.drawString(200, y, f"Dr. {appointment.doctor.full_name}")
+
+    y -= line_height
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(80, y, "Specialization:")
+    c.setFont("Helvetica", 12)
+    c.drawString(200, y, appointment.doctor.specialization)
+
+    y -= line_height
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(80, y, "Date:")
+    c.setFont("Helvetica", 12)
+    c.drawString(200, y, appointment.appointment_date.strftime('%d %B %Y'))
+
+    y -= line_height
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(80, y, "Time:")
+    c.setFont("Helvetica", 12)
+    c.drawString(200, y, appointment.appointment_time.strftime('%I:%M %p'))
+
+    y -= line_height
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(80, y, "Status:")
+    c.setFont("Helvetica", 12)
+    c.drawString(200, y, appointment.status.capitalize())
+
+    if appointment.reason:
+        y -= line_height
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(80, y, "Reason:")
+        c.setFont("Helvetica", 12)
+        c.drawString(200, y, appointment.reason)
+
+    # ---------------- FOOTER ----------------
+    c.setStrokeColor(colors.HexColor("#007BFF"))
+    c.setLineWidth(0.5)
+    c.line(40, 50, width - 40, 50)
+
+    c.setFont("Helvetica", 9)
+    c.setFillColor(colors.gray)
+    c.drawCentredString(width / 2, 35, "HelthCare+ | www.healthcareplus.com | +91 98765 43210")
+    c.drawRightString(width - 40, 20, f"Page 1")
+
+    c.showPage()
+    c.save()
+    buffer.seek(0)
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=f"appointment_{appointment.id}.pdf",
+        mimetype="application/pdf"
+    )
+
+def send_appointment_email(patient_email, patient_name, doctor_name, appointment_date, appointment_time):
+    # Get mail config from database (latest one)
+    mail_config = MailSetting.query.order_by(MailSetting.updated_at.desc()).first()
+    if not mail_config:
+        print("No mail configuration found!")
+        return False
+
+    try:
+        # Email content
+        subject = "Appointment Confirmation - HMS"
+        body = f"""
+        Dear {patient_name},
+
+        Your appointment has been successfully booked.
+
+        Doctor: {doctor_name}
+        Date: {appointment_date}
+        Time: {appointment_time}
+
+        Thank you for choosing HMS.
+
+        Regards,
+        {mail_config.mail_default_name or "HMS Team"}
+        """
+
+        # Setup email message
+        msg = MIMEMultipart()
+        msg["From"] = f"{mail_config.mail_default_name} <{mail_config.mail_default_email}>"
+        msg["To"] = patient_email
+        msg["Subject"] = subject
+        msg.attach(MIMEText(body, "plain"))
+
+        # Connect to SMTP server
+        server = smtplib.SMTP(mail_config.mail_server, mail_config.mail_port)
+        if mail_config.mail_use_tls:
+            server.starttls()
+        server.login(mail_config.mail_username, mail_config.mail_password)
+
+        # Send mail
+        server.sendmail(mail_config.mail_default_email, patient_email, msg.as_string())
+        server.quit()
+        print("Mail sent successfully")
+        return True
+    except Exception as e:
+        print(f"Error sending mail: {e}")
+        return False
+
+
+from flask import render_template
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from app.models import MailSetting
+
+def send_appointment_email(patient_email, patient_name, doctor_name, appointment_date, appointment_time, reason=None):
+    # Fetch mail settings
+    mail_config = MailSetting.query.order_by(MailSetting.updated_at.desc()).first()
+    if not mail_config:
+        print("No mail configuration found!")
+        return False
+
+    try:
+        # Render HTML email from template
+        html_body = render_template(
+            'email/appointment_email.html',
+            patient_name=patient_name,
+            doctor_name=doctor_name,
+            appointment_date=appointment_date,
+            appointment_time=appointment_time,
+            reason=reason,
+            mail_default_name=mail_config.mail_default_name or "HMS Team"
+        )
+
+        msg = MIMEMultipart("alternative")
+        msg["From"] = f"{mail_config.mail_default_name} <{mail_config.mail_default_email}>"
+        msg["To"] = patient_email
+        msg["Subject"] = "Appointment Confirmation - HMS"
+        msg.attach(MIMEText(html_body, "html"))
+
+        server = smtplib.SMTP(mail_config.mail_server, mail_config.mail_port)
+        if mail_config.mail_use_tls:
+            server.starttls()
+        server.login(mail_config.mail_username, mail_config.mail_password)
+        server.sendmail(mail_config.mail_default_email, patient_email, msg.as_string())
+        server.quit()
+        print("Email sent successfully")
+        return True
+
+    except Exception as e:
+        print(f"Error sending mail: {e}")
+        return False

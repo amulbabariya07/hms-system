@@ -1,648 +1,638 @@
 {% extends "base.html" %}
 {% block content %}
-<!-- Navigation Menu -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
-    <div class="container">
-        <a class="navbar-brand fw-bold text-primary fs-3" href="/">
-            <i class="fas fa-hospital-alt me-2"></i>
-            HMS
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link fw-semibold" href="{{ url_for('patient.patient_home') }}">
-                        <i class="fas fa-home me-1"></i>Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link fw-semibold" href="{{ url_for('patient.my_appointments') }}">
-                        <i class="fas fa-calendar-alt me-1"></i>My Appointments
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <span class="nav-link fw-semibold text-success">
-                        <i class="fas fa-user me-1"></i>{{ user_name }}
-                    </span>
-                </li>
-                <li class="nav-item ms-2">
-                    <a href="{{ url_for('patient.logout') }}" class="btn btn-outline-danger rounded-pill px-4">
-                        <i class="fas fa-sign-out-alt me-1"></i>Logout
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+{% include "patient/header.html" %}
 
-<!-- Book Appointment Section -->
-<div class="appointment-booking-section py-5 bg-light">
+<div class="appointment-section-v2">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <!-- Header -->
-                <div class="text-center mb-5">
-                    <div class="appointment-icon mb-4">
-                        <i class="fas fa-calendar-plus"></i>
-                    </div>
-                    <h2 class="display-5 fw-bold text-primary mb-3">Book an Appointment</h2>
-                    <p class="lead text-muted">Schedule your consultation with our expert doctors</p>
+        <form method="POST" action="{{ url_for('patient.book_appointment_post') }}" id="appointmentForm" class="appointment-form-wrapper">
+            
+            <div class="form-header text-center">
+                <h1 class="form-title">Book an Appointment</h1>
+                <p class="form-subtitle">Follow the steps to schedule your consultation</p>
+            </div>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar-line"></div>
+                <div class="step-indicator" data-step="1">
+                    <div class="icon"><i class="fas fa-user-md"></i></div>
+                    <p>Doctor</p>
                 </div>
+                <div class="step-indicator" data-step="2">
+                    <div class="icon"><i class="fas fa-calendar-alt"></i></div>
+                    <p>Schedule</p>
+                </div>
+                <div class="step-indicator" data-step="3">
+                    <div class="icon"><i class="fas fa-check-circle"></i></div>
+                    <p>Confirm</p>
+                </div>
+            </div>
 
-                <!-- Flash Messages -->
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-message-container">
                 {% for category, message in messages %}
-                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show custom-alert" role="alert">
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
                     <i class="fas fa-{{ 'exclamation-triangle' if category == 'danger' else ('check-circle' if category == 'success' else 'info-circle') }} me-2"></i>
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 {% endfor %}
-                {% endif %}
-                {% endwith %}
+            </div>
+            {% endif %}
+            {% endwith %}
 
-                <!-- Appointment Form -->
-                <div class="appointment-form-card bg-white rounded-4 shadow-sm p-4">
-                    <form method="POST" action="{{ url_for('patient.book_appointment_post') }}" class="appointment-form">
-                        <!-- Patient Information -->
-                        <div class="form-section mb-4">
-                            <h4 class="section-title mb-3">
-                                <i class="fas fa-user me-2 text-primary"></i>
-                                Patient Information
-                            </h4>
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label class="form-label">Patient Name</label>
-                                        <div class="input-container">
-                                            <div class="input-icon">
-                                                <i class="fas fa-user"></i>
-                                            </div>
-                                            <input type="text" class="form-control custom-input" value="{{ user_name }}" readonly>
-                                            <div class="input-border"></div>
-                                        </div>
-                                        <small class="form-text text-muted">This is automatically filled from your profile</small>
+            <div class="form-step active" data-step="1">
+                <h3 class="step-title">Select a Doctor</h3>
+                <div class="doctor-selection-grid">
+                    {% if doctors %}
+                    {% for doctor in doctors %}
+                    <div class="doctor-card-v2">
+                        <input type="radio" id="doctor_{{ doctor.id }}" name="doctor_id" value="{{ doctor.id }}" class="doctor-radio" required>
+                        <label for="doctor_{{ doctor.id }}" class="doctor-label-v2">
+                            <div class="doctor-info-v2">
+                                <img src="https://ui-avatars.com/api/?name={{ doctor.full_name|replace(' ', '+') }}&background=667eea&color=fff&size=128" alt="Dr. {{ doctor.full_name }}" class="doctor-avatar-v2">
+                                <div class="doctor-details-v2">
+                                    <h5 class="doctor-name">Dr. {{ doctor.full_name }}</h5>
+                                    <p class="doctor-specialization">{{ doctor.specialization }}</p>
+                                    <div class="doctor-meta">
+                                        <span><i class="fas fa-medal me-1"></i>{{ doctor.experience_years }} years exp.</span>
+                                        <span><i class="fas fa-graduation-cap me-1"></i>{{ doctor.qualification }}</span>
                                     </div>
+                                    {% if doctor.hospital_affiliation %}
+                                    <p class="hospital-affiliation"><i class="fas fa-hospital me-1"></i>{{ doctor.hospital_affiliation }}</p>
+                                    {% endif %}
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Doctor Selection -->
-                        <div class="form-section mb-4">
-                            <h4 class="section-title mb-3">
-                                <i class="fas fa-user-md me-2 text-primary"></i>
-                                Select Doctor
-                            </h4>
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label class="form-label required">Choose Doctor</label>
-                                        <div class="doctor-selection">
-                                            {% if doctors %}
-                                            {% for doctor in doctors %}
-                                            <div class="doctor-card">
-                                                <input type="radio" id="doctor_{{ doctor.id }}" name="doctor_id" value="{{ doctor.id }}" class="doctor-radio" required>
-                                                <label for="doctor_{{ doctor.id }}" class="doctor-label">
-                                                    <div class="doctor-info">
-                                                        <div class="doctor-avatar">
-                                                            <i class="fas fa-user-md"></i>
-                                                        </div>
-                                                        <div class="doctor-details">
-                                                            <h5 class="doctor-name">Dr. {{ doctor.full_name }}</h5>
-                                                            <p class="doctor-specialization">{{ doctor.specialization }}</p>
-                                                            <div class="doctor-meta">
-                                                                <span class="experience">
-                                                                    <i class="fas fa-calendar-alt me-1"></i>
-                                                                    {{ doctor.experience_years }} years exp.
-                                                                </span>
-                                                                <span class="qualification">
-                                                                    <i class="fas fa-graduation-cap me-1"></i>
-                                                                    {{ doctor.qualification }}
-                                                                </span>
-                                                            </div>
-                                                            {% if doctor.hospital_affiliation %}
-                                                            <p class="hospital-affiliation">
-                                                                <i class="fas fa-hospital me-1"></i>
-                                                                {{ doctor.hospital_affiliation }}
-                                                            </p>
-                                                            {% endif %}
-                                                        </div>
-                                                    </div>
-                                                    <div class="selection-indicator">
-                                                        <i class="fas fa-check"></i>
-                                                    </div>
-                                                </label>
-                                            </div>
-                                            {% endfor %}
-                                            {% else %}
-                                            <div class="no-doctors-message text-center py-4">
-                                                <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
-                                                <h5 class="text-muted">No doctors available</h5>
-                                                <p class="text-muted">Please check back later or contact support.</p>
-                                            </div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Appointment Details -->
-                        <div class="form-section mb-4">
-                            <h4 class="section-title mb-3">
-                                <i class="fas fa-calendar-alt me-2 text-primary"></i>
-                                Appointment Details
-                            </h4>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-label required">Appointment Date</label>
-                                        <div class="input-container">
-                                            <div class="input-icon">
-                                                <i class="fas fa-calendar"></i>
-                                            </div>
-                                            <input type="date" class="form-control custom-input" name="appointment_date" required min="{{ today }}">
-                                            <div class="input-border"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-label required">Appointment Time</label>
-                                        <div class="input-container">
-                                            <div class="input-icon">
-                                                <i class="fas fa-clock"></i>
-                                            </div>
-                                            <select class="form-control custom-input" name="appointment_time" required>
-                                                <option value="">Select Time</option>
-                                                <option value="09:00">09:00 AM</option>
-                                                <option value="09:30">09:30 AM</option>
-                                                <option value="10:00">10:00 AM</option>
-                                                <option value="10:30">10:30 AM</option>
-                                                <option value="11:00">11:00 AM</option>
-                                                <option value="11:30">11:30 AM</option>
-                                                <option value="12:00">12:00 PM</option>
-                                                <option value="14:00">02:00 PM</option>
-                                                <option value="14:30">02:30 PM</option>
-                                                <option value="15:00">03:00 PM</option>
-                                                <option value="15:30">03:30 PM</option>
-                                                <option value="16:00">04:00 PM</option>
-                                                <option value="16:30">04:30 PM</option>
-                                                <option value="17:00">05:00 PM</option>
-                                            </select>
-                                            <div class="input-border"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label class="form-label">Reason for Visit</label>
-                                        <div class="input-container">
-                                            <div class="input-icon">
-                                                <i class="fas fa-notes-medical"></i>
-                                            </div>
-                                            <textarea class="form-control custom-input" name="reason" rows="3" placeholder="Describe your symptoms or reason for the appointment (optional)"></textarea>
-                                            <div class="input-border"></div>
-                                        </div>
-                                        <small class="form-text text-muted">Optional - Help the doctor prepare for your visit</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-lg">
-                                <i class="fas fa-calendar-check me-2"></i>
-                                Book Appointment
-                            </button>
-                        </div>
-                    </form>
+                            <div class="selection-indicator-v2"><i class="fas fa-check"></i></div>
+                        </label>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="no-doctors-message text-center py-5">
+                        <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No doctors available</h5>
+                        <p class="text-muted">Please check back later or contact support.</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="form-navigation text-end mt-4">
+                    <button type="button" class="btn btn-primary next-btn">Next <i class="fas fa-arrow-right ms-2"></i></button>
                 </div>
             </div>
-        </div>
+
+            <div class="form-step" data-step="2">
+                <h3 class="step-title">Choose Date & Time</h3>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label class="form-label required">Appointment Date</label>
+                        <input type="date" class="form-control" name="appointment_date" required min="{{ today }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label required">Appointment Time</label>
+                        <div class="time-slot-grid">
+                            {% set time_slots = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"] %}
+                            {% set time_slots_display = ["09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM", "05:00 PM"] %}
+                            {% for i in range(time_slots|length) %}
+                                <div class="time-slot">
+                                    <input type="radio" id="time_{{ time_slots[i] }}" name="appointment_time" value="{{ time_slots[i] }}" required>
+                                    <label for="time_{{ time_slots[i] }}">{{ time_slots_display[i] }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-navigation mt-4 d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary prev-btn"><i class="fas fa-arrow-left me-2"></i> Back</button>
+                    <button type="button" class="btn btn-primary next-btn">Next <i class="fas fa-arrow-right ms-2"></i></button>
+                </div>
+            </div>
+
+            <div class="form-step" data-step="3">
+                <h3 class="step-title">Confirm Your Details</h3>
+                <div class="summary-card">
+                    <h4>Appointment Summary</h4>
+                    <div id="summaryContent">
+                        <p><strong>Patient:</strong> {{ user_name }}</p>
+                        <p><strong>Doctor:</strong> <span id="summaryDoctor"></span></p>
+                        <p><strong>Date:</strong> <span id="summaryDate"></span></p>
+                        <p><strong>Time:</strong> <span id="summaryTime"></span></p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <label class="form-label">Reason for Visit (Optional)</label>
+                    <textarea class="form-control" name="reason" rows="3" placeholder="Briefly describe your symptoms..."></textarea>
+                    <small class="form-text text-muted">This will help the doctor prepare for your visit.</small>
+                </div>
+                <div class="form-navigation mt-4 d-flex justify-content-between align-items-center">
+                    <button type="button" class="btn btn-secondary prev-btn"><i class="fas fa-arrow-left me-2"></i> Back</button>
+                    <button type="submit" class="btn btn-success btn-lg btn-submit">
+                        <i class="fas fa-credit-card me-2"></i> Confirm & Proceed to Pay
+                    </button>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
 <style>
-.appointment-booking-section {
+:root {
+    --primary-color: #667eea;
+    --secondary-color: #764ba2;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --bg-light: #f7f8fc;
+    --border-color: #e5e7eb;
+    --white: #ffffff;
+    --success: #10b981;
+}
+
+body {
+    background-color: var(--bg-light);
+}
+
+.appointment-section-v2 {
+    padding: 4rem 0;
     min-height: 100vh;
 }
 
-.appointment-icon {
+.appointment-form-wrapper {
+    max-width: 900px;
+    margin: auto;
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+    padding: 2.5rem;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.form-header .form-title {
+    font-weight: 800;
+    color: var(--text-dark);
+    font-size: 2.5rem;
+}
+
+.form-header .form-subtitle {
+    color: var(--text-light);
+    font-size: 1.1rem;
+}
+
+/* Progress Bar */
+.progress-bar-container {
+    display: flex;
+    justify-content: space-between;
+    margin: 2.5rem 0;
+    position: relative;
+}
+.progress-bar-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    height: 4px;
+    background: var(--border-color);
+    width: 100%;
+    z-index: 1;
+}
+.progress-bar-line::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    width: 0;
+    transition: width 0.4s ease;
+}
+.step-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+    text-align: center;
     width: 100px;
-    height: 100px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+.step-indicator .icon {
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
+    background: var(--white);
+    border: 4px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-size: 3rem;
-    margin: 0 auto;
-    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
-    animation: pulse 2s ease-in-out infinite;
+    font-size: 1.5rem;
+    color: var(--text-light);
+    transition: all 0.4s ease;
 }
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-.appointment-form-card {
-    border: 1px solid rgba(0,0,0,0.05);
-}
-
-.form-section {
-    border-bottom: 1px solid #e9ecef;
-    padding-bottom: 2rem;
-}
-
-.form-section:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.section-title {
-    color: #495057;
-    font-weight: 700;
-    font-size: 1.3rem;
-}
-
-.form-label {
+.step-indicator p {
+    margin-top: 0.5rem;
     font-weight: 600;
-    color: #374151;
-    margin-bottom: 0.5rem;
+    color: var(--text-light);
+    transition: color 0.4s ease;
+}
+.step-indicator.active .icon {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: var(--white);
+}
+.step-indicator.active p {
+    color: var(--primary-color);
 }
 
-.form-label.required::after {
-    content: ' *';
-    color: #ef4444;
-    font-weight: bold;
+/* Form Steps */
+.form-step {
+    display: none;
+    animation: fadeIn 0.5s ease-in-out;
+}
+.form-step.active {
+    display: block;
+}
+.step-title {
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 2rem;
+    text-align: center;
 }
 
-.input-container {
-    position: relative;
-    margin-bottom: 1rem;
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.input-icon {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #667eea;
-    font-size: 1.2rem;
-    z-index: 2;
-}
-
-.custom-input {
-    height: 55px;
-    padding-left: 50px;
-    padding-right: 15px;
-    border-radius: 12px;
-    border: 2px solid #e2e8f0;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.9);
-}
-
-.custom-input:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    background: white;
-    outline: none;
-}
-
-.custom-input[readonly] {
-    background-color: #f8f9fa;
-    color: #6c757d;
-}
-
-.input-border {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 3px;
-    width: 0;
-    background: linear-gradient(90deg, #667eea, #764ba2);
-    transition: width 0.3s ease;
-    border-radius: 0 0 12px 12px;
-}
-
-.custom-input:focus ~ .input-border {
-    width: 100%;
-}
-
-/* Doctor Selection Styles */
-.doctor-selection {
+/* Doctor Selection */
+.doctor-selection-grid {
     display: grid;
-    gap: 1rem;
+    gap: 1.5rem;
 }
-
-.doctor-card {
+.doctor-card-v2 {
     position: relative;
 }
-
 .doctor-radio {
     position: absolute;
     opacity: 0;
-    pointer-events: none;
 }
-
-.doctor-label {
+.doctor-label-v2 {
     display: block;
-    background: white;
-    border: 2px solid #e2e8f0;
+    background: var(--white);
+    border: 2px solid var(--border-color);
     border-radius: 15px;
     padding: 1.5rem;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
-    margin-bottom: 0;
 }
-
-.doctor-label:hover {
-    border-color: #667eea;
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
-    transform: translateY(-2px);
+.doctor-label-v2:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px -5px rgba(102, 126, 234, 0.15);
 }
-
-.doctor-radio:checked + .doctor-label {
-    border-color: #667eea;
+.doctor-radio:checked + .doctor-label-v2 {
+    border-color: var(--primary-color);
+    box-shadow: 0 10px 20px -5px rgba(102, 126, 234, 0.2);
     background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
 }
-
-.doctor-info {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-}
-
-.doctor-avatar {
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border-radius: 50%;
+.doctor-info-v2 {
     display: flex;
     align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.5rem;
+    gap: 1.5rem;
+}
+.doctor-avatar-v2 {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
     flex-shrink: 0;
 }
-
-.doctor-details {
-    flex: 1;
-}
-
-.doctor-name {
-    color: #1f2937;
-    font-weight: 700;
-    font-size: 1.2rem;
-    margin-bottom: 0.25rem;
-}
-
-.doctor-specialization {
-    color: #667eea;
-    font-weight: 600;
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
-}
-
-.doctor-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
-}
-
-.doctor-meta span {
-    color: #6b7280;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.hospital-affiliation {
-    color: #6b7280;
-    font-size: 0.9rem;
-    margin-bottom: 0;
-}
-
-.selection-indicator {
+.doctor-name { font-weight: 700; color: var(--text-dark); }
+.doctor-specialization { color: var(--primary-color); font-weight: 600; margin-bottom: 0.5rem; }
+.doctor-meta, .hospital-affiliation { color: var(--text-light); font-size: 0.9rem; }
+.doctor-meta span { margin-right: 1rem; }
+.selection-indicator-v2 {
     position: absolute;
     top: 1rem;
     right: 1rem;
-    width: 30px;
-    height: 30px;
-    background: #667eea;
+    width: 28px;
+    height: 28px;
+    background: var(--success);
     border-radius: 50%;
+    color: var(--white);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    opacity: 0;
     transform: scale(0);
-    transition: all 0.3s ease;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-
-.doctor-radio:checked + .doctor-label .selection-indicator {
-    opacity: 1;
+.doctor-radio:checked + .doctor-label-v2 .selection-indicator-v2 {
     transform: scale(1);
+    opacity: 1;
 }
 
-.no-doctors-message {
-    background: #f8f9fa;
-    border-radius: 15px;
-    padding: 3rem 2rem;
-}
-
-.form-text {
-    color: #6b7280;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-}
-
-.custom-alert {
-    border-radius: 12px;
-    border: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.navbar {
-    backdrop-filter: blur(10px);
-    background-color: rgba(255, 255, 255, 0.95) !important;
-}
-
-.nav-link {
-    color: #495057 !important;
+/* Date & Time Selection */
+.form-label { font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem; }
+.form-label.required::after { content: ' *'; color: #ef4444; }
+.form-control {
+    height: 55px;
+    border-radius: 10px;
+    border: 2px solid var(--border-color);
+    padding: 0 1rem;
     transition: all 0.3s ease;
 }
-
-.nav-link:hover {
-    color: #667eea !important;
-    transform: translateY(-1px);
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.2);
 }
 
+.time-slot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.75rem;
+}
+.time-slot input[type="radio"] {
+    display: none;
+}
+.time-slot label {
+    display: block;
+    text-align: center;
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+.time-slot label:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+.time-slot input[type="radio"]:checked + label {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border-color: var(--primary-color);
+}
+
+/* Summary */
+.summary-card {
+    background-color: var(--bg-light);
+    border-radius: 15px;
+    padding: 2rem;
+    border-left: 5px solid var(--primary-color);
+}
+.summary-card h4 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+.summary-card p {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Navigation Buttons */
+.btn {
+    padding: 0.8rem 1.8rem;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.btn-primary {
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border: none;
+}
+.btn-primary:hover {
+    box-shadow: 0 10px 20px -10px rgba(102, 126, 234, 0.5);
+    transform: translateY(-2px);
+}
+.btn-secondary {
+    background-color: var(--border-color);
+    color: var(--text-dark);
+    border: none;
+}
+.btn-success {
+    background-color: var(--success);
+    border-color: var(--success);
+}
+.btn-success:hover {
+    background-color: #059669;
+    border-color: #059669;
+}
+
+
+/* Responsive */
 @media (max-width: 768px) {
-    .appointment-icon {
-        width: 80px;
-        height: 80px;
-        font-size: 2.5rem;
+    .appointment-form-wrapper {
+        padding: 1.5rem;
     }
-    
-    .doctor-info {
+    .doctor-info-v2 {
         flex-direction: column;
         text-align: center;
+        gap: 1rem;
     }
-    
-    .doctor-avatar {
-        margin: 0 auto;
+    .progress-bar-container {
+        font-size: 0.8rem;
     }
-    
-    .doctor-meta {
-        justify-content: center;
+    .step-indicator .icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
     }
-    
-    .selection-indicator {
-        position: static;
-        margin: 1rem auto 0;
-    }
+    .step-indicator p { font-size: 0.8rem; }
 }
+
+@media (max-width: 576px) {
+    .form-header .form-title { font-size: 2rem; }
+    .btn { padding: 0.6rem 1.2rem; }
+    .btn-submit { width: 100%; margin-top: 1rem; }
+    .form-navigation { flex-direction: column-reverse; }
+    .form-navigation .btn-primary, .form-navigation .next-btn { width: 100%; }
+    .form-navigation .prev-btn { margin-top: 0.5rem; width: 100%; }
+}
+
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Set minimum date to today
+    const form = document.getElementById('appointmentForm');
+    const nextButtons = document.querySelectorAll('.next-btn');
+    const prevButtons = document.querySelectorAll('.prev-btn');
+    const steps = document.querySelectorAll('.form-step');
+    const stepIndicators = document.querySelectorAll('.step-indicator');
+    const progressBarLine = document.querySelector('.progress-bar-line::after');
+    let currentStep = 1;
+
+    // Set min date for date input
     const dateInput = document.querySelector('input[name="appointment_date"]');
     if (dateInput) {
         const today = new Date().toISOString().split('T')[0];
         dateInput.setAttribute('min', today);
     }
-    
-    // Form validation
-    const form = document.querySelector('.appointment-form');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            const doctorSelected = document.querySelector('input[name="doctor_id"]:checked');
-            const appointmentDate = document.querySelector('input[name="appointment_date"]').value;
-            const appointmentTime = document.querySelector('select[name="appointment_time"]').value;
-            
-            if (!doctorSelected) {
-                e.preventDefault();
-                alert('Please select a doctor.');
-                return;
-            }
-            
-            if (!appointmentDate) {
-                e.preventDefault();
-                alert('Please select an appointment date.');
-                return;
-            }
-            
-            if (!appointmentTime) {
-                e.preventDefault();
-                alert('Please select an appointment time.');
-                return;
-            }
-            
-            // Check if selected date is not in the past
-            const selectedDate = new Date(appointmentDate);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            if (selectedDate < today) {
-                e.preventDefault();
-                alert('Please select a future date for your appointment.');
-                return;
-            }
 
-            // Razorpay integration
-            e.preventDefault();
-            // Set your appointment fee here
-            const appointmentFee = 500; // INR
-            fetch('/payment/create_order', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    amount: appointmentFee,
-                    receipt: 'appointment_' + Date.now()
-                })
-            })
-            .then(response => response.json())
-            .then(order => {
-                if (!order.id) {
-                    alert('Error creating payment order.');
-                    return;
-                }
-                const options = {
-                    key: '{{ config["RAZORPAY_KEY_ID"] if config else "rzp_test_RCbfCPgiV69xNy" }}',
-                    amount: order.amount,
-                    currency: order.currency,
-                    name: 'HMS Appointment',
-                    description: 'Doctor Appointment Fee',
-                    order_id: order.id,
-                    handler: function (response){
-                        // On payment success, submit appointment and payment details
-                        const formData = new FormData(form);
-                        formData.append('razorpay_payment_id', response.razorpay_payment_id);
-                        formData.append('razorpay_order_id', response.razorpay_order_id);
-                        formData.append('razorpay_signature', response.razorpay_signature);
-                        formData.append('amount', appointmentFee);
-                        fetch(form.action, {
-                            method: 'POST',
-                            body: formData
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.success) {
-                                window.location.href = data.redirect_url;
-                            } else {
-                                alert(data.message || 'Appointment booking failed.');
-                            }
-                        });
-                    },
-                    prefill: {
-                        name: '{{ user_name }}',
-                        email: '{{ user_email if user_email else "" }}'
-                    },
-                    theme: {
-                        color: '#667eea'
-                    }
-                };
-                const rzp = new window.Razorpay(options);
-                rzp.open();
-            });
+    function updateProgress() {
+        stepIndicators.forEach((indicator, index) => {
+            if (index < currentStep) {
+                indicator.classList.add('active');
+            } else {
+                indicator.classList.remove('active');
+            }
         });
+        const progressPercentage = ((currentStep - 1) / (steps.length - 1)) * 100;
+        document.documentElement.style.setProperty('--progress-width', progressPercentage + '%');
+    }
+
+    function showStep(stepNumber) {
+        steps.forEach(step => step.classList.remove('active'));
+        document.querySelector(`.form-step[data-step="${stepNumber}"]`).classList.add('active');
+        currentStep = stepNumber;
+        updateProgress();
+    }
+
+    function validateStep(stepNumber) {
+        const step = document.querySelector(`.form-step[data-step="${stepNumber}"]`);
+        const inputs = step.querySelectorAll('[required]');
+        let isValid = true;
+        inputs.forEach(input => {
+            if ((input.type === 'radio' || input.type === 'checkbox') && !step.querySelector(`[name="${input.name}"]:checked`)) {
+                isValid = false;
+            } else if (!input.value) {
+                isValid = false;
+            }
+        });
+        if (!isValid) {
+            alert('Please fill out all required fields before proceeding.');
+        }
+        return isValid;
     }
     
-    // Enhanced doctor card interactions
-    const doctorCards = document.querySelectorAll('.doctor-label');
-    doctorCards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-5px)';
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            if (!this.previousElementSibling.checked) {
-                this.style.transform = 'translateY(0)';
+    function updateSummary() {
+        const selectedDoctorRadio = document.querySelector('input[name="doctor_id"]:checked');
+        if (selectedDoctorRadio) {
+            const doctorLabel = selectedDoctorRadio.closest('.doctor-card-v2').querySelector('.doctor-name').textContent;
+            const doctorSpec = selectedDoctorRadio.closest('.doctor-card-v2').querySelector('.doctor-specialization').textContent;
+            document.getElementById('summaryDoctor').textContent = `${doctorLabel} (${doctorSpec})`;
+        }
+
+        const selectedDate = document.querySelector('input[name="appointment_date"]').value;
+        document.getElementById('summaryDate').textContent = selectedDate ? new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Not selected';
+
+        const selectedTimeRadio = document.querySelector('input[name="appointment_time"]:checked');
+        if (selectedTimeRadio) {
+            const timeLabel = selectedTimeRadio.nextElementSibling.textContent;
+            document.getElementById('summaryTime').textContent = timeLabel;
+        } else {
+            document.getElementById('summaryTime').textContent = 'Not selected';
+        }
+    }
+
+
+    nextButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            if (validateStep(currentStep)) {
+                if (currentStep < steps.length) {
+                    if (currentStep === 2) { // Before going to step 3, update summary
+                        updateSummary();
+                    }
+                    showStep(currentStep + 1);
+                }
             }
         });
     });
 
-    // Load Razorpay script
-    if (!window.Razorpay) {
+    prevButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            if (currentStep > 1) {
+                showStep(currentStep - 1);
+            }
+        });
+    });
+
+    // Razorpay Integration
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (!validateStep(currentStep)) return;
+
+        // Set your appointment fee here
+        const appointmentFee = 500; // INR
+        fetch('/payment/create_order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                amount: appointmentFee,
+                receipt: 'appointment_' + Date.now()
+            })
+        })
+        .then(response => response.json())
+        .then(order => {
+            if (!order.id) {
+                alert('Error creating payment order.');
+                return;
+            }
+            const options = {
+                key: '{{ config["RAZORPAY_KEY_ID"] if config else "rzp_test_RCbfCPgiV69xNy" }}',
+                amount: order.amount,
+                currency: order.currency,
+                name: 'HMS Appointment Booking',
+                description: 'Doctor Consultation Fee',
+                order_id: order.id,
+                handler: function (response){
+                    // On payment success, append payment details to form and submit
+                    const formData = new FormData(form);
+                    formData.append('razorpay_payment_id', response.razorpay_payment_id);
+                    formData.append('razorpay_order_id', response.razorpay_order_id);
+                    formData.append('razorpay_signature', response.razorpay_signature);
+                    formData.append('amount', appointmentFee);
+                    
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest"   // 👈 important!
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = data.redirect_url;
+                        } else {
+                            alert(data.message || 'Appointment booking failed...');
+                        }
+                    })
+                    .catch(() => {
+                        alert('An error occurred while finalizing your appointment.');
+                    });
+                },
+                prefill: {
+                    name: '{{ user_name }}',
+                    email: '{{ user_email if user_email else "" }}'
+                },
+                theme: {
+                    color: '#667eea'
+                }
+            };
+            
+            // Ensure Razorpay script is loaded before creating an instance
+            if (window.Razorpay) {
+                const rzp = new window.Razorpay(options);
+                rzp.open();
+            } else {
+                alert('Payment gateway could not be loaded. Please try again.');
+            }
+        }).catch(() => {
+            alert('Could not connect to payment service. Please check your internet connection and try again.');
+        });
+    });
+
+    // Load Razorpay script if not already present
+    if (!document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]')) {
         const script = document.createElement('script');
         script.src = 'https://checkout.razorpay.com/v1/checkout.js';
         script.async = true;
         document.body.appendChild(script);
     }
+    
+    // Initial setup
+    showStep(1);
 });
 </script>
 {% endblock %}
