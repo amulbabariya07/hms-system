@@ -215,29 +215,15 @@
                                                     <div class="input-icon">
                                                         <i class="fas fa-stethoscope"></i>
                                                     </div>
-                                                    <select class="form-control doctor-input" name="specialization" required>
-                                                        <option value="">Choose your specialization</option>
-                                                        <option value="Cardiology">Cardiology</option>
-                                                        <option value="Neurology">Neurology</option>
-                                                        <option value="Orthopedics">Orthopedics</option>
-                                                        <option value="Pediatrics">Pediatrics</option>
-                                                        <option value="Dermatology">Dermatology</option>
-                                                        <option value="Ophthalmology">Ophthalmology</option>
-                                                        <option value="Psychiatry">Psychiatry</option>
-                                                        <option value="General Medicine">General Medicine</option>
-                                                        <option value="Surgery">Surgery</option>
-                                                        <option value="Gynecology">Gynecology</option>
-                                                        <option value="Radiology">Radiology</option>
-                                                        <option value="Anesthesiology">Anesthesiology</option>
-                                                        <option value="Emergency Medicine">Emergency Medicine</option>
-                                                        <option value="Oncology">Oncology</option>
-                                                        <option value="Pulmonology">Pulmonology</option>
-                                                        <option value="Gastroenterology">Gastroenterology</option>
-                                                        <option value="Endocrinology">Endocrinology</option>
-                                                        <option value="Nephrology">Nephrology</option>
-                                                        <option value="Rheumatology">Rheumatology</option>
-                                                        <option value="Other">Other</option>
-                                                    </select>
+                                                    <select class="form-control" id="specialization" name="specialization_id" required>
+                                                    <option value="">Choose your specialization</option>
+                                                    {% for spec in specializations %}
+                                                        <option value="{{ spec.id }}" 
+                                                            {% if doctor is defined and doctor is not none and doctor.specialization_id == spec.id %}selected{% endif %}>
+                                                            {{ spec.name }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
                                                     <div class="input-border"></div>
                                                 </div>
                                             </div>

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from app import db
-from app.models import Doctor, Appointment, User
+from app.models import Doctor, Appointment, User, Specialization
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, date
 import re
@@ -14,7 +14,9 @@ doctor_bp = Blueprint('doctor', __name__, template_folder='templates')
 def doctor_login():
     if 'doctor_logged_in' in session:
         return redirect(url_for('doctor.doctor_dashboard'))
-    return render_template('doctor/auth.html')
+    specializations = Specialization.query.order_by(Specialization.name).all()
+    return render_template('doctor/auth.html', specializations=specializations, doctor=None)
+
 
 @doctor_bp.route('/login', methods=['POST'])
 def doctor_login_post():
@@ -51,7 +53,7 @@ def doctor_signup():
     full_name = request.form.get('full_name')
     mobile_number = clean_mobile_number(request.form.get('mobile_number', ''))
     email = request.form.get('email', '')
-    specialization = request.form.get('specialization')
+    specialization_id = request.form.get('specialization_id')
     license_number = request.form.get('license_number')
     experience_years = request.form.get('experience_years')
     qualification = request.form.get('qualification')
@@ -59,9 +61,13 @@ def doctor_signup():
     password = request.form.get('password')
     confirm_password = request.form.get('confirm_password')
 
+    if not specialization_id:
+        flash('Please select a specialization.', 'danger')
+        specializations = Specialization.query.order_by(Specialization.name).all()
+        return render_template('doctor/auth.html', specializations=specializations)
+
     # Validation
-    if not all([full_name, mobile_number, specialization, license_number, 
-                experience_years, qualification, password, confirm_password]):
+    if not all([full_name, mobile_number, specialization_id, license_number, email, password]):
         flash('All required fields must be filled.', 'danger')
         return render_template('doctor/auth.html')
 
@@ -96,7 +102,7 @@ def doctor_signup():
         full_name=full_name,
         mobile_number=mobile_number,
         email=email if email else None,
-        specialization=specialization,
+        specialization_id=specialization_id,
         license_number=license_number,
         experience_years=experience_years,
         qualification=qualification,
@@ -232,11 +238,12 @@ def doctor_appointment_details(appointment_id):
 @doctor_bp.route('/profile')
 def doctor_profile():
     if 'doctor_logged_in' not in session:
-        flash('Please login to access your profile.', 'warning')
         return redirect(url_for('doctor.doctor_login'))
-    
-    doctor = Doctor.query.get(session['doctor_id'])
-    return render_template('doctor/profile.html', doctor=doctor)
+
+    doctor = Doctor.query.get(session['doctor_logged_in'])
+    specializations = Specialization.query.order_by(Specialization.name).all()
+    return render_template('doctor/profile.html', doctor=doctor, specializations=specializations)
+
 
 @doctor_bp.route('/logout')
 def doctor_logout():
@@ -247,23 +254,24 @@ def doctor_logout():
     return redirect(url_for('doctor.doctor_login'))
 
 @doctor_bp.route('/edit-profile', methods=['POST'])
-def doctor_edit_profile():
+def edit_profile():
     if 'doctor_logged_in' not in session:
-        flash('Please login to edit your profile.', 'warning')
         return redirect(url_for('doctor.doctor_login'))
 
-    doctor = Doctor.query.get(session['doctor_id'])
+    doctor = Doctor.query.get(session['doctor_logged_in'])
+    specializations = Specialization.query.order_by(Specialization.name).all()
+
     doctor.full_name = request.form.get('full_name')
-    doctor.mobile_number = request.form.get('mobile_number')
     doctor.email = request.form.get('email')
-    doctor.specialization = request.form.get('specialization')
-    doctor.license_number = request.form.get('license_number')
+    doctor.hospital_affiliation = request.form.get('hospital_affiliation')
     doctor.experience_years = request.form.get('experience_years')
     doctor.qualification = request.form.get('qualification')
-    doctor.hospital_affiliation = request.form.get('hospital_affiliation')
+    doctor.specialization_id = request.form.get('specialization_id')
+
     db.session.commit()
     flash('Profile updated successfully!', 'success')
     return redirect(url_for('doctor.doctor_profile'))
+
 
 
 @doctor_bp.route('/change-password', methods=['GET', 'POST'])

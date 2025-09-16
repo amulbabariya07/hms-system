@@ -44,7 +44,7 @@
                         </div>
                     </div>
                     <h3 class="fw-bold text-primary mb-2">Dr. {{ doctor.full_name }}</h3>
-                    <p class="text-muted mb-3">{{ doctor.specialization }}</p>
+                    <p class="text-muted mb-3">{{ doctor.specialization.name }}</p>
                     <div class="profile-badges">
                         <span class="badge bg-success bg-gradient px-3 py-2 rounded-pill me-2">
                             <i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i>
@@ -97,7 +97,7 @@
                         <div class="col-md-6">
                             <div class="detail-item">
                                 <label class="detail-label">Specialization</label>
-                                <div class="detail-value">{{ doctor.specialization }}</div>
+                                <div class="detail-value">{{ doctor.specialization.name }}</div>
                             </div>
                         </div>
                         
@@ -216,7 +216,13 @@
                     </div>
                     <div class="mb-3">
                         <label for="specialization" class="form-label">Specialization</label>
-                        <input type="text" class="form-control" id="specialization" name="specialization" value="{{ doctor.specialization }}">
+                        <select class="form-control" id="specialization" name="specialization_id" required>
+                            {% for spec in specializations %}
+                                <option value="{{ spec.id }}" {% if doctor.specialization_id == spec.id %}selected{% endif %}>
+                                    {{ spec.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="license_number" class="form-label">License Number</label>

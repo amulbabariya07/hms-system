@@ -52,7 +52,7 @@
                                 </div>
                             </td>
                             <td>
-                                <span class="badge text-bg-primary">{{ doctor.specialization }}</span>
+                                <span class="badge text-bg-primary">{{ doctor.specialization.name }}</span>
                             </td>
                             <td>{{ doctor.mobile_number }}</td>
                             <td>{{ doctor.experience_years }} years</td>
@@ -128,14 +128,11 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="specialization" class="form-label">Specialization *</label>
-                            <select class="form-select" id="specialization" name="specialization" required>
+                            <select class="form-select" id="specialization" name="specialization_id" required>
                                 <option value="" disabled selected>Choose specialization...</option>
-                                <option value="Cardiology">Cardiology</option>
-                                <option value="Neurology">Neurology</option>
-                                <option value="Orthopedics">Orthopedics</option>
-                                <option value="Pediatrics">Pediatrics</option>
-                                <option value="Dermatology">Dermatology</option>
-                                <option value="Other">Other</option>
+                                {% for spec in specializations %}
+                                    <option value="{{ spec.id }}">{{ spec.name }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -149,6 +146,11 @@
                         <div class="col-12 mb-3">
                             <label for="qualification" class="form-label">Qualification *</label>
                             <input type="text" class="form-control" id="qualification" name="qualification" placeholder="e.g., MBBS, MD, MS" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="appointments_per_day" class="form-label">Appointments Per Day *</label>
+                            <input type="number" class="form-control" id="appointments_per_day" name="appointments_per_day" min="1" max="50" value="10" required>
+                            <div class="form-text">Maximum patients the doctor can see per day.</div>
                         </div>
                         <div class="col-12 mb-3">
                             <label for="hospital_affiliation" class="form-label">Hospital/Clinic Affiliation</label>
@@ -212,10 +214,11 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="editSpecialization" class="form-label">Specialization *</label>
-                            <select class="form-select" id="editSpecialization" name="specialization" required>
-                                <option value="" disabled>Choose specialization...</option>
-                                <option value="Cardiology">Cardiology</option>
-                                <option value="Other">Other</option>
+                            <select class="form-select" id="editSpecialization" name="specialization_id" required>
+                                <option value="" disabled>Select specialization...</option>
+                                {% for spec in specializations %}
+                                <option value="{{ spec.id }}">{{ spec.name }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -230,6 +233,12 @@
                             <label for="editQualification" class="form-label">Qualification *</label>
                             <input type="text" class="form-control" id="editQualification" name="qualification" required>
                         </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editAppointmentsPerDay" class="form-label">Appointments Per Day *</label>
+                            <input type="number" class="form-control" id="editAppointmentsPerDay" name="appointments_per_day" min="1" max="50" required>
+                            <div class="form-text">Maximum patients the doctor can see per day.</div>
+                        </div>
+
                         <div class="col-12 mb-3">
                             <label for="editHospitalAffiliation" class="form-label">Hospital/Clinic Affiliation</label>
                             <input type="text" class="form-control" id="editHospitalAffiliation" name="hospital_affiliation">
@@ -335,7 +344,7 @@ function viewDoctor(doctorId) {
                     </div>
                     <div class="list-group-item d-flex justify-content-between align-items-center">
                         <strong>Specialization</strong>
-                        <span class="badge text-bg-primary">${doctor.specialization}</span>
+                        <span class="badge text-bg-primary">${doctor.specialization_name}</span>
                     </div>
                     <div class="list-group-item d-flex justify-content-between align-items-center">
                         <strong>License No.</strong>
@@ -350,19 +359,25 @@ function viewDoctor(doctorId) {
                         <span>${doctor.qualification}</span>
                     </div>
                     <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Appointments</strong>
+                        <span>${doctor.appointments_per_day}</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
                         <strong>Affiliation</strong>
                         <span>${doctor.hospital_affiliation || 'N/A'}</span>
                     </div>
                     <div class="list-group-item d-flex justify-content-between align-items-center">
                         <strong>Account Status</strong>
-                        ${statusBadge}
+                        ${doctor.is_verified ? 
+                            '<span class="badge rounded-pill text-bg-success">Verified</span>' : 
+                            '<span class="badge rounded-pill text-bg-warning">Pending</span>'}
                     </div>
                     <div class="list-group-item d-flex justify-content-between align-items-center">
                         <strong>Member Since</strong>
                         <span>${new Date(doctor.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                     </div>
-                </div>
-            `;
+                </div>`;
+
                 document.getElementById('doctorDetailsContent').innerHTML = content;
                 new bootstrap.Modal(document.getElementById('doctorDetailsModal')).show();
             }
@@ -379,11 +394,12 @@ function editDoctor(doctorId) {
                 document.getElementById('editFullName').value = doctor.full_name;
                 document.getElementById('editMobileNumber').value = doctor.mobile_number;
                 document.getElementById('editEmail').value = doctor.email || '';
-                document.getElementById('editSpecialization').value = doctor.specialization;
+                document.getElementById('editSpecialization').value = doctor.specialization_id;
                 document.getElementById('editLicenseNumber').value = doctor.license_number;
                 document.getElementById('editExperienceYears').value = doctor.experience_years;
                 document.getElementById('editQualification').value = doctor.qualification;
                 document.getElementById('editHospitalAffiliation').value = doctor.hospital_affiliation || '';
+                document.getElementById('editAppointmentsPerDay').value = doctor.appointments_per_day || 10;
 
                 // Reset password fields
                 document.getElementById('changePassword').checked = false;

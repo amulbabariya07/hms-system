@@ -114,6 +114,8 @@ def book_appointment():
                          doctors=doctors, 
                          user_name=session.get('user_name'))
 
+from app.models import Payment
+
 @patient_bp.route('/book-appointment', methods=['POST'])
 def book_appointment_post():
     """Handle booking an appointment after Razorpay payment success."""
@@ -129,14 +131,19 @@ def book_appointment_post():
         doctor_id = request.form.get('doctor_id')
         appointment_date = request.form.get('appointment_date')
         appointment_time = request.form.get('appointment_time')
+        razorpay_payment_id = request.form.get('razorpay_payment_id')
+        razorpay_order_id = request.form.get('razorpay_order_id')
+        razorpay_signature = request.form.get('razorpay_signature')
+        amount = request.form.get('amount', 0)
+        reason = request.form.get('reason')
 
-        if not doctor_id or not appointment_date or not appointment_time:
+        if not doctor_id or not appointment_date or not appointment_time or not razorpay_payment_id:
             if is_ajax:
-                return jsonify(success=False, message="Missing appointment details.")
-            flash("Please provide all appointment details.", "danger")
+                return jsonify(success=False, message="Missing appointment or payment details.")
+            flash("Please provide all appointment and payment details.", "danger")
             return redirect(url_for('patient.book_appointment'))
 
-        # convert
+        # Convert to datetime
         appointment_datetime = datetime.strptime(
             f"{appointment_date} {appointment_time}", "%Y-%m-%d %H:%M"
         )
@@ -150,6 +157,7 @@ def book_appointment_post():
             flash("Invalid doctor or patient.", "danger")
             return redirect(url_for('patient.book_appointment'))
 
+        # Create appointment
         appointment = Appointment(
             doctor_id=doctor.id,
             patient_id=patient.id,
@@ -157,23 +165,37 @@ def book_appointment_post():
             appointment_date=appointment_datetime.date(),
             appointment_time=appointment_datetime.time(),
             status="scheduled",
+            reason=reason
         )
         db.session.add(appointment)
         db.session.commit()
 
+        # Save payment record
+        payment = Payment(
+            appointment_id=appointment.id,
+            razorpay_payment_id=razorpay_payment_id,
+            amount=float(amount),
+            currency='INR',
+            status='success'
+        )
+        db.session.add(payment)
+        db.session.commit()
+
         # Send appointment confirmation email
-        if patient.email:  # only send if email exists
+        if patient.email:
             send_appointment_email(
                 patient_email=patient.email,
                 patient_name=patient.full_name,
                 doctor_name=f"Dr. {doctor.full_name}",
                 appointment_date=appointment.appointment_date.strftime('%d %B %Y'),
-                appointment_time=appointment.appointment_time.strftime('%I:%M %p')
+                appointment_time=appointment.appointment_time.strftime('%I:%M %p'),
+                reason=reason
             )
 
         if is_ajax:
             return jsonify(success=True, redirect_url=url_for('patient.my_appointments'))
-        flash("Appointment booked and confirmation email sent!", "success")
+
+        flash("Appointment booked and payment recorded successfully!", "success")
         return redirect(url_for('patient.my_appointments'))
 
     except Exception as e:

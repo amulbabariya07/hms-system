@@ -1,7 +1,7 @@
-from app.models import Payment, Appointment, Doctor
+from app.models import Payment, Appointment, Doctor, Specialization
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from app import db
-from app.models import Doctor, User, Appointment, MailSetting
+from app.models import Payment, Appointment, Doctor, User, MailSetting, Specialization
 from werkzeug.security import generate_password_hash
 from datetime import datetime
 import re
@@ -121,7 +121,12 @@ def admin_doctors():
         return redirect(url_for('admin.admin_login'))
     
     doctors = Doctor.query.all()
-    return render_template('admin/doctors.html', doctors=doctors)
+    specializations = Specialization.query.all()  # <-- make sure this is here
+    return render_template(
+        'admin/doctors.html',
+        doctors=doctors,
+        specializations=specializations  # <-- pass to template
+    )
 
 @admin_bp.route('/doctors/add', methods=['POST'])
 def admin_add_doctor():
@@ -132,16 +137,17 @@ def admin_add_doctor():
         full_name = request.form.get('full_name')
         mobile_number = clean_mobile_number(request.form.get('mobile_number', ''))
         email = request.form.get('email', '')
-        specialization = request.form.get('specialization')
+        specialization_id = request.form.get('specialization_id')  # <-- updated
         license_number = request.form.get('license_number')
         experience_years = request.form.get('experience_years')
         qualification = request.form.get('qualification')
         hospital_affiliation = request.form.get('hospital_affiliation', '')
         password = request.form.get('password')
+        appointments_per_day = request.form.get('appointments_per_day', 10)  # <-- added
 
         # Validation
-        if not all([full_name, mobile_number, specialization, license_number, 
-                    experience_years, qualification, password]):
+        if not all([full_name, mobile_number, specialization_id, license_number, 
+                    experience_years, qualification, password, appointments_per_day]):
             return jsonify({'success': False, 'message': 'All required fields must be filled.'})
 
         # Check if mobile number or license number already exists
@@ -158,23 +164,27 @@ def admin_add_doctor():
 
         try:
             experience_years = int(experience_years)
+            appointments_per_day = int(appointments_per_day)
             if experience_years < 0 or experience_years > 50:
                 return jsonify({'success': False, 'message': 'Experience years must be between 0 and 50.'})
+            if appointments_per_day < 1 or appointments_per_day > 50:
+                return jsonify({'success': False, 'message': 'Appointments per day must be between 1 and 50.'})
         except ValueError:
-            return jsonify({'success': False, 'message': 'Experience years must be a valid number.'})
+            return jsonify({'success': False, 'message': 'Experience and appointments must be valid numbers.'})
 
         hashed_password = generate_password_hash(password)
         new_doctor = Doctor(
             full_name=full_name,
             mobile_number=mobile_number,
             email=email if email else None,
-            specialization=specialization,
+            specialization_id=specialization_id,  # store ID, not name
             license_number=license_number,
             experience_years=experience_years,
             qualification=qualification,
             hospital_affiliation=hospital_affiliation if hospital_affiliation else None,
             password=hashed_password,
-            is_verified=True  # Admin created doctors are auto-approved
+            is_verified=True,
+            appointments_per_day=appointments_per_day
         )
 
         db.session.add(new_doctor)
@@ -185,6 +195,7 @@ def admin_add_doctor():
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': 'An error occurred while adding the doctor.'})
+
 
 @admin_bp.route('/doctors/edit/<int:doctor_id>', methods=['POST'])
 def admin_edit_doctor(doctor_id):
@@ -202,6 +213,7 @@ def admin_edit_doctor(doctor_id):
         experience_years = request.form.get('experience_years')
         qualification = request.form.get('qualification')
         hospital_affiliation = request.form.get('hospital_affiliation', '')
+        appointments_per_day = request.form.get('appointments_per_day', doctor.appointments_per_day)
 
         # Validation
         if not all([full_name, mobile_number, specialization, license_number, 
@@ -237,6 +249,7 @@ def admin_edit_doctor(doctor_id):
         doctor.experience_years = experience_years
         doctor.qualification = qualification
         doctor.hospital_affiliation = hospital_affiliation if hospital_affiliation else None
+        doctor.appointments_per_day = int(appointments_per_day)
 
         db.session.commit()
         return jsonify({'success': True, 'message': 'Doctor updated successfully!'})
@@ -292,22 +305,23 @@ def admin_doctor_details(doctor_id):
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
 
     doctor = Doctor.query.get_or_404(doctor_id)
-    return jsonify({
-        'success': True,
-        'doctor': {
-            'id': doctor.id,
-            'full_name': doctor.full_name,
-            'mobile_number': doctor.mobile_number,
-            'email': doctor.email,
-            'specialization': doctor.specialization,
-            'license_number': doctor.license_number,
-            'experience_years': doctor.experience_years,
-            'qualification': doctor.qualification,
-            'hospital_affiliation': doctor.hospital_affiliation,
-            'created_at': doctor.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-            'is_verified': doctor.is_verified
+    doctor_data = {
+        'id': doctor.id,
+        'full_name': doctor.full_name,
+        'mobile_number': doctor.mobile_number,
+        'email': doctor.email,
+        'specialization_id': doctor.specialization_id,
+        'specialization_name': doctor.specialization.name if doctor.specialization else 'N/A',
+        'license_number': doctor.license_number,
+        'experience_years': doctor.experience_years,
+        'qualification': doctor.qualification,
+        'appointments_per_day': doctor.appointments_per_day,
+        'hospital_affiliation': doctor.hospital_affiliation,
+        'is_verified': doctor.is_verified,
+        'created_at': doctor.created_at.isoformat()
         }
-    })
+    return jsonify({'success': True, 'doctor': doctor_data})
+
 
 @admin_bp.route('/patients')
 def admin_patients():
@@ -530,3 +544,84 @@ def appointment_details():
     mode = request.args.get("mode", "view")  # "view" or "edit"
     appointment = Appointment.query.get_or_404(appointment_id)
     return render_template("wizard/appointment_details.html", appointment=appointment, mode=mode)
+
+@admin_bp.route('/specializations')
+def admin_specializations():
+    if 'admin_logged_in' not in session:
+        flash('Please login to access specializations.', 'warning')
+        return redirect(url_for('admin.admin_login'))
+    
+    specializations = Specialization.query.order_by(Specialization.created_at.desc()).all()
+    return render_template('admin/specializations.html', specializations=specializations)
+
+
+@admin_bp.route('/specializations/add', methods=['POST'])
+def admin_add_specialization():
+    if 'admin_logged_in' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    try:
+        name = request.form.get('name', '').strip()
+        description = request.form.get('description', '').strip()
+
+        if not name:
+            return jsonify({'success': False, 'message': 'Name is required.'})
+
+        # Prevent duplicates
+        if Specialization.query.filter_by(name=name).first():
+            return jsonify({'success': False, 'message': 'Specialization already exists.'})
+
+        specialization = Specialization(name=name, description=description)
+        db.session.add(specialization)
+        db.session.commit()
+
+        return jsonify({'success': True, 'message': 'Specialization added successfully!'})
+    except Exception:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': 'Error while adding specialization.'})
+
+
+@admin_bp.route('/specializations/edit/<int:spec_id>', methods=['POST'])
+def admin_edit_specialization(spec_id):
+    if 'admin_logged_in' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    try:
+        specialization = Specialization.query.get_or_404(spec_id)
+        name = request.form.get('name', '').strip()
+        description = request.form.get('description', '').strip()
+
+        if not name:
+            return jsonify({'success': False, 'message': 'Name is required.'})
+
+        # Check duplicate (exclude current)
+        existing = Specialization.query.filter(Specialization.name == name, Specialization.id != spec_id).first()
+        if existing:
+            return jsonify({'success': False, 'message': 'Specialization name already exists.'})
+
+        specialization.name = name
+        specialization.description = description
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Specialization updated successfully!'})
+    except Exception:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': 'Error while updating specialization.'})
+
+
+@admin_bp.route('/specializations/delete/<int:spec_id>', methods=['POST'])
+def admin_delete_specialization(spec_id):
+    if 'admin_logged_in' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    try:
+        specialization = Specialization.query.get_or_404(spec_id)
+        db.session.delete(specialization)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Specialization deleted successfully!'})
+    except Exception:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': 'Error while deleting specialization.'})
+
+@admin_bp.route('/doctors/add', methods=['GET'])
+def admin_add_doctor_form():
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin.admin_login'))
+    specializations = Specialization.query.order_by(Specialization.name.asc()).all()
+    return render_template('admin/add_doctor.html', specializations=specializations)
