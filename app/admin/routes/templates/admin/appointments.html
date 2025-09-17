@@ -134,7 +134,14 @@
                                 <small class="text-primary">{{ appointment.appointment_time.strftime('%I:%M %p') }}</small>
                             </td>
                             <td>
-                                <small>{{ appointment.reason[:50] }}{% if appointment.reason|length > 50 %}...{% endif %}</small>
+                                <small>
+                                    {% if appointment.reason %}
+                                        {{ appointment.reason[:50] }}{% if appointment.reason|length > 50 %}...{% endif %}
+                                    {% else %}
+                                        <span class="text-muted">No reason provided</span>
+                                    {% endif %}
+                                </small>
+
                             </td>
                             <td>
                                 {% if appointment.status == 'scheduled' %}
