@@ -19,7 +19,7 @@
                 </div>
                 <div class="step-indicator" data-step="2">
                     <div class="icon"><i class="fas fa-calendar-alt"></i></div>
-                    <p>Schedule</p>
+                    <p>Date</p>
                 </div>
                 <div class="step-indicator" data-step="3">
                     <div class="icon"><i class="fas fa-check-circle"></i></div>
@@ -42,38 +42,18 @@
             {% endwith %}
 
             <div class="form-step active" data-step="1">
-                <h3 class="step-title">Select a Doctor</h3>
-                <div class="doctor-selection-grid">
-                    {% if doctors %}
-                    {% for doctor in doctors %}
-                    <div class="doctor-card-v2">
-                        <input type="radio" id="doctor_{{ doctor.id }}" name="doctor_id" value="{{ doctor.id }}" class="doctor-radio" required>
-                        <label for="doctor_{{ doctor.id }}" class="doctor-label-v2">
-                            <div class="doctor-info-v2">
-                                <img src="https://ui-avatars.com/api/?name={{ doctor.full_name|replace(' ', '+') }}&background=667eea&color=fff&size=128" alt="Dr. {{ doctor.full_name }}" class="doctor-avatar-v2">
-                                <div class="doctor-details-v2">
-                                    <h5 class="doctor-name">Dr. {{ doctor.full_name }}</h5>
-                                    <p class="doctor-specialization">{{ doctor.specialization }}</p>
-                                    <div class="doctor-meta">
-                                        <span><i class="fas fa-medal me-1"></i>{{ doctor.experience_years }} years exp.</span>
-                                        <span><i class="fas fa-graduation-cap me-1"></i>{{ doctor.qualification }}</span>
-                                    </div>
-                                    {% if doctor.hospital_affiliation %}
-                                    <p class="hospital-affiliation"><i class="fas fa-hospital me-1"></i>{{ doctor.hospital_affiliation }}</p>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="selection-indicator-v2"><i class="fas fa-check"></i></div>
-                        </label>
-                    </div>
-                    {% endfor %}
-                    {% else %}
-                    <div class="no-doctors-message text-center py-5">
-                        <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">No doctors available</h5>
-                        <p class="text-muted">Please check back later or contact support.</p>
-                    </div>
-                    {% endif %}
+                <h3 class="step-title">Select Specialization & Doctor</h3>
+                <div class="mb-4">
+                    <label for="specializationSelect" class="form-label required">Specialization</label>
+                    <select id="specializationSelect" class="form-control" required>
+                        <option value="">-- Select Specialization --</option>
+                        {% for spec in specializations %}
+                        <option value="{{ spec.id }}" {% if spec.id == selected_specialization_id %}selected{% endif %}>{{ spec.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="doctor-selection-grid" id="doctorSelectionGrid">
+                    <!-- Doctors will be loaded here by JS -->
                 </div>
                 <div class="form-navigation text-end mt-4">
                     <button type="button" class="btn btn-primary next-btn">Next <i class="fas fa-arrow-right ms-2"></i></button>
@@ -81,24 +61,12 @@
             </div>
 
             <div class="form-step" data-step="2">
-                <h3 class="step-title">Choose Date & Time</h3>
+                <h3 class="step-title">Select Appointment Date</h3>
                 <div class="row g-4">
-                    <div class="col-md-6">
+                    <div class="col-md-8 mx-auto">
                         <label class="form-label required">Appointment Date</label>
-                        <input type="date" class="form-control" name="appointment_date" required min="{{ today }}">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label required">Appointment Time</label>
-                        <div class="time-slot-grid">
-                            {% set time_slots = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"] %}
-                            {% set time_slots_display = ["09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM", "05:00 PM"] %}
-                            {% for i in range(time_slots|length) %}
-                                <div class="time-slot">
-                                    <input type="radio" id="time_{{ time_slots[i] }}" name="appointment_time" value="{{ time_slots[i] }}" required>
-                                    <label for="time_{{ time_slots[i] }}">{{ time_slots_display[i] }}</label>
-                                </div>
-                            {% endfor %}
-                        </div>
+                        <input type="date" class="form-control" id="appointmentDate" name="appointment_date" required min="{{ today }}">
+                        <div id="dateAvailabilityMessage" class="mt-2"></div>
                     </div>
                 </div>
                 <div class="form-navigation mt-4 d-flex justify-content-between">
@@ -115,7 +83,7 @@
                         <p><strong>Patient:</strong> {{ user_name }}</p>
                         <p><strong>Doctor:</strong> <span id="summaryDoctor"></span></p>
                         <p><strong>Date:</strong> <span id="summaryDate"></span></p>
-                        <p><strong>Time:</strong> <span id="summaryTime"></span></p>
+                        <p><strong>Appointment Status:</strong> <span id="summaryAvailability"></span></p>
                     </div>
                 </div>
                 <div class="mt-4">
@@ -125,7 +93,7 @@
                 </div>
                 <div class="form-navigation mt-4 d-flex justify-content-between align-items-center">
                     <button type="button" class="btn btn-secondary prev-btn"><i class="fas fa-arrow-left me-2"></i> Back</button>
-                    <button type="submit" class="btn btn-success btn-lg btn-submit">
+                    <button type="submit" class="btn btn-success btn-lg btn-submit" id="confirmButton">
                         <i class="fas fa-credit-card me-2"></i> Confirm & Proceed to Pay
                     </button>
                 </div>
@@ -144,6 +112,7 @@
     --border-color: #e5e7eb;
     --white: #ffffff;
     --success: #10b981;
+    --danger: #ef4444;
 }
 
 body {
@@ -308,6 +277,10 @@ body {
 .doctor-specialization { color: var(--primary-color); font-weight: 600; margin-bottom: 0.5rem; }
 .doctor-meta, .hospital-affiliation { color: var(--text-light); font-size: 0.9rem; }
 .doctor-meta span { margin-right: 1rem; }
+.doctor-meta .appointment-limit {
+    color: var(--primary-color);
+    font-weight: 600;
+}
 .selection-indicator-v2 {
     position: absolute;
     top: 1rem;
@@ -329,7 +302,7 @@ body {
     opacity: 1;
 }
 
-/* Date & Time Selection */
+/* Date Selection */
 .form-label { font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem; }
 .form-label.required::after { content: ' *'; color: #ef4444; }
 .form-control {
@@ -344,32 +317,18 @@ body {
     box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.2);
 }
 
-.time-slot-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 0.75rem;
-}
-.time-slot input[type="radio"] {
-    display: none;
-}
-.time-slot label {
-    display: block;
-    text-align: center;
+.availability-message {
     padding: 0.75rem;
-    border: 2px solid var(--border-color);
     border-radius: 8px;
-    cursor: pointer;
     font-weight: 500;
-    transition: all 0.2s ease;
 }
-.time-slot label:hover {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
+.availability-available {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success);
 }
-.time-slot input[type="radio"]:checked + label {
-    background-color: var(--primary-color);
-    color: var(--white);
-    border-color: var(--primary-color);
+.availability-full {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
 }
 
 /* Summary */
@@ -416,7 +375,10 @@ body {
     background-color: #059669;
     border-color: #059669;
 }
-
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -457,14 +419,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const prevButtons = document.querySelectorAll('.prev-btn');
     const steps = document.querySelectorAll('.form-step');
     const stepIndicators = document.querySelectorAll('.step-indicator');
-    const progressBarLine = document.querySelector('.progress-bar-line::after');
+    const appointmentDateInput = document.getElementById('appointmentDate');
+    const dateAvailabilityMessage = document.getElementById('dateAvailabilityMessage');
+    const confirmButton = document.getElementById('confirmButton');
     let currentStep = 1;
+    let selectedDoctorId = null;
+    let selectedDoctorAppointmentLimit = null;
+    let appointmentAvailability = false;
 
     // Set min date for date input
-    const dateInput = document.querySelector('input[name="appointment_date"]');
-    if (dateInput) {
+    if (appointmentDateInput) {
         const today = new Date().toISOString().split('T')[0];
-        dateInput.setAttribute('min', today);
+        appointmentDateInput.setAttribute('min', today);
     }
 
     function updateProgress() {
@@ -490,6 +456,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const step = document.querySelector(`.form-step[data-step="${stepNumber}"]`);
         const inputs = step.querySelectorAll('[required]');
         let isValid = true;
+        
         inputs.forEach(input => {
             if ((input.type === 'radio' || input.type === 'checkbox') && !step.querySelector(`[name="${input.name}"]:checked`)) {
                 isValid = false;
@@ -497,12 +464,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 isValid = false;
             }
         });
+        
+        // Additional validation for step 2
+        if (stepNumber === 2 && isValid) {
+            if (!appointmentAvailability) {
+                isValid = false;
+                alert('This doctor has no available appointments on the selected date. Please choose another date.');
+            }
+        }
+        
         if (!isValid) {
             alert('Please fill out all required fields before proceeding.');
         }
         return isValid;
     }
-    
+
     function updateSummary() {
         const selectedDoctorRadio = document.querySelector('input[name="doctor_id"]:checked');
         if (selectedDoctorRadio) {
@@ -513,16 +489,151 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const selectedDate = document.querySelector('input[name="appointment_date"]').value;
         document.getElementById('summaryDate').textContent = selectedDate ? new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Not selected';
-
-        const selectedTimeRadio = document.querySelector('input[name="appointment_time"]:checked');
-        if (selectedTimeRadio) {
-            const timeLabel = selectedTimeRadio.nextElementSibling.textContent;
-            document.getElementById('summaryTime').textContent = timeLabel;
-        } else {
-            document.getElementById('summaryTime').textContent = 'Not selected';
-        }
+        
+        // Update availability status in summary
+        document.getElementById('summaryAvailability').textContent = appointmentAvailability ? 
+            'Available - Proceed to payment' : 
+            'Not Available - Please select another date';
+        
+        // Enable/disable confirm button based on availability
+        confirmButton.disabled = !appointmentAvailability;
     }
 
+    // Check appointment availability for selected doctor and date
+    function checkAppointmentAvailability(doctorId, date) {
+        if (!doctorId || !date) {
+            dateAvailabilityMessage.innerHTML = '';
+            appointmentAvailability = false;
+            updateSummary();
+            return;
+        }
+        
+        fetch(`/patient/check-appointment-availability?doctor_id=${doctorId}&date=${date}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.available) {
+                    dateAvailabilityMessage.innerHTML = `
+                        <div class="availability-message availability-available">
+                            <i class="fas fa-check-circle me-2"></i>
+                            ${data.message}
+                        </div>
+                    `;
+                    appointmentAvailability = true;
+                } else {
+                    dateAvailabilityMessage.innerHTML = `
+                        <div class="availability-message availability-full">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            ${data.message}
+                        </div>
+                    `;
+                    appointmentAvailability = false;
+                }
+                updateSummary();
+            })
+            .catch(error => {
+                console.error('Error checking availability:', error);
+                dateAvailabilityMessage.innerHTML = `
+                    <div class="availability-message availability-full">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Error checking availability. Please try again.
+                    </div>
+                `;
+                appointmentAvailability = false;
+                updateSummary();
+            });
+    }
+
+    // AJAX: Load doctors by specialization
+    const specializationSelect = document.getElementById('specializationSelect');
+    const doctorSelectionGrid = document.getElementById('doctorSelectionGrid');
+
+    function renderDoctors(doctors) {
+        doctorSelectionGrid.innerHTML = '';
+        if (doctors.length === 0) {
+            doctorSelectionGrid.innerHTML = `<div class="no-doctors-message text-center py-5">
+                <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No doctors available</h5>
+                <p class="text-muted">Please check back later or contact support.</p>
+            </div>`;
+            return;
+        }
+        doctors.forEach(doctor => {
+            const card = document.createElement('div');
+            card.className = 'doctor-card-v2';
+            card.innerHTML = `
+                <input type="radio" id="doctor_${doctor.id}" name="doctor_id" value="${doctor.id}" class="doctor-radio" required
+                    data-appointment-limit="${doctor.appointments_per_day}">
+                <label for="doctor_${doctor.id}" class="doctor-label-v2">
+                    <div class="doctor-info-v2">
+                        <img src="https://ui-avatars.com/api/?name=${doctor.full_name.replace(/ /g, '+')}&background=667eea&color=fff&size=128" alt="Dr. ${doctor.full_name}" class="doctor-avatar-v2">
+                        <div class="doctor-details-v2">
+                            <h5 class="doctor-name">Dr. ${doctor.full_name}</h5>
+                            <p class="doctor-specialization">${doctor.specialization}</p>
+                            <div class="doctor-meta">
+                                <span><i class="fas fa-medal me-1"></i>${doctor.experience_years} years exp.</span>
+                                <span><i class="fas fa-graduation-cap me-1"></i>${doctor.qualification}</span>
+                                <span class="appointment-limit"><i class="fas fa-calendar-check me-1"></i>${doctor.appointments_per_day} appointments/day</span>
+                            </div>
+                            ${doctor.hospital_affiliation ? `<p class="hospital-affiliation"><i class="fas fa-hospital me-1"></i>${doctor.hospital_affiliation}</p>` : ''}
+                        </div>
+                    </div>
+                    <div class="selection-indicator-v2"><i class="fas fa-check"></i></div>
+                </label>
+            `;
+            doctorSelectionGrid.appendChild(card);
+        });
+        
+        // Add event listener for doctor selection
+        document.querySelectorAll('input[name="doctor_id"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                selectedDoctorId = this.value;
+                selectedDoctorAppointmentLimit = this.getAttribute('data-appointment-limit');
+                
+                // If a date is already selected, check availability
+                if (appointmentDateInput.value) {
+                    checkAppointmentAvailability(selectedDoctorId, appointmentDateInput.value);
+                }
+            });
+        });
+    }
+
+    function loadDoctors(specializationId) {
+        doctorSelectionGrid.innerHTML = '<div class="text-center py-4"><span class="spinner-border"></span> Loading doctors...</div>';
+        fetch(`/patient/get-doctors-by-specialization?specialization_id=${specializationId}`)
+            .then(res => res.json())
+            .then(data => {
+                renderDoctors(data.doctors);
+            })
+            .catch(error => {
+                console.error('Error loading doctors:', error);
+                doctorSelectionGrid.innerHTML = '<div class="text-center py-4 text-danger">Error loading doctors. Please try again.</div>';
+            });
+    }
+
+    specializationSelect.addEventListener('change', function() {
+        const specId = this.value;
+        if (specId) {
+            loadDoctors(specId);
+        } else {
+            doctorSelectionGrid.innerHTML = '';
+        }
+    });
+
+    // Event listener for date selection
+    appointmentDateInput.addEventListener('change', function() {
+        if (selectedDoctorId) {
+            checkAppointmentAvailability(selectedDoctorId, this.value);
+        } else {
+            dateAvailabilityMessage.innerHTML = `
+                <div class="availability-message availability-full">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    Please select a doctor first
+                </div>
+            `;
+            appointmentAvailability = false;
+            updateSummary();
+        }
+    });
 
     nextButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -548,7 +659,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Razorpay Integration
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        if (!validateStep(currentStep)) return;
+        if (!validateStep(currentStep) || !appointmentAvailability) return;
 
         // Set your appointment fee here
         const appointmentFee = 500; // INR
@@ -587,7 +698,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         method: 'POST',
                         body: formData,
                         headers: {
-                            "X-Requested-With": "XMLHttpRequest"   // 👈 important!
+                            "X-Requested-With": "XMLHttpRequest"
                         }
                     })
                     .then(res => res.json())
@@ -630,7 +741,7 @@ document.addEventListener('DOMContentLoaded', function() {
         script.async = true;
         document.body.appendChild(script);
     }
-    
+
     // Initial setup
     showStep(1);
 });

@@ -1,7 +1,27 @@
+# Medicine model for individual medicine entries in a prescription
 
 # ContactQuery model for Contact Us form
 from datetime import datetime
 from app import db
+
+class Medicine(db.Model):
+    __tablename__ = 'medicines'
+    id = db.Column(db.Integer, primary_key=True)
+    prescription_id = db.Column(db.Integer, db.ForeignKey('medical_prescriptions.id'), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    type = db.Column(db.String(20), nullable=False)  # tablet, liquid, injection
+    dosage = db.Column(db.String(50), nullable=False)
+    frequency = db.Column(db.String(20), nullable=False)  # morning, afternoon, night
+    days = db.Column(db.Integer, nullable=False)
+    timing = db.Column(db.String(20), nullable=False)  # before, after food
+    quantity = db.Column(db.String(50), nullable=True)  # e.g. 5ml, 1 vial
+    notes = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+    def __repr__(self):
+        return f'<Medicine {self.name}>'
 
 class ContactQuery(db.Model):
     __tablename__ = 'contact_queries'
@@ -75,7 +95,7 @@ class Appointment(db.Model):
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False)
     patient_name = db.Column(db.String(100), nullable=False)
     appointment_date = db.Column(db.Date, nullable=False)
-    appointment_time = db.Column(db.Time, nullable=False)
+    appointment_time = db.Column(db.Time)
     reason = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(20), default='scheduled')  # scheduled, completed, cancelled
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -93,7 +113,7 @@ class MedicalPrescription(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     appointment_id = db.Column(db.Integer, db.ForeignKey('appointments.id'), nullable=False)
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False)
-    medicines = db.Column(db.Text, nullable=False)
+    medicines = db.relationship('Medicine', backref='prescription', lazy=True)
     instructions = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

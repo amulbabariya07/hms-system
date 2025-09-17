@@ -98,15 +98,16 @@ def admin_edit_doctor(doctor_id):
         full_name = request.form.get('full_name')
         mobile_number = clean_mobile_number(request.form.get('mobile_number', ''))
         email = request.form.get('email', '')
-        specialization = request.form.get('specialization')
+        specialization_id = request.form.get('specialization_id')  # Changed from specialization
         license_number = request.form.get('license_number')
         experience_years = request.form.get('experience_years')
         qualification = request.form.get('qualification')
         hospital_affiliation = request.form.get('hospital_affiliation', '')
         appointments_per_day = request.form.get('appointments_per_day', doctor.appointments_per_day)
+        password = request.form.get('password')  # Added password field
 
         # Validation
-        if not all([full_name, mobile_number, specialization, license_number, 
+        if not all([full_name, mobile_number, specialization_id, license_number, 
                     experience_years, qualification]):
             return jsonify({'success': False, 'message': 'All required fields must be filled.'})
 
@@ -125,28 +126,35 @@ def admin_edit_doctor(doctor_id):
 
         try:
             experience_years = int(experience_years)
+            appointments_per_day = int(appointments_per_day)
             if experience_years < 0 or experience_years > 50:
                 return jsonify({'success': False, 'message': 'Experience years must be between 0 and 50.'})
+            if appointments_per_day < 1 or appointments_per_day > 50:
+                return jsonify({'success': False, 'message': 'Appointments per day must be between 1 and 50.'})
         except ValueError:
-            return jsonify({'success': False, 'message': 'Experience years must be a valid number.'})
+            return jsonify({'success': False, 'message': 'Experience and appointments must be valid numbers.'})
 
         # Update doctor information
         doctor.full_name = full_name
         doctor.mobile_number = mobile_number
         doctor.email = email if email else None
-        doctor.specialization = specialization
+        doctor.specialization_id = specialization_id  # Changed from specialization
         doctor.license_number = license_number
         doctor.experience_years = experience_years
         doctor.qualification = qualification
         doctor.hospital_affiliation = hospital_affiliation if hospital_affiliation else None
-        doctor.appointments_per_day = int(appointments_per_day)
+        doctor.appointments_per_day = appointments_per_day
+
+        # Update password if provided
+        if password:
+            doctor.password = generate_password_hash(password)
 
         db.session.commit()
         return jsonify({'success': True, 'message': 'Doctor updated successfully!'})
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'message': 'An error occurred while updating the doctor.'})
+        return jsonify({'success': False, 'message': f'An error occurred while updating the doctor: {str(e)}'})
 
 @admin_bp.route('/doctors/approval')
 def admin_doctors_approval():

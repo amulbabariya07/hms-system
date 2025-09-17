@@ -318,5 +318,52 @@ def patients():
 
 @doctor_bp.route('/add-prescription', methods=['POST'])
 def add_prescription():
-    # Your logic for adding prescription
-    return "Prescription added"
+    from flask import request, redirect, url_for, flash, session
+    from app.models import MedicalPrescription, Appointment, Doctor
+    if 'doctor_id' not in session:
+        flash('Please login as doctor.', 'danger')
+        return redirect(url_for('doctor.doctor_login'))
+    import json
+    appointment_id = request.form.get('appointment_id')
+    instructions = request.form.get('instructions')
+    doctor_id = session['doctor_id']
+    # Expect medicines as JSON string from frontend
+    medicines_json = request.form.get('medicines_json')
+    if not appointment_id or not medicines_json:
+        flash('All fields are required.', 'danger')
+        return redirect(url_for('doctor.doctor_appointments'))
+    try:
+        medicines = json.loads(medicines_json)
+        if not isinstance(medicines, list) or not medicines:
+            raise ValueError
+    except Exception:
+        flash('Invalid medicines data.', 'danger')
+        return redirect(url_for('doctor.doctor_appointments'))
+    from app import db
+    prescription = MedicalPrescription(
+        appointment_id=appointment_id,
+        doctor_id=doctor_id,
+        instructions=instructions
+    )
+    db.session.add(prescription)
+    db.session.commit()
+
+    # Add each medicine as a Medicine object
+    from app.models import Medicine
+    for med in medicines:
+        medicine = Medicine(
+            prescription_id=prescription.id,
+            name=med.get('name'),
+            type=med.get('type'),
+            dosage=med.get('dosage'),
+            frequency=med.get('frequency'),
+            days=med.get('days'),
+            timing=med.get('timing'),
+            quantity=med.get('quantity'),
+            notes=med.get('notes')
+        )
+        db.session.add(medicine)
+    db.session.commit()
+    flash('Prescription added successfully!', 'success')
+    return redirect(url_for('doctor.doctor_appointments'))
+

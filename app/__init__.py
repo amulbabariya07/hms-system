@@ -47,7 +47,9 @@ def create_app():
         return render_template('contact.html')
 
     from app.patient.routes import patient_bp
+    from app.patient import register_patient_blueprints
     app.register_blueprint(patient_bp, url_prefix='/patient')
+    register_patient_blueprints(app)
 
     from app.admin.routes import admin_bp
     app.register_blueprint(admin_bp, url_prefix='/admin')

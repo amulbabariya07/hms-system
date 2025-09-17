@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "patient/header.html" %}
+<div class="container py-5">
+    <h2 class="mb-4">Medical Records</h2>
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Date</th>
+                <th>Doctor</th>
+                <th>Medicines</th>
+                <th>Instructions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pres in prescriptions %}
+            <tr>
+                <td>{{ pres.created_at.strftime('%d-%b-%Y %I:%M %p') }}</td>
+                <td>Dr. {{ pres.doctor.full_name }}</td>
+                <td>{{ pres.medicines }}</td>
+                <td>{{ pres.instructions or '-' }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center">No medical records found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

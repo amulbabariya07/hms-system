@@ -197,7 +197,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="editDoctorForm">
+                <form id="editDoctorForm" novalidate>
                     <input type="hidden" id="editDoctorId" name="doctor_id">
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -412,6 +412,11 @@ function editDoctor(doctorId) {
 
 function submitEditDoctor() {
     const form = document.getElementById('editDoctorForm');
+    if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        return;
+    }
+    
     const formData = new FormData(form);
     const doctorId = document.getElementById('editDoctorId').value;
 
