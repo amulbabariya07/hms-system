@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "patient/header.html" %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Payment Records</h2>
+            
+            {% if payments %}
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Payment ID</th>
+                                    <th>Appointment Date</th>
+                                    <th>Doctor</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Payment Date</th>
+                                    <th>Receipt</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in payments %}
+                                <tr>
+                                    <td>{{ payment.razorpay_payment_id }}</td>
+                                    <td>{{ payment.appointment.appointment_date.strftime('%d-%b-%Y') }}</td>
+                                    <td>Dr. {{ payment.appointment.doctor.full_name }}</td>
+                                    <td>₹{{ "%.2f"|format(payment.amount) }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if payment.status == 'success' else 'warning' if payment.status == 'pending' else 'danger' }}">
+                                            {{ payment.status|title }}
+                                        </span>
+                                    </td>
+                                    <td>{{ payment.created_at.strftime('%d-%b-%Y %I:%M %p') }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#receiptModal{{ payment.id }}">
+                                            <i class="fas fa-receipt"></i> View
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Receipt Modal -->
+                                <div class="modal fade" id="receiptModal{{ payment.id }}" tabindex="-1">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Payment Receipt</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <p><strong>Payment ID:</strong> {{ payment.razorpay_payment_id }}</p>
+                                                        <p><strong>Appointment ID:</strong> {{ payment.appointment.id }}</p>
+                                                        <p><strong>Patient:</strong> {{ payment.appointment.patient_name }}</p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p><strong>Date:</strong> {{ payment.created_at.strftime('%d-%b-%Y %I:%M %p') }}</p>
+                                                        <p><strong>Amount:</strong> ₹{{ "%.2f"|format(payment.amount) }}</p>
+                                                        <p><strong>Status:</strong> {{ payment.status|title }}</p>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <h6>Appointment Details:</h6>
+                                                        <p>
+                                                            <strong>Doctor:</strong> Dr. {{ payment.appointment.doctor.full_name }}<br>
+                                                            <strong>Date:</strong> {{ payment.appointment.appointment_date.strftime('%d-%b-%Y') }}<br>
+                                                            <strong>Time:</strong> {{ payment.appointment.appointment_time.strftime('%I:%M %p') if payment.appointment.appointment_time else 'N/A' }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <a href="{{ url_for('patient.download_payment_receipt', payment_id=payment.id) }}" class="btn btn-primary">
+                                                    <i class="fas fa-download"></i> Download PDF
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> No payment records found.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

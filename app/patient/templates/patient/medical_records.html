@@ -1,31 +1,98 @@
-{% extends "base.html" %}
+<!-- {% extends "base.html" %} -->
 {% block content %}
 {% include "patient/header.html" %}
+
 <div class="container py-5">
-    <h2 class="mb-4">Medical Records</h2>
-    <table class="table table-bordered table-hover">
-        <thead class="table-light">
-            <tr>
-                <th>Date</th>
-                <th>Doctor</th>
-                <th>Medicines</th>
-                <th>Instructions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for pres in prescriptions %}
-            <tr>
-                <td>{{ pres.created_at.strftime('%d-%b-%Y %I:%M %p') }}</td>
-                <td>Dr. {{ pres.doctor.full_name }}</td>
-                <td>{{ pres.medicines }}</td>
-                <td>{{ pres.instructions or '-' }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="4" class="text-center">No medical records found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Header Section -->
+    <div class="text-center mb-5 p-5 rounded-4 shadow-lg"
+         style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+        <i class="bi bi-file-medical fs-1 mb-3"></i>
+        <h1 class="fw-bold mb-2">Medical Records</h1>
+        <p class="lead">View all your appointments, prescriptions, and doctor's instructions in one place</p>
+    </div>
+
+    {% if appointments %}
+        {% for appt in appointments %}
+            {% if appt.prescriptions and appt.prescriptions|length > 0 %}
+            <div class="card shadow-lg rounded-4 border-0 mb-5">
+                <div class="card-header bg-primary text-white rounded-top-4">
+                    <div class="d-flex justify-content-between flex-wrap">
+                        <div>
+                            <h5 class="mb-1"><i class="bi bi-calendar-event"></i> Appointment</h5>
+                            <p class="mb-0">
+                                {{ appt.appointment_date.strftime('%d-%b-%Y') }} 
+                                at {{ appt.appointment_time.strftime('%I:%M %p') if appt.appointment_time else '' }}
+                            </p>
+                        </div>
+                        <div>
+                            <h5 class="mb-1"><i class="bi bi-person-badge"></i> Doctor</h5>
+                            <p class="mb-0">Dr. {{ appt.doctor.full_name }}</p>
+                        </div>
+                        <div>
+                            <a href="{{ url_for('patient_medical.download_prescription_pdf', appointment_id=appt.id) }}" 
+                               class="btn btn-light btn-sm shadow-sm">
+                                <i class="bi bi-download"></i> Download PDF
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <p class="text-muted mb-4">
+                        <i class="bi bi-clock-history"></i> 
+                        Prescription Date: <strong>{{ appt.prescriptions[0].created_at.strftime('%d-%b-%Y %I:%M %p') }}</strong>
+                    </p>
+
+                    {% for pres in appt.prescriptions %}
+                        {% if pres.instructions %}
+                            <div class="alert alert-info rounded-3">
+                                <i class="bi bi-info-circle"></i> <strong>Instructions:</strong> {{ pres.instructions }}
+                            </div>
+                        {% endif %}
+
+                        {% if pres.medicines and pres.medicines|length > 0 %}
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle shadow-sm">
+                                    <thead class="table-primary text-center">
+                                        <tr>
+                                            <th>Medicine</th>
+                                            <th>Type</th>
+                                            <th>Dosage</th>
+                                            <th>Frequency</th>
+                                            <th>Days</th>
+                                            <th>Timing</th>
+                                            <th>Quantity</th>
+                                            <th>Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for med in pres.medicines %}
+                                        <tr>
+                                            <td class="fw-semibold">{{ med.name }}</td>
+                                            <td>{{ med.type }}</td>
+                                            <td>{{ med.dosage }}</td>
+                                            <td>{{ med.frequency }}</td>
+                                            <td>{{ med.days }}</td>
+                                            <td>{{ med.timing }}</td>
+                                            <td>{{ med.quantity or '-' }}</td>
+                                            <td>{{ med.notes or '-' }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-emoji-frown fs-1 text-muted"></i>
+            <p class="mt-3 fs-5">No medical records found.</p>
+        </div>
+    {% endif %}
 </div>
+
 {% endblock %}

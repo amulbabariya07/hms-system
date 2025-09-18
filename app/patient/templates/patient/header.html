@@ -15,18 +15,23 @@
 
                 <!-- ✅ New Menu Items -->
                 <li class="nav-item">
-                    <a class="nav-link fw-semibold" href="/appointment/book">
+                    <a class="nav-link fw-semibold" href="{{ url_for('patient.book_appointment') }}">
                         <i class="fas fa-calendar-plus me-1"></i>Book Appointment
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link fw-semibold" href="/appointment/view">
+                    <a class="nav-link fw-semibold"href="{{ url_for('patient.my_appointments') }}">
                         <i class="fas fa-calendar-check me-1"></i>View Appointment
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link fw-semibold" href="{{ url_for('patient_medical.medical_records') }}">
+                    <a class="nav-link fw-semibold" href="{{ url_for('patient.medical_records') }}">
                         <i class="fas fa-file-medical me-1"></i>Medical Records
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="{{ url_for('patient.payment_records') }}">
+                        <i class="fas fa-credit-card me-1"></i>Payment Records
                     </a>
                 </li>
                 <li class="nav-item">

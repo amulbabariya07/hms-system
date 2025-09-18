@@ -1,23 +1,25 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, send_file, abort
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, send_file, abort, make_response
 from app import db
-from app.models import User, Doctor, Appointment
+from app.models import User, Doctor, Appointment, MedicalPrescription, MailSetting, Payment, Specialization
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, date, time
+from datetime import datetime, time
 import re
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from app.models import MailSetting
 import random
-from flask import session
-from app.models import User, MailSetting
 import io
-from flask import send_file
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from sqlalchemy.orm import joinedload
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
-from reportlab.lib.units import inch
-from app.models import Appointment
+from flask import send_file
 
 def clean_mobile_number(number):
     return re.sub(r'\D', '', number)
@@ -806,3 +808,175 @@ def check_appointment_availability():
         
     except Exception as e:
         return jsonify({'available': False, 'message': f'Error checking availability: {str(e)}'})
+
+@patient_bp.route('/medical-records')
+def medical_records():
+    if 'user_id' not in session:
+        flash('Please login first.', 'warning')
+        return redirect(url_for('patient.patient_login'))
+
+    patient_id = session['user_id']
+    appointments = Appointment.query.options(
+        joinedload(Appointment.prescriptions).joinedload(MedicalPrescription.medicines)
+    ).filter_by(patient_id=patient_id).order_by(Appointment.appointment_date.desc()).all()
+
+    return render_template('patient/medical_records.html', appointments=appointments)
+
+
+@patient_bp.route('/medical-records/download/<int:appointment_id>')
+def download_prescription_pdf(appointment_id):
+    if 'user_id' not in session:
+        flash('Please login first.', 'warning')
+        return redirect(url_for('patient.patient_login'))
+
+    appointment = Appointment.query.options(
+        joinedload(Appointment.prescriptions).joinedload(MedicalPrescription.medicines)
+    ).filter_by(id=appointment_id, patient_id=session['user_id']).first()
+
+    if not appointment:
+        flash("Appointment not found or unauthorized.", "danger")
+        return redirect(url_for('patient.medical_records'))
+
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=50, bottomMargin=30)
+    elements = []
+    styles = getSampleStyleSheet()
+
+    header_style = ParagraphStyle("Header", parent=styles["Title"], fontSize=20, textColor=colors.HexColor("#007BFF"), alignment=1)
+    subheader_style = ParagraphStyle("Subheader", parent=styles["Heading2"], fontSize=12, textColor=colors.black, spaceAfter=6)
+    normal_bold = ParagraphStyle("Bold", parent=styles["Normal"], fontSize=11, textColor=colors.black, leading=14, spaceAfter=6)
+
+    elements.append(Paragraph("🏥 HelthCare+", header_style))
+    elements.append(Spacer(1, 10))
+    elements.append(Paragraph(f"<b>Appointment Date:</b> {appointment.appointment_date.strftime('%d-%b-%Y')} at {appointment.appointment_time.strftime('%I:%M %p') if appointment.appointment_time else ''}", subheader_style))
+    elements.append(Paragraph(f"<b>Doctor:</b> Dr. {appointment.doctor.full_name}", subheader_style))
+    elements.append(Paragraph(f"<b>Patient ID:</b> {appointment.patient_id}", subheader_style))
+    elements.append(Spacer(1, 15))
+
+    for pres in appointment.prescriptions:
+        elements.append(Paragraph(f"📝 Prescription Date: {pres.created_at.strftime('%d-%b-%Y %I:%M %p')}", normal_bold))
+        if pres.instructions:
+            elements.append(Paragraph(f"<b>Instructions:</b> {pres.instructions}", styles["Normal"]))
+            elements.append(Spacer(1, 8))
+        if pres.medicines:
+            data = [["Medicine", "Type", "Dosage", "Frequency", "Days", "Timing", "Quantity", "Notes"]]
+            for med in pres.medicines:
+                data.append([
+                    med.name, med.type, med.dosage, med.frequency,
+                    med.days, med.timing, med.quantity or "-", med.notes or "-"
+                ])
+            table = Table(data, repeatRows=1, colWidths=[1.2*inch, 0.9*inch, 0.8*inch, 0.9*inch, 0.7*inch, 0.9*inch, 0.9*inch, 1.2*inch])
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#007BFF")),
+                ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+                ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+                ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0,0), (-1,-1), 9),
+                ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+                ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.whitesmoke, colors.lightgrey]),
+            ]))
+            elements.append(table)
+            elements.append(Spacer(1, 20))
+
+    elements.append(Spacer(1, 40))
+    footer_style = ParagraphStyle("Footer", parent=styles["Normal"], fontSize=9, textColor=colors.grey, alignment=1)
+    elements.append(Paragraph("HelthCare+ • Your Trusted Medical Partner", footer_style))
+    elements.append(Paragraph("Contact: info@healthcareplus.com | +1 (555) 123-4567", footer_style))
+
+    doc.build(elements)
+    buffer.seek(0)
+    response = make_response(buffer.read())
+    response.headers['Content-Disposition'] = f'attachment; filename=appointment_{appointment.id}.pdf'
+    response.headers['Content-Type'] = 'application/pdf'
+    return response
+
+
+@patient_bp.route('/payment-records')
+def payment_records():
+    if 'user_id' not in session:
+        flash('Please login first.', 'warning')
+        return redirect(url_for('patient.patient_login'))
+    
+    # Get all payments for the current user through their appointments
+    payments = Payment.query.join(Appointment).filter(
+        Appointment.patient_id == session['user_id']
+    ).order_by(Payment.created_at.desc()).all()
+    
+    return render_template('patient/payment_records.html', 
+                         payments=payments,
+                         user_name=session.get('user_name'))
+
+@patient_bp.route('/payment-receipt/<int:payment_id>')
+def download_payment_receipt(payment_id):
+    if 'user_id' not in session:
+        flash('Please login first.', 'warning')
+        return redirect(url_for('patient.patient_login'))
+    
+    # Verify the payment belongs to the current user
+    payment = Payment.query.join(Appointment).filter(
+        Payment.id == payment_id,
+        Appointment.patient_id == session['user_id']
+    ).first_or_404()
+    
+    # Create PDF
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
+    
+    # Header with logo
+    c.setFillColor(colors.HexColor("#007BFF"))
+    c.rect(0, height - 80, width, 80, stroke=0, fill=1)
+    c.setFillColor(colors.white)
+    c.setFont("Helvetica-Bold", 24)
+    c.drawString(70, height - 50, "HelthCare+")
+    c.setFont("Helvetica", 10)
+    c.drawString(400, height - 40, "Your Health, Our Priority")
+    
+    # Title
+    c.setFillColor(colors.black)
+    c.setFont("Helvetica-Bold", 18)
+    c.drawCentredString(width / 2, height - 120, "PAYMENT RECEIPT")
+    
+    # Payment details
+    y = height - 160
+    line_height = 20
+    
+    details = [
+        ("Receipt Number:", payment.razorpay_payment_id),
+        ("Payment Date:", payment.created_at.strftime('%d-%b-%Y %I:%M %p')),
+        ("Amount:", f"{payment.amount:.2f}"),
+        ("Status:", payment.status.upper()),
+        ("Appointment ID:", str(payment.appointment.id)),
+        ("Patient Name:", payment.appointment.patient_name),
+        ("Doctor:", f"Dr. {payment.appointment.doctor.full_name}"),
+        ("Appointment Date:", payment.appointment.appointment_date.strftime('%d-%b-%Y')),
+        ("Appointment Time:", payment.appointment.appointment_time.strftime('%I:%M %p') if payment.appointment.appointment_time else 'N/A')
+    ]
+    
+    c.setFont("Helvetica-Bold", 12)
+    for label, value in details:
+        c.drawString(80, y, label)
+        c.setFont("Helvetica", 12)
+        c.drawString(200, y, value)
+        c.setFont("Helvetica-Bold", 12)
+        y -= line_height
+    
+    # Footer
+    c.setStrokeColor(colors.HexColor("#007BFF"))
+    c.setLineWidth(0.5)
+    c.line(40, 50, width - 40, 50)
+    c.setFont("Helvetica", 9)
+    c.setFillColor(colors.gray)
+    c.drawCentredString(width / 2, 35, "HelthCare+ | www.healthcareplus.com | +91 98765 43210")
+    c.drawRightString(width - 40, 20, f"Generated on: {datetime.now().strftime('%d-%b-%Y %I:%M %p')}")
+    
+    c.showPage()
+    c.save()
+    buffer.seek(0)
+    
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=f"payment_receipt_{payment.razorpay_payment_id}.pdf",
+        mimetype="application/pdf"
+    )
