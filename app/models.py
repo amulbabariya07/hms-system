@@ -142,6 +142,96 @@ class MailSetting(db.Model):
     def __repr__(self):
         return f'<MailSetting {self.mail_server}>'
 
+    # Patient Intake Form Model
+from sqlalchemy import Column, Integer, String, Date, DateTime, Boolean, Text, Enum, ForeignKey
+from sqlalchemy.orm import relationship
+from datetime import datetime
+from . import db  # Assuming db is SQLAlchemy instance from Flask
+
+class PatientIntakeForm(db.Model):
+    __tablename__ = 'patient_intake_form'
+
+    # 1. Personal Information
+    id = Column(Integer, primary_key=True)  # Patient_ID
+    first_name = Column(String(100), nullable=False)
+    last_name = Column(String(100), nullable=False)
+    date_of_birth = Column(Date, nullable=False)
+    age = Column(Integer)
+    gender = Column(String(20))
+    blood_group = Column(String(10))
+    national_id = Column(String(50))  # National_ID / Passport / SSN
+    marital_status = Column(String(20))  # Single, Married, Divorced, Widowed
+    occupation = Column(String(100))
+    education_level = Column(String(100))
+    language_preference = Column(String(50))
+
+    # 2. Contact Details
+    phone_number = Column(String(20))
+    alternate_phone = Column(String(20))
+    email_address = Column(String(100))
+    permanent_address = Column(Text)
+    current_address = Column(Text)
+    emergency_contact_name = Column(String(100))
+    emergency_contact_relationship = Column(String(50))
+    emergency_contact_phone = Column(String(20))
+
+    # 3. Insurance Information
+    insurance_provider = Column(String(100))
+    insurance_policy_number = Column(String(50))
+    coverage_details = Column(Text)
+    validity_period = Column(String(50))
+    primary_policy_holder = Column(String(100))
+
+    # 4. Medical History
+    allergies = Column(Text)  # Drug, Food, Environmental
+    past_illnesses = Column(Text)  # Diabetes, Hypertension, Asthma, etc.
+    past_surgeries = Column(Text)
+    current_medications = Column(Text)
+    family_history = Column(Text)  # Heart disease, Cancer, etc.
+    vaccination_status = Column(Text)
+    chronic_conditions = Column(Text)
+
+    # 5. Lifestyle & Social History
+    smoking_status = Column(String(50))  # Yes/No, Frequency
+    alcohol_use = Column(String(50))  # Yes/No, Frequency
+    drug_use = Column(String(100))  # Yes/No, Type
+    exercise_habits = Column(Text)
+    diet_pattern = Column(String(50))  # Vegetarian, Non-Vegetarian, Vegan, etc.
+    sleep_pattern = Column(String(100))
+    stress_level = Column(String(50))
+
+    # 6. Reproductive / OB-GYN History (if applicable)
+    menstrual_cycle = Column(String(20))  # Regular/Irregular
+    last_menstrual_period = Column(Date)
+    pregnancy_status = Column(String(50))
+    number_of_pregnancies = Column(Integer)
+    number_of_children = Column(Integer)
+    contraceptive_use = Column(String(100))
+
+    # 7. Visit / Clinical Data
+    reason_for_visit = Column(Text)
+    symptoms = Column(Text)
+    diagnosis = Column(Text)
+    treatment_plan = Column(Text)
+    doctor_assigned = Column(String(100))
+    visit_date = Column(Date)
+    next_appointment_date = Column(Date)
+
+    # 8. Consent & Legal
+    consent_form_signed = Column(Boolean, default=False)
+    consent_date = Column(Date)
+    legal_guardian_name = Column(String(100))
+    guardian_relationship = Column(String(50))
+    guardian_signature = Column(String(200))
+
+    # 9. Administrative
+    registration_date = Column(DateTime, default=datetime.utcnow)
+    created_by = Column(String(100))  # Staff/Doctor ID
+    last_updated = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    status = Column(String(20), default='Active')  # Active, Inactive, Archived
+
+    def __repr__(self):
+        return f"<PatientIntakeForm {self.first_name} {self.last_name}>"
 
 # Payment model for Razorpay integration
 class Payment(db.Model):

@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    body {
+        background-color: #f4f7f6;
+    }
+    .intake-card {
+        border-radius: 15px;
+        border: none;
+        overflow: hidden; /* Ensures child elements conform to border radius */
+    }
+    .card-header-custom {
+        background-color: #0d6efd;
+        color: white;
+        padding: 1.5rem;
+        border-bottom: none;
+    }
+    .card-header-custom h2 {
+        margin-bottom: 0.25rem;
+    }
+    .card-header-custom p {
+        margin-bottom: 0;
+        opacity: 0.8;
+    }
+
+    /* Step Indicators */
+    .step-indicators {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        position: relative;
+    }
+    .step-indicator {
+        flex: 1;
+        text-align: center;
+        position: relative;
+        min-width: 90px;
+    }
+    /* Connecting Lines */
+    .step-indicator:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        top: 20px;
+        left: 50%;
+        height: 3px;
+        background-color: #dee2e6;
+        z-index: 1;
+    }
+    .step-indicator.completed:not(:last-child)::after {
+        background-color: #198754;
+    }
+    .step-indicator .step-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #dee2e6;
+        color: #495057;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px;
+        font-size: 18px;
+        position: relative;
+        z-index: 2;
+        transition: all 0.3s ease;
+        border: 3px solid #dee2e6;
+    }
+    .step-indicator.active .step-icon {
+        background-color: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+        transform: scale(1.1);
+        box-shadow: 0 0 15px rgba(13, 110, 253, 0.5);
+    }
+    .step-indicator.completed .step-icon {
+        background-color: #198754;
+        color: white;
+        border-color: #198754;
+    }
+    .step-indicator .step-label {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #6c757d;
+    }
+    .step-indicator.active .step-label,
+    .step-indicator.completed .step-label {
+        color: #212529;
+    }
+
+    /* Progress Bar */
+    .progress-container {
+        margin-bottom: 2rem;
+    }
+    .progress { height: 8px; border-radius: 8px; }
+
+    /* Form Steps */
+    .form-step { display: none; }
+    .form-step.active { display: block; animation: fadeIn 0.5s; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Summary view styles from summary file (for consistency) */
+    .summary-section { border: 1px solid #dee2e6; border-radius: 10px; padding: 20px; margin-bottom: 1.5rem; background: #f9fbfc; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+    .summary-section h5 { font-size: 1.1rem; font-weight: 600; color: #0d6efd; border-bottom: 2px solid #e9ecef; padding-bottom: 8px; margin-bottom: 15px; }
+</style>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-12 col-lg-10">
+            <div class="intake-card">
+
+                {% if form and form.id and not edit_mode %}
+                    <div id="intake-summary-print" class="summary-view">
+                        {% include 'patient/intake_form_summary.html' %}
+                    </div>
+                {% else %}
+                    <div class="card-header-custom text-center">
+                        <h2 class="mb-1"><i class="fas fa-notes-medical me-2"></i>Patient Intake Form</h2>
+                        <p>Please complete all steps to finalize your information.</p>
+                    </div>
+
+                    <div class="card-body p-4 p-md-5">
+                        <div class="step-indicators d-none d-md-flex">
+                            <div class="step-indicator active" data-step="1"><div class="step-icon"><i class="fas fa-user"></i></div><div class="step-label">Personal</div></div>
+                            <div class="step-indicator" data-step="2"><div class="step-icon"><i class="fas fa-phone-alt"></i></div><div class="step-label">Contact</div></div>
+                            <div class="step-indicator" data-step="3"><div class="step-icon"><i class="fas fa-shield-alt"></i></div><div class="step-label">Insurance</div></div>
+                            <div class="step-indicator" data-step="4"><div class="step-icon"><i class="fas fa-heartbeat"></i></div><div class="step-label">Medical</div></div>
+                            <div class="step-indicator" data-step="5"><div class="step-icon"><i class="fas fa-walking"></i></div><div class="step-label">Lifestyle</div></div>
+                            <div class="step-indicator" data-step="6"><div class="step-icon"><i class="fas fa-venus-mars"></i></div><div class="step-label">OB-GYN</div></div>
+                            <div class="step-indicator" data-step="7"><div class="step-icon"><i class="fas fa-stethoscope"></i></div><div class="step-label">Clinical</div></div>
+                            <div class="step-indicator" data-step="8"><div class="step-icon"><i class="fas fa-file-signature"></i></div><div class="step-label">Consent</div></div>
+                        </div>
+
+                        <div class="progress-container mt-4 mb-5">
+                            <div class="progress">
+                                <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+
+                        <form id="patientIntakeForm" method="POST" action="{{ url_for('patient.patient_intake_form') }}">
+                            <div class="form-step active" data-step="1">
+                                <h4 class="mb-4 text-center text-primary fw-bold">1. Personal Information</h4>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3"><label for="first_name" class="form-label">First Name</label><input type="text" class="form-control" id="first_name" name="first_name" value="{{ form.first_name|default('') }}" required></div>
+                                    <div class="col-md-6 mb-3"><label for="last_name" class="form-label">Last Name</label><input type="text" class="form-control" id="last_name" name="last_name" value="{{ form.last_name|default('') }}" required></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3"><label for="date_of_birth" class="form-label">Date of Birth</label><input type="date" class="form-control" id="date_of_birth" name="date_of_birth" value="{{ form.date_of_birth.strftime('%Y-%m-%d') if form and form.date_of_birth else '' }}" required></div>
+                                    <div class="col-md-6 mb-3"><label for="gender" class="form-label">Gender</label>
+                                        <select class="form-select" id="gender" name="gender">
+                                            <option value="">Select</option>
+                                            <option value="Male" {% if form.gender=='Male' %}selected{% endif %}>Male</option>
+                                            <option value="Female" {% if form.gender=='Female' %}selected{% endif %}>Female</option>
+                                            <option value="Other" {% if form.gender=='Other' %}selected{% endif %}>Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3"><label for="national_id" class="form-label">National ID</label><input type="text" class="form-control" id="national_id" name="national_id" value="{{ form.national_id|default('') }}"></div>
+                                    <div class="col-md-6 mb-3"><label for="marital_status" class="form-label">Marital Status</label>
+                                        <select class="form-select" id="marital_status" name="marital_status">
+                                            <option value="">Select</option>
+                                            <option value="Single" {% if form.marital_status=='Single' %}selected{% endif %}>Single</option>
+                                            <option value="Married" {% if form.marital_status=='Married' %}selected{% endif %}>Married</option>
+                                            <option value="Divorced" {% if form.marital_status=='Divorced' %}selected{% endif %}>Divorced</option>
+                                            <option value="Widowed" {% if form.marital_status=='Widowed' %}selected{% endif %}>Widowed</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3"><label for="occupation" class="form-label">Occupation</label><input type="text" class="form-control" id="occupation" name="occupation" value="{{ form.occupation|default('') }}"></div>
+                                    <div class="col-md-6 mb-3"><label for="language_preference" class="form-label">Language Preference</label><input type="text" class="form-control" id="language_preference" name="language_preference" value="{{ form.language_preference|default('') }}"></div>
+                                </div>
+                            </div>
+
+                            {% include 'patient/_intake_form_steps.html' %}
+
+                            <div class="d-flex justify-content-between align-items-center mt-5">
+                                <a href="{{ url_for('patient.my_profile') }}" class="btn btn-link text-secondary"><i class="fas fa-arrow-left me-2"></i>Back to Profile</a>
+                                <div>
+                                    <button type="button" class="btn btn-outline-secondary" id="prevBtn" style="display: none;"><i class="fas fa-chevron-left me-2"></i>Previous</button>
+                                    <button type="button" class="btn btn-primary" id="nextBtn">Next<i class="fas fa-chevron-right ms-2"></i></button>
+                                    <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">
+                                        <i class="fas fa-save me-2"></i>
+                                        {% if form and form.id %}Update Information{% else %}Save Information{% endif %}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    let currentStep = 1;
+    const totalSteps = 8;
+    const steps = document.querySelectorAll(".form-step");
+    const indicators = document.querySelectorAll(".step-indicator");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const submitBtn = document.getElementById("submitBtn");
+    const progressBar = document.getElementById("progressBar");
+
+    function showStep(step) {
+        steps.forEach(s => s.classList.remove("active"));
+        indicators.forEach(i => {
+            i.classList.remove("active", "completed");
+            const indicatorStep = parseInt(i.getAttribute("data-step"));
+            if (indicatorStep < step) {
+                i.classList.add("completed");
+            } else if (indicatorStep === step) {
+                i.classList.add("active");
+            }
+        });
+
+        if(steps[step - 1]) {
+            steps[step - 1].classList.add("active");
+        }
+
+        // Update Progress Bar
+        const progressPercentage = ((step - 1) / (totalSteps - 1)) * 100;
+        progressBar.style.width = progressPercentage + "%";
+        progressBar.setAttribute("aria-valuenow", progressPercentage);
+
+        // Update Buttons
+        prevBtn.style.display = step === 1 ? "none" : "inline-block";
+        if (step === totalSteps) {
+            nextBtn.style.display = "none";
+            submitBtn.style.display = "inline-block";
+        } else {
+            nextBtn.style.display = "inline-block";
+            submitBtn.style.display = "none";
+        }
+    }
+
+    prevBtn.addEventListener("click", function () {
+        if (currentStep > 1) {
+            currentStep--;
+            showStep(currentStep);
+        }
+    });
+
+    nextBtn.addEventListener("click", function () {
+        if (currentStep < totalSteps) {
+            currentStep++;
+            showStep(currentStep);
+        }
+    });
+
+    showStep(currentStep);
+});
+</script>
+{% endblock %}

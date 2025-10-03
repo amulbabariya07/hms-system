@@ -1,0 +1,128 @@
+
+<!-- Step 2: Contact Details -->
+<div class="form-step" data-step="2">
+    <h5 class="mb-4 text-center">2. Contact Details</h5>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="phone_number" class="form-label">Phone Number</label><input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ form.phone_number|default('') }}"></div>
+        <div class="col-md-6 mb-3"><label for="alternate_phone" class="form-label">Alternate Phone</label><input type="text" class="form-control" id="alternate_phone" name="alternate_phone" value="{{ form.alternate_phone|default('') }}"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="email_address" class="form-label">Email Address</label><input type="email" class="form-control" id="email_address" name="email_address" value="{{ form.email_address|default('') }}"></div>
+        <div class="col-md-6 mb-3"><label for="permanent_address" class="form-label">Permanent Address</label><input type="text" class="form-control" id="permanent_address" name="permanent_address" value="{{ form.permanent_address|default('') }}"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="current_address" class="form-label">Current Address</label><input type="text" class="form-control" id="current_address" name="current_address" value="{{ form.current_address|default('') }}"></div>
+        <div class="col-md-6 mb-3"><label for="emergency_contact_name" class="form-label">Emergency Contact Name</label><input type="text" class="form-control" id="emergency_contact_name" name="emergency_contact_name" value="{{ form.emergency_contact_name|default('') }}"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="emergency_contact_relationship" class="form-label">Emergency Contact Relationship</label><input type="text" class="form-control" id="emergency_contact_relationship" name="emergency_contact_relationship" value="{{ form.emergency_contact_relationship|default('') }}"></div>
+        <div class="col-md-6 mb-3"><label for="emergency_contact_phone" class="form-label">Emergency Contact Phone</label><input type="text" class="form-control" id="emergency_contact_phone" name="emergency_contact_phone" value="{{ form.emergency_contact_phone|default('') }}"></div>
+    </div>
+</div>
+
+<!-- Step 3: Insurance Information -->
+<div class="form-step" data-step="3">
+    <h5 class="mb-4 text-center">3. Insurance Information</h5>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="insurance_provider" class="form-label">Insurance Provider</label><input type="text" class="form-control" id="insurance_provider" name="insurance_provider" value="{{ form.insurance_provider|default('') }}"></div>
+        <div class="col-md-6 mb-3"><label for="insurance_policy_number" class="form-label">Policy Number</label><input type="text" class="form-control" id="insurance_policy_number" name="insurance_policy_number" value="{{ form.insurance_policy_number|default('') }}"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="coverage_details" class="form-label">Coverage Details</label><input type="text" class="form-control" id="coverage_details" name="coverage_details" value="{{ form.coverage_details|default('') }}"></div>
+        <div class="col-md-6 mb-3"><label for="validity_period" class="form-label">Validity Period</label><input type="text" class="form-control" id="validity_period" name="validity_period" value="{{ form.validity_period|default('') }}"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="primary_policy_holder" class="form-label">Primary Policy Holder</label><input type="text" class="form-control" id="primary_policy_holder" name="primary_policy_holder" value="{{ form.primary_policy_holder|default('') }}"></div>
+    </div>
+</div>
+
+<!-- Step 4: Medical History -->
+<div class="form-step" data-step="4">
+    <h5 class="mb-4 text-center">4. Medical History</h5>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="allergies" class="form-label">Allergies</label><input type="text" class="form-control" id="allergies" name="allergies" value="{{ form.allergies|default('') }}"></div>
+        <div class="col-md-6 mb-3"><label for="past_illnesses" class="form-label">Past Illnesses</label><input type="text" class="form-control" id="past_illnesses" name="past_illnesses" value="{{ form.past_illnesses|default('') }}"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="past_surgeries" class="form-label">Past Surgeries</label><input type="text" class="form-control" id="past_surgeries" name="past_surgeries" value="{{ form.past_surgeries|default('') }}"></div>
+        <div class="col-md-6 mb-3"><label for="current_medications" class="form-label">Current Medications</label><input type="text" class="form-control" id="current_medications" name="current_medications" value="{{ form.current_medications|default('') }}"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="family_history" class="form-label">Family History</label><input type="text" class="form-control" id="family_history" name="family_history" value="{{ form.family_history|default('') }}"></div>
+        <div class="col-md-6 mb-3"><label for="vaccination_status" class="form-label">Vaccination Status</label><input type="text" class="form-control" id="vaccination_status" name="vaccination_status" value="{{ form.vaccination_status|default('') }}"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="chronic_conditions" class="form-label">Chronic Conditions</label><input type="text" class="form-control" id="chronic_conditions" name="chronic_conditions" value="{{ form.chronic_conditions|default('') }}"></div>
+    </div>
+</div>
+
+<!-- Step 5: Lifestyle & Social History -->
+<div class="form-step" data-step="5">
+    <h5 class="mb-4 text-center">5. Lifestyle & Social History</h5>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="smoking_status" class="form-label">Smoking Status</label><input type="text" class="form-control" id="smoking_status" name="smoking_status" value="{{ form.smoking_status|default('') }}"></div>
+        <div class="col-md-6 mb-3"><label for="alcohol_use" class="form-label">Alcohol Use</label><input type="text" class="form-control" id="alcohol_use" name="alcohol_use" value="{{ form.alcohol_use|default('') }}"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="drug_use" class="form-label">Drug Use</label><input type="text" class="form-control" id="drug_use" name="drug_use" value="{{ form.drug_use|default('') }}"></div>
+        <div class="col-md-6 mb-3"><label for="exercise_habits" class="form-label">Exercise Habits</label><input type="text" class="form-control" id="exercise_habits" name="exercise_habits" value="{{ form.exercise_habits|default('') }}"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="diet_pattern" class="form-label">Diet Pattern</label><input type="text" class="form-control" id="diet_pattern" name="diet_pattern" value="{{ form.diet_pattern|default('') }}"></div>
+        <div class="col-md-6 mb-3"><label for="sleep_pattern" class="form-label">Sleep Pattern</label><input type="text" class="form-control" id="sleep_pattern" name="sleep_pattern" value="{{ form.sleep_pattern|default('') }}"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="stress_level" class="form-label">Stress Level</label><input type="text" class="form-control" id="stress_level" name="stress_level" value="{{ form.stress_level|default('') }}"></div>
+    </div>
+</div>
+
+<!-- Step 6: Reproductive / OB-GYN History -->
+<div class="form-step" data-step="6">
+    <h5 class="mb-4 text-center">6. Reproductive / OB-GYN History</h5>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="menstrual_cycle" class="form-label">Menstrual Cycle</label><input type="text" class="form-control" id="menstrual_cycle" name="menstrual_cycle" value="{{ form.menstrual_cycle|default('') }}"></div>
+        <div class="col-md-6 mb-3"><label for="last_menstrual_period" class="form-label">Last Menstrual Period</label><input type="date" class="form-control" id="last_menstrual_period" name="last_menstrual_period" value="{{ form.last_menstrual_period.strftime('%Y-%m-%d') if form and form.last_menstrual_period else '' }}"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="pregnancy_status" class="form-label">Pregnancy Status</label><input type="text" class="form-control" id="pregnancy_status" name="pregnancy_status" value="{{ form.pregnancy_status|default('') }}"></div>
+        <div class="col-md-6 mb-3"><label for="number_of_pregnancies" class="form-label">Number of Pregnancies</label><input type="number" class="form-control" id="number_of_pregnancies" name="number_of_pregnancies" value="{{ form.number_of_pregnancies|default('') }}"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="number_of_children" class="form-label">Number of Children</label><input type="number" class="form-control" id="number_of_children" name="number_of_children" value="{{ form.number_of_children|default('') }}"></div>
+        <div class="col-md-6 mb-3"><label for="contraceptive_use" class="form-label">Contraceptive Use</label><input type="text" class="form-control" id="contraceptive_use" name="contraceptive_use" value="{{ form.contraceptive_use|default('') }}"></div>
+    </div>
+</div>
+
+<!-- Step 7: Visit / Clinical Data -->
+<div class="form-step" data-step="7">
+    <h5 class="mb-4 text-center">7. Visit / Clinical Data</h5>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="reason_for_visit" class="form-label">Reason for Visit</label><input type="text" class="form-control" id="reason_for_visit" name="reason_for_visit" value="{{ form.reason_for_visit|default('') }}"></div>
+        <div class="col-md-6 mb-3"><label for="symptoms" class="form-label">Symptoms</label><input type="text" class="form-control" id="symptoms" name="symptoms" value="{{ form.symptoms|default('') }}"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="diagnosis" class="form-label">Diagnosis</label><input type="text" class="form-control" id="diagnosis" name="diagnosis" value="{{ form.diagnosis|default('') }}"></div>
+        <div class="col-md-6 mb-3"><label for="treatment_plan" class="form-label">Treatment Plan</label><input type="text" class="form-control" id="treatment_plan" name="treatment_plan" value="{{ form.treatment_plan|default('') }}"></div>
+    </div>
+    <div class="row">
+        <!-- doctor_assigned is intentionally hidden from patient -->
+        <div class="col-md-6 mb-3"><label for="visit_date" class="form-label">Visit Date</label><input type="date" class="form-control" id="visit_date" name="visit_date" value="{{ form.visit_date.strftime('%Y-%m-%d') if form and form.visit_date else '' }}"></div>
+        <div class="col-md-6 mb-3"><label for="next_appointment_date" class="form-label">Next Appointment Date</label><input type="date" class="form-control" id="next_appointment_date" name="next_appointment_date" value="{{ form.next_appointment_date.strftime('%Y-%m-%d') if form and form.next_appointment_date else '' }}"></div>
+    </div>
+</div>
+
+<!-- Step 8: Consent & Legal -->
+<div class="form-step" data-step="8">
+    <h5 class="mb-4 text-center">8. Consent & Legal</h5>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="consent_form_signed" class="form-label">Consent Form Signed</label><select class="form-select" id="consent_form_signed" name="consent_form_signed"><option value="">Select</option><option value="1" {% if form.consent_form_signed %}selected{% endif %}>Yes</option><option value="0" {% if form.consent_form_signed is not none and not form.consent_form_signed %}selected{% endif %}>No</option></select></div>
+        <div class="col-md-6 mb-3"><label for="consent_date" class="form-label">Consent Date</label><input type="date" class="form-control" id="consent_date" name="consent_date" value="{{ form.consent_date.strftime('%Y-%m-%d') if form and form.consent_date else '' }}"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="legal_guardian_name" class="form-label">Legal Guardian Name</label><input type="text" class="form-control" id="legal_guardian_name" name="legal_guardian_name" value="{{ form.legal_guardian_name|default('') }}"></div>
+        <div class="col-md-6 mb-3"><label for="guardian_relationship" class="form-label">Guardian Relationship</label><input type="text" class="form-control" id="guardian_relationship" name="guardian_relationship" value="{{ form.guardian_relationship|default('') }}"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label for="guardian_signature" class="form-label">Guardian Signature</label><input type="text" class="form-control" id="guardian_signature" name="guardian_signature" value="{{ form.guardian_signature|default('') }}"></div>
+    </div>
+</div>

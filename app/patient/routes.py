@@ -26,6 +26,199 @@ def clean_mobile_number(number):
 
 patient_bp = Blueprint('patient', __name__, template_folder='templates')
 
+from datetime import datetime
+from flask import render_template, request, redirect, url_for, flash, session
+from app import db  # Make sure to import your db instance
+from app.models import PatientIntakeForm # Import your model
+
+# ... (inside your patient blueprint)
+
+@patient_bp.route('/intake-form', methods=['GET', 'POST'])
+def patient_intake_form():
+    if 'user_id' not in session:
+        flash('Please log in to access the intake form.', 'warning')
+        return redirect(url_for('patient.patient_login'))
+
+    user_id_str = str(session['user_id'])
+    form_data = PatientIntakeForm.query.filter_by(created_by=user_id_str).first()
+
+    # Check edit mode
+    edit_mode = request.args.get("edit") == "1"
+
+    if request.method == 'POST':
+        if form_data:
+            form_to_update = form_data
+        else:
+            form_to_update = PatientIntakeForm(
+                created_by=user_id_str,
+                registration_date=datetime.utcnow(),
+                status='Active'
+            )
+
+        for key, value in request.form.items():
+            if not value:
+                value = None
+            if key == 'consent_form_signed':
+                setattr(form_to_update, key, True if value == "1" else False)
+                continue
+            if hasattr(form_to_update, key):
+                setattr(form_to_update, key, value)
+
+        if 'consent_form_signed' not in request.form:
+            form_to_update.consent_form_signed = False
+
+        try:
+            if not form_data:
+                db.session.add(form_to_update)
+            db.session.commit()
+            flash('Your information has been saved successfully!', 'success')
+            return redirect(url_for('patient.my_profile'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'An error occurred. Please try again. Error: {e}', 'danger')
+
+    return render_template('patient/intake_form_wizard.html', form=form_data, edit_mode=edit_mode)
+
+@patient_bp.route('/intake-form/download-pdf')
+def download_intake_form_pdf():
+    if 'user_id' not in session:
+        flash('Please log in to access the intake form.', 'warning')
+        return redirect(url_for('patient.patient_login'))
+
+    user_id_str = str(session['user_id'])
+    form = PatientIntakeForm.query.filter_by(created_by=user_id_str).first()
+    if not form:
+        flash('No intake form found.', 'danger')
+        return redirect(url_for('patient.patient_intake_form'))
+
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=40, leftMargin=40, topMargin=90, bottomMargin=60)
+    elements = []
+    styles = getSampleStyleSheet()
+    header_style = ParagraphStyle("Header", parent=styles["Title"], fontSize=20, textColor=colors.HexColor("#0d6efd"), alignment=1)
+    section_title = ParagraphStyle("SectionTitle", parent=styles["Heading2"], fontSize=13, textColor=colors.HexColor("#0d6efd"), spaceAfter=8, spaceBefore=16)
+    label_style = ParagraphStyle("Label", parent=styles["Normal"], fontSize=10, textColor=colors.HexColor("#495057"), leftIndent=0, spaceAfter=2)
+    value_style = ParagraphStyle("Value", parent=styles["Normal"], fontSize=10, textColor=colors.HexColor("#212529"), leftIndent=0, spaceAfter=6)
+
+    # Header
+    elements.append(Paragraph("Patient Intake Form Report", header_style))
+    elements.append(Spacer(1, 8))
+    elements.append(Paragraph("HelthCare+ | www.healthcareplus.com", styles["Normal"]))
+    elements.append(Spacer(1, 12))
+
+    def add_field(label, value):
+        elements.append(Paragraph(f"<b>{label}:</b>", label_style))
+        elements.append(Paragraph(str(value) if value else "-", value_style))
+
+    # Personal Information
+    elements.append(Paragraph("Personal Information", section_title))
+    add_field("First Name", form.first_name)
+    add_field("Last Name", form.last_name)
+    add_field("Date of Birth", form.date_of_birth.strftime('%Y-%m-%d') if form.date_of_birth else "")
+    add_field("Age", form.age)
+    add_field("Gender", form.gender)
+    add_field("Blood Group", form.blood_group)
+    add_field("National ID", form.national_id)
+    add_field("Marital Status", form.marital_status)
+    add_field("Occupation", form.occupation)
+    add_field("Education Level", form.education_level)
+    add_field("Language Preference", form.language_preference)
+
+    # Contact Details
+    elements.append(Paragraph("Contact Details", section_title))
+    add_field("Phone Number", form.phone_number)
+    add_field("Alternate Phone", form.alternate_phone)
+    add_field("Email Address", form.email_address)
+    add_field("Permanent Address", form.permanent_address)
+    add_field("Current Address", form.current_address)
+    add_field("Emergency Contact Name", form.emergency_contact_name)
+    add_field("Emergency Contact Relationship", form.emergency_contact_relationship)
+    add_field("Emergency Contact Phone", form.emergency_contact_phone)
+
+    # Insurance Information
+    elements.append(Paragraph("Insurance Information", section_title))
+    add_field("Insurance Provider", form.insurance_provider)
+    add_field("Policy Number", form.insurance_policy_number)
+    add_field("Coverage Details", form.coverage_details)
+    add_field("Validity Period", form.validity_period)
+    add_field("Primary Policy Holder", form.primary_policy_holder)
+
+    # Medical History
+    elements.append(Paragraph("Medical History", section_title))
+    add_field("Allergies", form.allergies)
+    add_field("Past Illnesses", form.past_illnesses)
+    add_field("Past Surgeries", form.past_surgeries)
+    add_field("Current Medications", form.current_medications)
+    add_field("Family History", form.family_history)
+    add_field("Vaccination Status", form.vaccination_status)
+    add_field("Chronic Conditions", form.chronic_conditions)
+
+    # Lifestyle & Social History
+    elements.append(Paragraph("Lifestyle & Social History", section_title))
+    add_field("Smoking Status", form.smoking_status)
+    add_field("Alcohol Use", form.alcohol_use)
+    add_field("Drug Use", form.drug_use)
+    add_field("Exercise Habits", form.exercise_habits)
+    add_field("Diet Pattern", form.diet_pattern)
+    add_field("Sleep Pattern", form.sleep_pattern)
+    add_field("Stress Level", form.stress_level)
+
+    # Reproductive / OB-GYN History
+    elements.append(Paragraph("Reproductive / OB-GYN History", section_title))
+    add_field("Menstrual Cycle", form.menstrual_cycle)
+    add_field("Last Menstrual Period", form.last_menstrual_period.strftime('%Y-%m-%d') if form.last_menstrual_period else "")
+    add_field("Pregnancy Status", form.pregnancy_status)
+    add_field("Number of Pregnancies", form.number_of_pregnancies)
+    add_field("Number of Children", form.number_of_children)
+    add_field("Contraceptive Use", form.contraceptive_use)
+
+    # Visit / Clinical Data
+    elements.append(Paragraph("Visit / Clinical Data", section_title))
+    add_field("Reason for Visit", form.reason_for_visit)
+    add_field("Symptoms", form.symptoms)
+    add_field("Diagnosis", form.diagnosis)
+    add_field("Treatment Plan", form.treatment_plan)
+    add_field("Doctor Assigned", form.doctor_assigned)
+    add_field("Visit Date", form.visit_date.strftime('%Y-%m-%d') if form.visit_date else "")
+    add_field("Next Appointment Date", form.next_appointment_date.strftime('%Y-%m-%d') if form.next_appointment_date else "")
+
+    # Consent & Legal
+    elements.append(Paragraph("Consent & Legal", section_title))
+    add_field("Consent Form Signed", "Yes" if form.consent_form_signed else "No")
+    add_field("Consent Date", form.consent_date.strftime('%Y-%m-%d') if form.consent_date else "")
+    add_field("Legal Guardian Name", form.legal_guardian_name)
+    add_field("Guardian Relationship", form.guardian_relationship)
+    add_field("Guardian Signature", form.guardian_signature)
+
+    # Administrative
+    elements.append(Paragraph("Administrative", section_title))
+    add_field("Registration Date", form.registration_date.strftime('%Y-%m-%d %H:%M') if form.registration_date else "")
+    add_field("Created By", form.created_by)
+    add_field("Last Updated", form.last_updated.strftime('%Y-%m-%d %H:%M') if form.last_updated else "")
+    add_field("Status", form.status)
+
+    # Footer (on every page)
+    def add_footer(canvas, doc):
+        width, height = letter
+        canvas.saveState()
+        canvas.setStrokeColor(colors.HexColor("#0d6efd"))
+        canvas.setLineWidth(0.5)
+        canvas.line(40, 50, width - 40, 50)
+        canvas.setFont("Helvetica", 9)
+        canvas.setFillColor(colors.gray)
+        canvas.drawCentredString(width / 2, 35, "HelthCare+ | www.healthcareplus.com | +91 98765 43210")
+        canvas.drawRightString(width - 40, 20, f"Generated on: {datetime.now().strftime('%d-%b-%Y %I:%M %p')}")
+        canvas.restoreState()
+
+    doc.build(elements, onFirstPage=add_footer, onLaterPages=add_footer)
+    buffer.seek(0)
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=f"intake_form_{form.id}.pdf",
+        mimetype="application/pdf"
+    )
+
 @patient_bp.route('/login')
 def patient_login():
     return render_template('patient/auth.html')

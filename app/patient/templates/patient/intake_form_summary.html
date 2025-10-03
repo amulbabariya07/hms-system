@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .summary-card {
+        border-radius: 15px;
+        border: none;
+    }
+    .summary-header {
+        background: linear-gradient(45deg, #0d6efd, #0d95fd);
+        color: white;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+    .summary-section {
+        border: 1px solid #e9ecef;
+        border-left: 4px solid #0d6efd;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 1.5rem;
+        background: #ffffff;
+    }
+    .summary-section h5 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #343a40;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+    .summary-section h5 .fas {
+        color: #0d6efd;
+        margin-right: 12px;
+        font-size: 1.3rem;
+    }
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #f1f3f5;
+        flex-wrap: wrap; /* For responsiveness */
+    }
+    .summary-item:last-child {
+        border-bottom: none;
+    }
+    .summary-label {
+        font-weight: 500;
+        color: #6c757d;
+        flex-basis: 40%;
+    }
+    .summary-value {
+        font-weight: 400;
+        color: #212529;
+        text-align: right;
+        flex-basis: 60%;
+    }
+    .summary-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    /* Print-friendly styles */
+    @media print {
+        body {
+            background-color: #fff;
+        }
+        .container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .summary-card {
+            box-shadow: none !important;
+            border: 1px solid #dee2e6;
+        }
+        .summary-header, .summary-actions {
+            display: none !important;
+        }
+        .card-body {
+            padding: 0 !important;
+        }
+        .summary-section {
+            border: 1px solid #dee2e6;
+            box-shadow: none;
+            page-break-inside: avoid;
+        }
+    }
+</style>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-12 col-lg-9">
+            <div class="card shadow-lg summary-card">
+                <div class="card-header summary-header text-white text-center d-flex justify-content-between align-items-center p-3">
+                    <h4 class="mb-0 flex-grow-1"><i class="fas fa-clipboard-list me-2"></i>Patient Intake Form Summary</h4>
+                    <div>
+                        <a href="#" onclick="window.print();return false;" title="Print" class="btn btn-light btn-sm me-2">
+                            <i class="fas fa-print me-1"></i> Print
+                        </a>
+                        <a href="{{ url_for('patient.download_intake_form_pdf') }}" title="Download PDF" class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-file-pdf me-1"></i> Download PDF
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    {% if form %}
+
+                        <!-- Personal Information -->
+                        <div class="summary-section">
+                            <h5><i class="fas fa-user-circle"></i>Personal Information</h5>
+                            <div class="summary-item"><span class="summary-label">First Name</span><span class="summary-value">{{ form.first_name or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Last Name</span><span class="summary-value">{{ form.last_name or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Date of Birth</span><span class="summary-value">{{ form.date_of_birth.strftime('%B %d, %Y') if form.date_of_birth else 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Age</span><span class="summary-value">{{ form.age or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Gender</span><span class="summary-value">{{ form.gender or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Blood Group</span><span class="summary-value">{{ form.blood_group or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">National ID</span><span class="summary-value">{{ form.national_id or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Marital Status</span><span class="summary-value">{{ form.marital_status or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Occupation</span><span class="summary-value">{{ form.occupation or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Education Level</span><span class="summary-value">{{ form.education_level or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Language Preference</span><span class="summary-value">{{ form.language_preference or 'N/A' }}</span></div>
+                        </div>
+
+                        <!-- Contact Details -->
+                        <div class="summary-section">
+                            <h5><i class="fas fa-address-card"></i>Contact Details</h5>
+                            <div class="summary-item"><span class="summary-label">Phone Number</span><span class="summary-value">{{ form.phone_number or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Alternate Phone</span><span class="summary-value">{{ form.alternate_phone or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Email Address</span><span class="summary-value">{{ form.email_address or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Permanent Address</span><span class="summary-value">{{ form.permanent_address or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Current Address</span><span class="summary-value">{{ form.current_address or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Emergency Contact Name</span><span class="summary-value">{{ form.emergency_contact_name or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Emergency Contact Relationship</span><span class="summary-value">{{ form.emergency_contact_relationship or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Emergency Contact Phone</span><span class="summary-value">{{ form.emergency_contact_phone or 'N/A' }}</span></div>
+                        </div>
+
+                        <!-- Insurance Information -->
+                        <div class="summary-section">
+                            <h5><i class="fas fa-shield-alt"></i>Insurance Information</h5>
+                            <div class="summary-item"><span class="summary-label">Insurance Provider</span><span class="summary-value">{{ form.insurance_provider or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Policy Number</span><span class="summary-value">{{ form.insurance_policy_number or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Coverage Details</span><span class="summary-value">{{ form.coverage_details or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Validity Period</span><span class="summary-value">{{ form.validity_period or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Primary Policy Holder</span><span class="summary-value">{{ form.primary_policy_holder or 'N/A' }}</span></div>
+                        </div>
+
+                        <!-- Medical History -->
+                        <div class="summary-section">
+                            <h5><i class="fas fa-heartbeat"></i>Medical History</h5>
+                            <div class="summary-item"><span class="summary-label">Allergies</span><span class="summary-value">{{ form.allergies or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Past Illnesses</span><span class="summary-value">{{ form.past_illnesses or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Past Surgeries</span><span class="summary-value">{{ form.past_surgeries or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Current Medications</span><span class="summary-value">{{ form.current_medications or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Family History</span><span class="summary-value">{{ form.family_history or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Vaccination Status</span><span class="summary-value">{{ form.vaccination_status or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Chronic Conditions</span><span class="summary-value">{{ form.chronic_conditions or 'N/A' }}</span></div>
+                        </div>
+
+                        <!-- Lifestyle & Social History -->
+                        <div class="summary-section">
+                            <h5><i class="fas fa-walking"></i>Lifestyle & Social History</h5>
+                            <div class="summary-item"><span class="summary-label">Smoking Status</span><span class="summary-value">{{ form.smoking_status or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Alcohol Use</span><span class="summary-value">{{ form.alcohol_use or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Drug Use</span><span class="summary-value">{{ form.drug_use or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Exercise Habits</span><span class="summary-value">{{ form.exercise_habits or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Diet Pattern</span><span class="summary-value">{{ form.diet_pattern or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Sleep Pattern</span><span class="summary-value">{{ form.sleep_pattern or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Stress Level</span><span class="summary-value">{{ form.stress_level or 'N/A' }}</span></div>
+                        </div>
+
+                        <!-- Reproductive / OB-GYN History -->
+                        <div class="summary-section">
+                            <h5><i class="fas fa-venus-mars"></i>Reproductive / OB-GYN History</h5>
+                            <div class="summary-item"><span class="summary-label">Menstrual Cycle</span><span class="summary-value">{{ form.menstrual_cycle or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Last Menstrual Period</span><span class="summary-value">{{ form.last_menstrual_period.strftime('%B %d, %Y') if form.last_menstrual_period else 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Pregnancy Status</span><span class="summary-value">{{ form.pregnancy_status or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Number of Pregnancies</span><span class="summary-value">{{ form.number_of_pregnancies or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Number of Children</span><span class="summary-value">{{ form.number_of_children or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Contraceptive Use</span><span class="summary-value">{{ form.contraceptive_use or 'N/A' }}</span></div>
+                        </div>
+
+                        <!-- Visit / Clinical Data -->
+                        <div class="summary-section">
+                            <h5><i class="fas fa-stethoscope"></i>Visit / Clinical Data</h5>
+                            <div class="summary-item"><span class="summary-label">Reason for Visit</span><span class="summary-value">{{ form.reason_for_visit or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Symptoms</span><span class="summary-value">{{ form.symptoms or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Diagnosis</span><span class="summary-value">{{ form.diagnosis or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Treatment Plan</span><span class="summary-value">{{ form.treatment_plan or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Doctor Assigned</span><span class="summary-value">{{ form.doctor_assigned or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Visit Date</span><span class="summary-value">{{ form.visit_date.strftime('%B %d, %Y') if form.visit_date else 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Next Appointment Date</span><span class="summary-value">{{ form.next_appointment_date.strftime('%B %d, %Y') if form.next_appointment_date else 'N/A' }}</span></div>
+                        </div>
+
+                        <!-- Consent & Legal -->
+                        <div class="summary-section">
+                            <h5><i class="fas fa-file-signature"></i>Consent & Legal</h5>
+                            <div class="summary-item"><span class="summary-label">Consent Form Signed</span><span class="summary-value">{{ 'Yes' if form.consent_form_signed else 'No' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Consent Date</span><span class="summary-value">{{ form.consent_date.strftime('%B %d, %Y') if form.consent_date else 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Legal Guardian Name</span><span class="summary-value">{{ form.legal_guardian_name or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Guardian Relationship</span><span class="summary-value">{{ form.guardian_relationship or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Guardian Signature</span><span class="summary-value">{{ form.guardian_signature or 'N/A' }}</span></div>
+                        </div>
+
+                        <!-- Administrative -->
+                        <div class="summary-section">
+                            <h5><i class="fas fa-cog"></i>Administrative</h5>
+                            <div class="summary-item"><span class="summary-label">Registration Date</span><span class="summary-value">{{ form.registration_date.strftime('%B %d, %Y %I:%M %p') if form.registration_date else 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Created By</span><span class="summary-value">{{ form.created_by or 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Last Updated</span><span class="summary-value">{{ form.last_updated.strftime('%B %d, %Y %I:%M %p') if form.last_updated else 'N/A' }}</span></div>
+                            <div class="summary-item"><span class="summary-label">Status</span><span class="summary-value">{{ form.status or 'N/A' }}</span></div>
+                        </div>
+
+                        <div class="summary-actions">
+                            <a href="{{ url_for('patient.my_profile') }}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i> Back to Profile</a>
+                            <a href="{{ url_for('patient.patient_intake_form', edit=1) }}" class="btn btn-primary"><i class="fas fa-edit me-2"></i> Edit Information</a>
+                        </div>
+
+                    {% else %}
+                        <div class="alert alert-warning text-center">
+                            <i class="fas fa-exclamation-triangle me-2"></i>No intake form data could be found.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
