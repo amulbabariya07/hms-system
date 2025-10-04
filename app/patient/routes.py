@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, send_file, abort, make_response
 from app import db
-from app.models import User, Doctor, Appointment, MedicalPrescription, MailSetting, Payment, Specialization
+from app.models import User, Doctor, Appointment, MedicalPrescription,PatientIntakeForm, MailSetting, Payment, Specialization
+from sqlalchemy.orm import joinedload
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, time
 import re
@@ -26,12 +27,92 @@ def clean_mobile_number(number):
 
 patient_bp = Blueprint('patient', __name__, template_folder='templates')
 
-from datetime import datetime
-from flask import render_template, request, redirect, url_for, flash, session
-from app import db  # Make sure to import your db instance
-from app.models import PatientIntakeForm # Import your model
+@patient_bp.route('/timeline/download-report')
+def download_timeline_report():
+    if 'user_id' not in session:
+        flash('Please login first.', 'warning')
+        return redirect(url_for('patient.patient_login'))
 
-# ... (inside your patient blueprint)
+    patient_id = session['user_id']
+    appointments = Appointment.query.options(
+        joinedload(Appointment.doctor).joinedload(Doctor.specialization),
+        joinedload(Appointment.prescriptions).joinedload(MedicalPrescription.medicines)
+    ).filter_by(patient_id=patient_id).order_by(Appointment.appointment_date.desc(), Appointment.appointment_time.desc()).all()
+
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=50, bottomMargin=30)
+    elements = []
+    styles = getSampleStyleSheet()
+    header_style = ParagraphStyle("Header", parent=styles["Title"], fontSize=20, textColor=colors.HexColor("#0d6efd"), alignment=1)
+    section_title = ParagraphStyle("SectionTitle", parent=styles["Heading2"], fontSize=13, textColor=colors.HexColor("#0d6efd"), spaceAfter=8, spaceBefore=16)
+    label_style = ParagraphStyle("Label", parent=styles["Normal"], fontSize=10, textColor=colors.HexColor("#495057"), leftIndent=0, spaceAfter=2)
+    value_style = ParagraphStyle("Value", parent=styles["Normal"], fontSize=10, textColor=colors.HexColor("#212529"), leftIndent=0, spaceAfter=6)
+
+    # Header
+    elements.append(Paragraph("Patient Timeline Report", header_style))
+    elements.append(Spacer(1, 8))
+    elements.append(Paragraph("HelthCare+ | www.healthcareplus.com", styles["Normal"]))
+    elements.append(Spacer(1, 12))
+
+    # Timeline visual design
+    for idx, appt in enumerate(appointments):
+        # Draw a card-like box for each appointment
+        card = []
+        card.append(Paragraph(f"<b>Date:</b> <font color='#0d6efd'>{appt.appointment_date.strftime('%d %b %Y')} {appt.appointment_time.strftime('%I:%M %p') if appt.appointment_time else ''}</font>", label_style))
+        card.append(Paragraph(f"<b>Status:</b> <font color='#17a2b8'>{appt.status.capitalize()}</font>", value_style))
+        card.append(Paragraph(f"<b>Doctor:</b> Dr. {appt.doctor.full_name} ({appt.doctor.specialization.name if appt.doctor.specialization else 'N/A'})", value_style))
+        card.append(Paragraph(f"<b>Department:</b> {appt.doctor.specialization.name if appt.doctor.specialization else 'N/A'}", value_style))
+        card.append(Paragraph(f"<b>Reason:</b> {appt.reason or 'N/A'}", value_style))
+        if appt.prescriptions:
+            pres = appt.prescriptions[0]
+            card.append(Paragraph(f"<b>Prescription Date:</b> <font color='#198754'>{pres.created_at.strftime('%d %b %Y')}</font>", value_style))
+            if pres.instructions:
+                card.append(Paragraph(f"<b>Instructions:</b> {pres.instructions}", value_style))
+            if pres.medicines:
+                data = [["Name", "Type", "Dosage", "Frequency", "Days", "Timing", "Quantity", "Notes"]]
+                for med in pres.medicines:
+                    data.append([
+                        med.name, med.type, med.dosage, med.frequency,
+                        med.days, med.timing, med.quantity or "-", med.notes or "-"
+                    ])
+                table = Table(data, repeatRows=1, colWidths=[1.2*inch, 0.9*inch, 0.8*inch, 0.9*inch, 0.7*inch, 0.9*inch, 0.9*inch, 1.2*inch])
+                table.setStyle(TableStyle([
+                    ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#0d6efd")),
+                    ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+                    ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+                    ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0,0), (-1,-1), 9),
+                    ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+                    ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.whitesmoke, colors.lightgrey]),
+                ]))
+                card.append(table)
+        # Card border and spacing
+        card_box = Table([[card]], colWidths=[6.5*inch])
+        card_box.setStyle(TableStyle([
+            ('BOX', (0,0), (-1,-1), 1.2, colors.HexColor('#0d6efd')),
+            ('BACKGROUND', (0,0), (-1,-1), colors.whitesmoke),
+            ('LEFTPADDING', (0,0), (-1,-1), 16),
+            ('RIGHTPADDING', (0,0), (-1,-1), 16),
+            ('TOPPADDING', (0,0), (-1,-1), 12),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 12),
+        ]))
+        # Add timeline dot and vertical line using a Spacer and a colored circle (simulate visually)
+        if idx > 0:
+            elements.append(Spacer(1, 8))
+            # Simulate vertical line between cards
+            elements.append(Paragraph("<font color='#0d6efd'>|</font>", ParagraphStyle('Line', fontSize=18, alignment=1)))
+            elements.append(Spacer(1, 2))
+        # Simulate timeline dot
+        elements.append(Paragraph("<font color='#0d6efd'>&#9679;</font>", ParagraphStyle('Dot', fontSize=16, alignment=1)))
+        elements.append(card_box)
+        elements.append(Spacer(1, 10))
+
+    # Only call doc.build once, after all elements are added
+    buffer.seek(0)
+    response = make_response(buffer.read())
+    response.headers['Content-Disposition'] = 'attachment; filename=patient_timeline_report.pdf'
+    response.headers['Content-Type'] = 'application/pdf'
+    return response
 
 @patient_bp.route('/intake-form', methods=['GET', 'POST'])
 def patient_intake_form():
@@ -295,14 +376,29 @@ def patient_home():
         flash('Please login to access this page.', 'warning')
         return redirect(url_for('patient.patient_login'))
     
-    return render_template('patient/home.html', user_name=session.get('user_name'))
+    # Intake form prompt logic
+    show_intake_prompt = False
+    if 'user_id' in session:
+        from app.models import PatientIntakeForm
+        user_id_str = str(session['user_id'])
+        intake_form = PatientIntakeForm.query.filter_by(created_by=user_id_str).first()
+        if not intake_form:
+            show_intake_prompt = True
+    return render_template('patient/home.html', user_name=session.get('user_name'), show_intake_prompt=show_intake_prompt)
 
 @patient_bp.route('/book-appointment')
 def book_appointment():
     if 'user_id' not in session:
         flash('Please login to book an appointment.', 'warning')
         return redirect(url_for('patient.patient_login'))
-    
+    # Intake form prompt logic
+    show_intake_prompt = False
+    if 'user_id' in session:
+        from app.models import PatientIntakeForm
+        user_id_str = str(session['user_id'])
+        intake_form = PatientIntakeForm.query.filter_by(created_by=user_id_str).first()
+        if not intake_form:
+            show_intake_prompt = True
     # Get all specializations
     from app.models import Specialization
     specializations = Specialization.query.all()
@@ -314,7 +410,8 @@ def book_appointment():
                          doctors=doctors, 
                          specializations=specializations,
                          selected_specialization_id=specialization_id,
-                         user_name=session.get('user_name'))
+                         user_name=session.get('user_name'),
+                         show_intake_prompt=show_intake_prompt)
 @patient_bp.route('/get-doctors-by-specialization', methods=['GET'])
 def get_doctors_by_specialization():
     specialization_id = request.args.get('specialization_id', type=int)
@@ -523,15 +620,37 @@ def my_appointments():
     if 'user_id' not in session:
         flash('Please login to view your appointments.', 'warning')
         return redirect(url_for('patient.patient_login'))
-    
+    # Intake form prompt logic
+    show_intake_prompt = False
+    if 'user_id' in session:
+        from app.models import PatientIntakeForm
+        user_id_str = str(session['user_id'])
+        intake_form = PatientIntakeForm.query.filter_by(created_by=user_id_str).first()
+        if not intake_form:
+            show_intake_prompt = True
     # Get all appointments for the current user
     appointments = Appointment.query.filter_by(patient_id=session['user_id'])\
                                   .order_by(Appointment.appointment_date.desc(), 
                                           Appointment.appointment_time.desc()).all()
-    
+
+    # Compute display status for each appointment
+    today = datetime.utcnow().date()
+    for appt in appointments:
+        if appt.status == 'cancelled':
+            appt.display_status = 'Cancelled'
+        elif appt.status == 'completed':
+            appt.display_status = 'Appointment Done'
+        elif appt.appointment_date == today:
+            appt.display_status = 'Today Scheduled'
+        elif appt.status == 'scheduled':
+            appt.display_status = 'Appointment Booked'
+        else:
+            appt.display_status = appt.status.capitalize()
+
     return render_template('patient/my_appointments.html', 
                          appointments=appointments,
-                         user_name=session.get('user_name'))
+                         user_name=session.get('user_name'),
+                         show_intake_prompt=show_intake_prompt)
 
 @patient_bp.route('/cancel-appointment/<int:appointment_id>')
 def cancel_appointment(appointment_id):
@@ -570,10 +689,30 @@ def my_profile():
     if 'user_id' not in session:
         flash('Please login to view your profile.', 'warning')
         return redirect(url_for('patient.patient_login'))
-
+    # Intake form prompt logic
+    show_intake_prompt = False
+    if 'user_id' in session:
+        from app.models import PatientIntakeForm
+        user_id_str = str(session['user_id'])
+        intake_form = PatientIntakeForm.query.filter_by(created_by=user_id_str).first()
+        if not intake_form:
+            show_intake_prompt = True
     patient = User.query.get(session['user_id'])
-    return render_template('patient/my_profile.html', patient=patient)
+    return render_template('patient/my_profile.html', patient=patient, show_intake_prompt=show_intake_prompt)
 
+@patient_bp.route('/timeline')
+def patient_timeline():
+    if 'user_id' not in session:
+        flash('Please login first.', 'warning')
+        return redirect(url_for('patient.patient_login'))
+
+    patient_id = session['user_id']
+    appointments = Appointment.query.options(
+        joinedload(Appointment.doctor).joinedload(Doctor.specialization),
+        joinedload(Appointment.prescriptions).joinedload(MedicalPrescription.medicines)
+    ).filter_by(patient_id=patient_id).order_by(Appointment.appointment_date.desc(), Appointment.appointment_time.desc()).all()
+
+    return render_template('patient/patient_timeline.html', appointments=appointments)
 
 @patient_bp.route('/update-profile', methods=['POST'])
 def update_profile():

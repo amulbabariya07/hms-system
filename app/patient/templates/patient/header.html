@@ -48,3 +48,51 @@
         </div>
     </div>
 </nav>
+
+{# Intake Form Prompt (top right, persistent, below navbar) #}
+{% if show_intake_prompt %}
+<style>
+    .intake-form-prompt-fixed {
+        position: fixed;
+        top: 80px; /* below navbar (navbar is usually ~56-64px) */
+        right: 32px;
+        z-index: 2000;
+        background: linear-gradient(90deg, #e0eafc 0%, #cfdef3 100%);
+        color: #0d6efd;
+        border: 2px solid #0d6efd;
+        border-radius: 2rem;
+        padding: 0.75rem 2rem 0.75rem 1.5rem;
+        box-shadow: 0 4px 24px rgba(13,110,253,0.08);
+        font-weight: 600;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        animation: intakePromptSlideIn 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    @media (max-width: 768px) {
+        .intake-form-prompt-fixed {
+            right: 8px;
+            left: 8px;
+            top: 72px;
+            border-radius: 1.2rem;
+            font-size: 1rem;
+            padding: 0.7rem 1.2rem 0.7rem 1rem;
+        }
+    }
+    @keyframes intakePromptSlideIn {
+        from { opacity: 0; transform: translateY(-30px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .intake-form-prompt-fixed .btn {
+        margin-left: 1rem;
+        font-size: 1rem;
+        padding: 0.4rem 1.2rem;
+    }
+</style>
+<div class="intake-form-prompt-fixed">
+    <i class="fas fa-exclamation-circle fa-lg"></i>
+    Please fill up your intake form
+    <a href="{{ url_for('patient.patient_intake_form') }}" class="btn btn-primary btn-sm rounded-pill ms-2">Fill Now</a>
+</div>
+{% endif %}

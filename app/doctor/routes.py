@@ -10,6 +10,32 @@ def clean_mobile_number(number):
 
 doctor_bp = Blueprint('doctor', __name__, template_folder='templates')
 
+@doctor_bp.route('/prescription/<int:prescription_id>/view', methods=['GET'])
+def view_prescription_readonly(prescription_id):
+    from app.models import MedicalPrescription, Medicine, Doctor
+    pres = MedicalPrescription.query.get_or_404(prescription_id)
+    doctor_id = session.get('doctor_id')
+    if not doctor_id or (pres.doctor_id != doctor_id and pres.appointment.doctor_id != doctor_id):
+        return "Unauthorized", 403
+    medicines = pres.medicines
+    doctor = pres.doctor
+    appointment = pres.appointment
+    return render_template('doctor/prescription_readonly.html', prescription=pres, medicines=medicines, doctor=doctor, appointment=appointment)
+
+@doctor_bp.route('/patient/<int:patient_id>/timeline')
+def patient_timeline(patient_id):
+    from app.models import Appointment
+    appointments = (
+        Appointment.query
+        .filter_by(patient_id=patient_id)
+        .order_by(Appointment.appointment_date.desc(), Appointment.appointment_time.desc())
+        .all()
+    )
+    return render_template(
+        'doctor/patient_timeline.html',
+        appointments=appointments
+    )
+
 @doctor_bp.route('/login')
 def doctor_login():
     if 'doctor_logged_in' in session:
@@ -133,7 +159,7 @@ def doctor_appointments():
         return redirect(url_for('doctor.doctor_login'))
     
     doctor_id = session['doctor_id']
-    view_type = request.args.get('view', 'list')  # list or kanban
+    view_type = request.args.get('view', 'kanban')  # default to kanban, can be 'list' or 'kanban'
     selected_date = request.args.get('date', date.today().strftime('%Y-%m-%d'))
     search_query = request.args.get('search', '')
     
@@ -157,20 +183,33 @@ def doctor_appointments():
         )
     
     appointments = appointments_query.order_by(Appointment.appointment_time).all()
-    
-    # Get statistics
+
+    # Compute display status for each appointment
     today = date.today()
+    for appt in appointments:
+        if appt.status == 'cancelled':
+            appt.display_status = 'Cancelled'
+        elif appt.status == 'completed':
+            appt.display_status = 'Appointment Done'
+        elif appt.appointment_date == today:
+            appt.display_status = 'Today Scheduled'
+        elif appt.status == 'scheduled':
+            appt.display_status = 'Appointment Booked'
+        else:
+            appt.display_status = appt.status.title()
+
+    # Get statistics
     today_appointments = Appointment.query.filter_by(doctor_id=doctor_id, appointment_date=today).count()
     total_appointments = Appointment.query.filter_by(doctor_id=doctor_id).count()
     completed_appointments = Appointment.query.filter_by(doctor_id=doctor_id, status='completed').count()
-    
+
     stats = {
         'today': today_appointments,
         'total': total_appointments,
         'completed': completed_appointments,
         'pending': total_appointments - completed_appointments
     }
-    
+
     return render_template('doctor/appointments.html', 
                          appointments=appointments,
                          stats=stats,

@@ -74,7 +74,7 @@
                     </div>
 
                     <div class="appointment-actions">
-                        <span class="status-badge status-{{ appointment.status }}-badge">{{ appointment.status|capitalize }}</span>
+                        <span class="status-badge status-{{ appointment.status }}-badge">{{ appointment.display_status }}</span>
                         {% if appointment.status == 'scheduled' %}
                         <button class="btn btn-sm btn-outline-danger mt-3" onclick="cancelAppointment({{ appointment.id }})">
                             <i class="fas fa-times me-1"></i> Cancel
@@ -387,4 +387,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+{% include 'patient/footer.html' %}
 {% endblock %}

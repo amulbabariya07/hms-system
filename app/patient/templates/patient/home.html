@@ -214,39 +214,19 @@
     </div>
 </section>
 
-<footer class="footer-primary pt-5 pb-4">
-    <div class="container text-center text-md-start">
-        <div class="row text-center text-md-start">
-            <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
-                <h5 class="text-uppercase mb-4 fw-bold text-white">HMS Portal</h5>
-                <p class="text-white-50">Committed to pioneering healthcare through technology and compassionate patient care.</p>
-            </div>
-            <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
-                <h5 class="text-uppercase mb-4 fw-bold text-white-50">Links</h5>
-                <p><a href="#">Appointments</a></p>
-                <p><a href="#">Find a Doctor</a></p>
-                <p><a href="#">Services</a></p>
-            </div>
-            <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
-                <h5 class="text-uppercase mb-4 fw-bold text-white-50">Contact</h5>
-                <p class="text-white-50"><i class="fas fa-envelope me-3"></i>info@hospital.com</p>
-                <p class="text-white-50"><i class="fas fa-phone me-3"></i>+1 (555) 123-4567</p>
-            </div>
-        </div>
-        <hr class="my-4 border-light border-opacity-25">
-        <div class="row align-items-center">
-            <div class="col-md-7 col-lg-8">
-                <p class="text-white-50">© 2025 Hospital Management System. All rights reserved.</p>
-            </div>
-            <div class="col-md-5 col-lg-4">
-                <div class="text-center text-md-end">
-                    <a href="#" class="me-3 fs-4"><i class="fab fa-facebook"></i></a>
-                    <a href="#" class="me-3 fs-4"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="fs-4"><i class="fab fa-linkedin-in"></i></a>
-                </div>
+{% if show_intake_prompt %}
+<div id="intakePrompt" style="position:fixed;bottom:32px;right:32px;z-index:9999;">
+    <div class="card shadow-lg border-warning border-2" style="min-width:270px;max-width:320px;background:#fffbe6;">
+        <div class="card-body d-flex align-items-center">
+            <i class="fas fa-clipboard-list fa-2x text-warning me-3"></i>
+            <div>
+                <div class="fw-bold text-dark mb-1">Please fill up intake form</div>
+                <a href="{{ url_for('patient.patient_intake_form') }}" class="btn btn-warning btn-sm mt-1">Fill Now</a>
             </div>
         </div>
     </div>
-</footer>
+</div>
+{% endif %}
+{% include 'patient/footer.html' %}
 
 {% endblock %}

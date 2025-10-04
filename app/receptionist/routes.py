@@ -207,6 +207,19 @@ def receptionist_appointments():
         appointments = Appointment.query.all() if Appointment else []
     except:
         appointments = []
+    # Compute display status for each appointment
+    today = datetime.now().date()
+    for appt in appointments:
+        if appt.status == 'cancelled':
+            appt.display_status = 'Cancelled'
+        elif appt.status == 'completed':
+            appt.display_status = 'Appointment Done'
+        elif appt.appointment_date == today:
+            appt.display_status = 'Today Scheduled'
+        elif appt.status == 'scheduled':
+            appt.display_status = 'Appointment Booked'
+        else:
+            appt.display_status = appt.status.title()
     return render_template('receptionist/appointments.html', appointments=appointments)
 
 @receptionist_bp.route('/appointments/create', methods=['GET', 'POST'])

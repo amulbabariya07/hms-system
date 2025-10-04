@@ -11,6 +11,19 @@ def admin_appointments():
         return redirect(url_for('admin.admin_login'))
     
     appointments = Appointment.query.order_by(Appointment.created_at.desc()).all()
+    # Compute display status for each appointment
+    today = datetime.now().date()
+    for appt in appointments:
+        if appt.status == 'cancelled':
+            appt.display_status = 'Cancelled'
+        elif appt.status == 'completed':
+            appt.display_status = 'Appointment Done'
+        elif appt.appointment_date == today:
+            appt.display_status = 'Today Scheduled'
+        elif appt.status == 'scheduled':
+            appt.display_status = 'Appointment Booked'
+        else:
+            appt.display_status = appt.status.title()
     return render_template('admin/appointments.html', appointments=appointments)
 
 @admin_bp.route('/appointments/update-status/<int:appointment_id>', methods=['POST'])

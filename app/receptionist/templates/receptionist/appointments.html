@@ -49,7 +49,7 @@
                                 <td>{{ appointment.symptoms if appointment.symptoms else 'N/A' }}</td>
                                 <td>
                                     <span class="badge bg-{{ 'success' if appointment.status == 'completed' else ('warning' if appointment.status == 'scheduled' else 'danger') }}">
-                                        {{ appointment.status.title() }}
+                                        {{ appointment.display_status }}
                                     </span>
                                 </td>
                                 <td>

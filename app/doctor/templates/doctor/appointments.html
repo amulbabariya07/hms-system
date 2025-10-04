@@ -185,7 +185,13 @@
                                     </td>
                                     <td>
                                         <div class="patient-info">
-                                            <div class="fw-bold">{{ appointment.user.full_name if appointment.user else 'N/A' }}</div>
+                                            <div class="fw-bold">{{ appointment.user.full_name if appointment.user else 'N/A' }}
+                                                {% if appointment.user %}
+                                                <a href="{{ url_for('doctor.patient_timeline', patient_id=appointment.user.id) }}" class="btn btn-outline-primary btn-sm ms-2" title="Patient Timeline">
+                                                    <i class="fas fa-stream"></i> Timeline
+                                                </a>
+                                                {% endif %}
+                                            </div>
                                             <small class="text-muted">
                                                 {% if appointment.user %}
                                                     {{ appointment.user.age }} years, {{ appointment.user.gender }}
@@ -208,19 +214,22 @@
                                     </td>
                                     <td>
                                         <span class="badge bg-{{ 'success' if appointment.status == 'completed' else ('warning' if appointment.status == 'scheduled' else 'danger') }} status-badge">
-                                            {{ appointment.status.title() }}
+                                            {{ appointment.display_status }}
                                         </span>
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
+                                            <!-- Rx Button -->
+                                            <button class="btn btn-sm btn-outline-success" onclick="openPrescriptionModal({{ appointment.id }})" title="Rx (Prescription)">
+                                                <i class="fa-solid fa-prescription"></i>
+                                            </button>
+                                            <!-- View Button -->
                                             <button class="btn btn-sm btn-outline-primary" onclick="viewAppointment({{ appointment.id }})" title="View Details">
                                                 <i class="fas fa-eye"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-outline-success" onclick="openPrescriptionModal({{ appointment.id }})" title="Add Prescription">
-                                                <i class="fa-solid fa-prescription"></i>
-                                            </button>
+                                            <!-- Update Status Dropdown -->
                                             <div class="btn-group" role="group">
-                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" title="Update Status">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                                 <ul class="dropdown-menu">
@@ -229,6 +238,12 @@
                                                     <li><a class="dropdown-item" href="#" onclick="updateStatus({{ appointment.id }}, 'cancelled')">Mark Cancelled</a></li>
                                                 </ul>
                                             </div>
+                                            <!-- Patient Timeline Button -->
+                                            {% if appointment.user %}
+                                            <button class="btn btn-sm btn-outline-success" onclick="openTimelineModal('{{ appointment.user.id }}')" title="Patient Timeline View">
+                                                <i class="fa-solid fa-timeline"></i>
+                                            </button>
+                                            {% endif %}
                                         </div>
                                     </td>
                                 </tr>
@@ -248,27 +263,36 @@
                                 </div>
                                 <div class="kanban-body bg-light p-3 rounded-bottom">
                                     {% for appointment in appointments if appointment.status == 'scheduled' %}
-                                    <div class="kanban-card bg-white rounded-3 p-3 mb-3 shadow-sm">
+                                    <div class="kanban-card bg-primary-subtle rounded-3 p-3 mb-3 shadow-lg">
                                         <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <div class="time-badge bg-warning text-white px-2 py-1 rounded-pill small">
+                                            <div class="time-badge bg-warning text-dark px-2 py-1 rounded-pill small">
                                                 {{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}
                                             </div>
-                                            <div class="dropdown">
-                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                                                    <i class="fas fa-ellipsis-v"></i>
+                                            <div class="btn-group" role="group">
+                                                <button class="btn btn-sm btn-outline-success" onclick="openPrescriptionModal('{{ appointment.id }}')" title="Rx (Prescription)">
+                                                    <i class="fa-solid fa-prescription"></i>
                                                 </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="#" onclick="viewAppointment({{ appointment.id }})">View Details</a></li>
-                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus({{ appointment.id }}, 'completed')">Mark Completed</a></li>
-                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus({{ appointment.id }}, 'cancelled')">Cancel</a></li>
-                                                </ul>
+                                                </button>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-primary" onclick="viewAppointment('{{ appointment.id }}')" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <div class="btn-group" role="group">
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" title="Update Status">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="#" onclick="updateStatus('{{ appointment.id }}', 'completed')">Mark Completed</a></li>
+                                                        <li><a class="dropdown-item" href="#" onclick="updateStatus('{{ appointment.id }}', 'cancelled')">Cancel</a></li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
                                         <h6 class="fw-bold mb-1">{{ appointment.user.full_name if appointment.user else 'N/A' }}</h6>
-                                        <p class="text-muted small mb-2">
+                                        <p class="text-dark small mb-2">
                                             <i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}
                                         </p>
-                                        <p class="small mb-0">{{ appointment.symptoms[:60] if appointment.symptoms is defined and appointment.symptoms else 'N/A' }}{% if appointment.symptoms is defined and appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
+                                        <p class="small mb-0 text-dark">{{ appointment.symptoms[:60] if appointment.symptoms is defined and appointment.symptoms else 'N/A' }}{% if appointment.symptoms is defined and appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
                                     </div>
                                     {% endfor %}
                                 </div>
@@ -279,28 +303,14 @@
                                 <div class="kanban-header bg-success text-white p-3 rounded-top">
                                     <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>Completed</h5>
                                 </div>
-                                <div class="kanban-body bg-light p-3 rounded-bottom">
+                                <div class="kanban-body p-3 rounded-bottom">
                                     {% for appointment in appointments if appointment.status == 'completed' %}
-                                    <div class="kanban-card bg-white rounded-3 p-3 mb-3 shadow-sm">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <div class="time-badge bg-success text-white px-2 py-1 rounded-pill small">
-                                                {{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}
-                                            </div>
-                                            <div class="dropdown">
-                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                                                    <i class="fas fa-ellipsis-v"></i>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="#" onclick="viewAppointment({{ appointment.id }})">View Details</a></li>
-                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus({{ appointment.id }}, 'scheduled')">Mark Scheduled</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
+                                    <div class="kanban-card bg-body-secondary text-black rounded-3 p-3 mb-3 shadow-lg">
                                         <h6 class="fw-bold mb-1">{{ appointment.user.full_name if appointment.user else 'N/A' }}</h6>
                                         <p class="text-muted small mb-2">
                                             <i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}
                                         </p>
-                                        <p class="small mb-0">{{ appointment.symptoms[:60] if hasattr(appointment, 'symptoms') and appointment.symptoms else 'N/A' }}{% if hasattr(appointment, 'symptoms') and appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
+                                        <p class="small mb-0">{{ appointment.symptoms[:60] if appointment.symptoms is defined and appointment.symptoms else 'N/A' }}{% if appointment.symptoms is defined and appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
                                     </div>
                                     {% endfor %}
                                 </div>
@@ -323,8 +333,8 @@
                                                     <i class="fas fa-ellipsis-v"></i>
                                                 </button>
                                                 <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="#" onclick="viewAppointment({{ appointment.id }})">View Details</a></li>
-                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus({{ appointment.id }}, 'scheduled')">Reschedule</a></li>
+                                                    <li><a class="dropdown-item" href="#" onclick="viewAppointment('{{ appointment.id }}')">View Details</a></li>
+                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus('{{ appointment.id }}', 'scheduled')">Reschedule</a></li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -510,13 +520,37 @@ function viewAppointment(appointmentId) {
     });
 }
 
+function handleRxClick(appointmentId, status) {
+    fetch(`/doctor/appointment/${appointmentId}/prescription-info`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.has_prescription) {
+                // Show read-only/history modal
+                fetch(`/doctor/prescription/${data.prescription_id}/view`)
+                    .then(resp => resp.text())
+                    .then(html => {
+                        document.getElementById('timelinePrescriptionContent').innerHTML = html;
+                        var modal = new bootstrap.Modal(document.getElementById('timelinePrescriptionModal'));
+                        modal.show();
+                    });
+            } else if (status !== 'completed') {
+                // Open in edit mode
+                document.getElementById('prescriptionAppointmentId').value = appointmentId;
+                document.getElementById('prescriptionForm').reset();
+                const modal = new bootstrap.Modal(document.getElementById('prescriptionModal'));
+                modal.show();
+            } else {
+                showAlert('info', 'No prescription available and appointment is completed.');
+            }
+        });
+}
+
 function openPrescriptionModal(appointmentId) {
     document.getElementById('prescriptionAppointmentId').value = appointmentId;
     document.getElementById('prescriptionForm').reset();
     const modal = new bootstrap.Modal(document.getElementById('prescriptionModal'));
     modal.show();
 }
-
 function updateStatus(appointmentId, newStatus) {
     if (confirm(`Are you sure you want to mark this appointment as ${newStatus}?`)) {
         fetch(`{{ url_for("doctor.doctor_update_appointment_status", appointment_id=0) }}`.replace('0', appointmentId), {
@@ -555,6 +589,41 @@ function showAlert(type, message) {
     setTimeout(() => {
         alertDiv.remove();
     }, 5000);
+}
+</script>
+
+<!-- Patient Timeline Modal -->
+<div class="modal fade" id="timelineModal" tabindex="-1" aria-labelledby="timelineModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="timelineModalLabel">
+                    <i class="fa-solid fa-timeline me-2"></i>
+                    Patient Timeline
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="timelineContent">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-info" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openTimelineModal(patientId) {
+    const modal = new bootstrap.Modal(document.getElementById('timelineModal'));
+    document.getElementById('timelineContent').innerHTML = `<div class='text-center py-5'><div class='spinner-border text-info' role='status'><span class='visually-hidden'>Loading...</span></div></div>`;
+    modal.show();
+    fetch(`/doctor/patient/${patientId}/timeline?ajax=1`)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('timelineContent').innerHTML = html;
+        });
 }
 </script>
 

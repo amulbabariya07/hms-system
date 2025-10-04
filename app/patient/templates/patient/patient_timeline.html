@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">My Medical Timeline</h2>
+        <a href="{{ url_for('patient.download_timeline_report') }}" class="btn btn-success btn-lg rounded-pill">
+            <i class="fas fa-file-download me-2"></i> Download Report
+        </a>
+    </div>
+    <div class="timeline">
+        {% for appt in appointments %}
+        <div class="timeline-item d-flex mb-4">
+            <div class="timeline-date text-end pe-4" style="min-width:120px;">
+                <div class="fw-bold text-primary">{{ appt.appointment_date.strftime('%d %b %Y') }}</div>
+                <div class="small text-muted">{{ appt.appointment_time.strftime('%I:%M %p') if appt.appointment_time else '' }}</div>
+            </div>
+            <div class="timeline-content bg-white rounded shadow-sm p-4 flex-fill">
+                <div>
+                    <span class="badge bg-info">{{ appt.status|capitalize }}</span>
+                </div>
+                <div class="mb-2">
+                    <strong>Doctor:</strong> Dr. {{ appt.doctor.full_name }} ({{ appt.doctor.specialization.name if appt.doctor.specialization else 'N/A' }})
+                </div>
+                <div class="mb-2">
+                    <strong>Department:</strong> {{ appt.doctor.specialization.name if appt.doctor.specialization else 'N/A' }}
+                </div>
+                <div class="mb-2">
+                    <strong>Reason:</strong> {{ appt.reason or 'N/A' }}
+                </div>
+                {% if appt.prescriptions %}
+                {% set pres = appt.prescriptions[0] %}
+                <div>
+                    <strong>Prescription Date:</strong> {{ pres.created_at.strftime('%d %b %Y') }}
+                    <div class="table-responsive mt-2">
+                        <table class="table table-bordered table-sm align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Dosage</th>
+                                    <th>Frequency</th>
+                                    <th>Days</th>
+                                    <th>Timing</th>
+                                    <th>Quantity</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for med in pres.medicines %}
+                                <tr>
+                                    <td>{{ med.name }}</td>
+                                    <td>{{ med.type }}</td>
+                                    <td>{{ med.dosage }}</td>
+                                    <td>{{ med.frequency }}</td>
+                                    <td>{{ med.days }}</td>
+                                    <td>{{ med.timing }}</td>
+                                    <td>{{ med.quantity or '-' }}</td>
+                                    <td>{{ med.notes or '-' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if pres.instructions %}
+                    <div class="mt-2"><strong>Instructions:</strong> {{ pres.instructions }}</div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div><strong>No prescription for this appointment.</strong></div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<style>
+.timeline {
+    border-left: 3px solid #0d6efd;
+    margin-left: 60px;
+}
+.timeline-item {
+    position: relative;
+}
+.timeline-item:before {
+    content: '';
+    position: absolute;
+    left: -32px;
+    top: 18px;
+    width: 16px;
+    height: 16px;
+    background: #0d6efd;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    z-index: 1;
+}
+.timeline-date {
+    min-width: 120px;
+    color: #0d6efd;
+    font-weight: 600;
+}
+.timeline-content {
+    margin-left: 16px;
+}
+</style>
+{% endblock %}

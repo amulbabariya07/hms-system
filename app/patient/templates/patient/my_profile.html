@@ -70,8 +70,11 @@
 
             <!-- Intake Form Button -->
             <div class="d-grid mt-3">
-                <a href="{{ url_for('patient.patient_intake_form') }}" class="btn btn-warning btn-lg rounded-pill">
+                <a href="{{ url_for('patient.patient_intake_form') }}" class="btn btn-warning btn-lg rounded-pill mb-2">
                     <i class="fas fa-clipboard-list me-2"></i> Fill Up Intake Form
+                </a>
+                <a href="{{ url_for('patient.patient_timeline') }}" class="btn btn-info btn-lg rounded-pill">
+                    <i class="fas fa-history me-2"></i> View Medical Timeline
                 </a>
             </div>
         </div>
@@ -130,4 +133,5 @@ function toggleEdit(editMode) {
 }
 </script>
 
+{% include 'patient/footer.html' %}
 {% endblock %}
