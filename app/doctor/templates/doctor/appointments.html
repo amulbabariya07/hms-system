@@ -41,7 +41,6 @@
         </div>
     </div>
 </nav>
-
 <!-- Breadcrumb -->
 <div class="bg-light py-3">
     <div class="container">
@@ -53,7 +52,6 @@
         </nav>
     </div>
 </div>
-
 <!-- Header Section -->
 <div class="bg-gradient-primary text-white py-4">
     <div class="container">
@@ -96,7 +94,6 @@
         </div>
     </div>
 </div>
-
 <!-- Controls Section -->
 <div class="bg-white py-4 shadow-sm">
     <div class="container">
@@ -110,9 +107,7 @@
                             <span class="input-group-text bg-light border-end-0">
                                 <i class="fas fa-search text-muted"></i>
                             </span>
-                            <input type="text" class="form-control border-start-0" 
-                                   name="search" value="{{ search_query }}" 
-                                   placeholder="Search patients...">
+                            <input type="text" class="form-control border-start-0" name="search" value="{{ search_query }}" placeholder="Search patients...">
                             <button class="btn btn-primary" type="submit">Search</button>
                         </div>
                     </form>
@@ -127,8 +122,7 @@
                             <span class="input-group-text bg-light">
                                 <i class="fas fa-calendar text-muted"></i>
                             </span>
-                            <input type="date" class="form-control" name="date" 
-                                   value="{{ selected_date }}" onchange="this.form.submit()">
+                            <input type="date" class="form-control" name="date" value="{{ selected_date }}" onchange="this.form.submit()">
                         </div>
                     </form>
                 </div>
@@ -136,12 +130,10 @@
             <div class="col-lg-4">
                 <div class="view-toggle d-flex justify-content-end">
                     <div class="btn-group" role="group">
-                        <a href="?view=list&date={{ selected_date }}&search={{ search_query }}" 
-                           class="btn btn-outline-primary {{ 'active' if view_type == 'list' else '' }}">
+                        <a href="?view=list&date={{ selected_date }}&search={{ search_query }}" class="btn btn-outline-primary {{ 'active' if view_type == 'list' else '' }}">
                             <i class="fas fa-list me-1"></i>List
                         </a>
-                        <a href="?view=kanban&date={{ selected_date }}&search={{ search_query }}" 
-                           class="btn btn-outline-primary {{ 'active' if view_type == 'kanban' else '' }}">
+                        <a href="?view=kanban&date={{ selected_date }}&search={{ search_query }}" class="btn btn-outline-primary {{ 'active' if view_type == 'kanban' else '' }}">
                             <i class="fas fa-columns me-1"></i>Kanban
                         </a>
                     </div>
@@ -150,229 +142,335 @@
         </div>
     </div>
 </div>
-
 <!-- Appointments Content -->
 <div class="py-5">
     <div class="container">
         {% if appointments %}
-            {% if view_type == 'list' %}
-                <!-- List View -->
-                <div class="appointments-list">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Time</th>
-                                    <th>Patient</th>
-                                    <th>Contact</th>
-                                    <th>Symptoms</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for appointment in appointments %}
-                                <tr>
-                                    <td>
-                                        <div class="time-slot">
-                                            <div class="fw-bold text-primary">
-                                                {{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}
-                                            </div>
-                                            <small class="text-muted">
-                                                {{ appointment.appointment_date.strftime('%b %d') if appointment.appointment_date else 'N/A' }}
-                                            </small>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="patient-info">
-                                            <div class="fw-bold">{{ appointment.user.full_name if appointment.user else 'N/A' }}
-                                                {% if appointment.user %}
-                                                <a href="{{ url_for('doctor.patient_timeline', patient_id=appointment.user.id) }}" class="btn btn-outline-primary btn-sm ms-2" title="Patient Timeline">
-                                                    <i class="fas fa-stream"></i> Timeline
-                                                </a>
-                                                {% endif %}
-                                            </div>
-                                            <small class="text-muted">
-                                                {% if appointment.user %}
-                                                    {{ appointment.user.age }} years, {{ appointment.user.gender }}
-                                                {% else %}
-                                                    N/A
-                                                {% endif %}
-                                            </small>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="contact-info">
-                                            <div><i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}</div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="symptoms">
-                                            {{ appointment.symptoms[:50] if appointment.symptoms is defined and appointment.symptoms else 'N/A' }}
-                                            {% if appointment.symptoms is defined and appointment.symptoms and appointment.symptoms|length > 50 %}...{% endif %}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-{{ 'success' if appointment.status == 'completed' else ('warning' if appointment.status == 'scheduled' else 'danger') }} status-badge">
-                                            {{ appointment.display_status }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group" role="group">
-                                            <!-- Rx Button -->
-                                            <button class="btn btn-sm btn-outline-success" onclick="openPrescriptionModal({{ appointment.id }})" title="Rx (Prescription)">
-                                                <i class="fa-solid fa-prescription"></i>
-                                            </button>
-                                            <!-- View Button -->
-                                            <button class="btn btn-sm btn-outline-primary" onclick="viewAppointment({{ appointment.id }})" title="View Details">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <!-- Update Status Dropdown -->
-                                            <div class="btn-group" role="group">
-                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" title="Update Status">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus({{ appointment.id }}, 'scheduled')">Mark Scheduled</a></li>
-                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus({{ appointment.id }}, 'completed')">Mark Completed</a></li>
-                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus({{ appointment.id }}, 'cancelled')">Mark Cancelled</a></li>
-                                                </ul>
-                                            </div>
-                                            <!-- Patient Timeline Button -->
-                                            {% if appointment.user %}
-                                            <button class="btn btn-sm btn-outline-success" onclick="openTimelineModal('{{ appointment.user.id }}')" title="Patient Timeline View">
-                                                <i class="fa-solid fa-timeline"></i>
-                                            </button>
-                                            {% endif %}
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            {% else %}
-                <!-- Kanban View -->
-                <div class="appointments-kanban">
-                    <div class="row g-4">
-                        <div class="col-lg-4">
-                            <div class="kanban-column">
-                                <div class="kanban-header bg-warning text-white p-3 rounded-top">
-                                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Scheduled</h5>
-                                </div>
-                                <div class="kanban-body bg-light p-3 rounded-bottom">
-                                    {% for appointment in appointments if appointment.status == 'scheduled' %}
-                                    <div class="kanban-card bg-primary-subtle rounded-3 p-3 mb-3 shadow-lg">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <div class="time-badge bg-warning text-dark px-2 py-1 rounded-pill small">
-                                                {{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}
-                                            </div>
-                                            <div class="btn-group" role="group">
-                                                <button class="btn btn-sm btn-outline-success" onclick="openPrescriptionModal('{{ appointment.id }}')" title="Rx (Prescription)">
-                                                    <i class="fa-solid fa-prescription"></i>
-                                                </button>
-                                                </button>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-primary" onclick="viewAppointment('{{ appointment.id }}')" title="View Details">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <div class="btn-group" role="group">
-                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" title="Update Status">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="#" onclick="updateStatus('{{ appointment.id }}', 'completed')">Mark Completed</a></li>
-                                                        <li><a class="dropdown-item" href="#" onclick="updateStatus('{{ appointment.id }}', 'cancelled')">Cancel</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <h6 class="fw-bold mb-1">{{ appointment.user.full_name if appointment.user else 'N/A' }}</h6>
-                                        <p class="text-dark small mb-2">
-                                            <i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}
-                                        </p>
-                                        <p class="small mb-0 text-dark">{{ appointment.symptoms[:60] if appointment.symptoms is defined and appointment.symptoms else 'N/A' }}{% if appointment.symptoms is defined and appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
+        {% if view_type == 'list' %}
+        <!-- List View -->
+        <!-- List View -->
+        <div class="appointments-list">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Time</th>
+                            <th>Patient</th>
+                            <th>Contact</th>
+                            <th>Symptoms</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in appointments %}
+                        <tr>
+                            <td>
+                                <div class="time-slot">
+                                    <div class="fw-bold text-primary">
+                                        {{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}
                                     </div>
-                                    {% endfor %}
+                                    <small class="text-muted">
+                                        {{ appointment.appointment_date.strftime('%b %d') if appointment.appointment_date else 'N/A' }}
+                                    </small>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="kanban-column">
-                                <div class="kanban-header bg-success text-white p-3 rounded-top">
-                                    <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>Completed</h5>
+                            </td>
+                            <td>
+                                <div class="patient-info">
+                                    <div class="fw-bold">{{ appointment.user.full_name if appointment.user else 'N/A' }}</div>
+                                    <small class="text-muted">
+                                        {% if appointment.user %}
+                                        {{ appointment.user.age }} years, {{ appointment.user.gender }}
+                                        {% else %}
+                                        N/A
+                                        {% endif %}
+                                    </small>
                                 </div>
-                                <div class="kanban-body p-3 rounded-bottom">
-                                    {% for appointment in appointments if appointment.status == 'completed' %}
-                                    <div class="kanban-card bg-body-secondary text-black rounded-3 p-3 mb-3 shadow-lg">
-                                        <h6 class="fw-bold mb-1">{{ appointment.user.full_name if appointment.user else 'N/A' }}</h6>
-                                        <p class="text-muted small mb-2">
-                                            <i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}
-                                        </p>
-                                        <p class="small mb-0">{{ appointment.symptoms[:60] if appointment.symptoms is defined and appointment.symptoms else 'N/A' }}{% if appointment.symptoms is defined and appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
-                                    </div>
-                                    {% endfor %}
+                            </td>
+                            <td>
+                                <div class="contact-info">
+                                    <div><i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}</div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="kanban-column">
-                                <div class="kanban-header bg-danger text-white p-3 rounded-top">
-                                    <h5 class="mb-0"><i class="fas fa-times-circle me-2"></i>Cancelled</h5>
+                            </td>
+                            <td>
+                                <div class="symptoms">
+                                    {{ appointment.symptoms[:50] if appointment.symptoms is defined and appointment.symptoms else 'N/A' }}
+                                    {% if appointment.symptoms is defined and appointment.symptoms and appointment.symptoms|length > 50 %}...{% endif %}
                                 </div>
-                                <div class="kanban-body bg-light p-3 rounded-bottom">
-                                    {% for appointment in appointments if appointment.status == 'cancelled' %}
-                                    <div class="kanban-card bg-white rounded-3 p-3 mb-3 shadow-sm">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <div class="time-badge bg-danger text-white px-2 py-1 rounded-pill small">
-                                                {{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}
-                                            </div>
-                                            <div class="dropdown">
-                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                                                    <i class="fas fa-ellipsis-v"></i>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="#" onclick="viewAppointment('{{ appointment.id }}')">View Details</a></li>
-                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus('{{ appointment.id }}', 'scheduled')">Reschedule</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <h6 class="fw-bold mb-1">{{ appointment.user.full_name if appointment.user else 'N/A' }}</h6>
-                                        <p class="text-muted small mb-2">
-                                            <i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}
-                                        </p>
-                                        <p class="small mb-0">{{ appointment.symptoms[:60] if hasattr(appointment, 'symptoms') and appointment.symptoms else 'N/A' }}{% if hasattr(appointment, 'symptoms') and appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
-                                    </div>
-                                    {% endfor %}
+                            </td>
+                            <td>
+                                <span class="badge status-badge 
+                            {% if appointment.status == 'completed' %}bg-success
+                            {% elif appointment.status == 'under_consultation' %}bg-info
+                            {% elif appointment.status == 'confirmed' %}bg-primary
+                            {% elif appointment.status == 'scheduled' and appointment.appointment_date == date.today() %}bg-warning
+                            {% elif appointment.status == 'scheduled' %}bg-secondary
+                            {% elif appointment.status == 'cancelled' %}bg-danger
+                            {% endif %}">
+                                    {{ appointment.display_status }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <!-- SCHEDULED: Only Confirm and Cancel -->
+                                    {% if appointment.status == 'scheduled' and appointment.appointment_date == date.today() %}
+                                    <button class="btn btn-sm btn-primary" onclick="updateStatus('{{ appointment.id }}', 'confirmed')">
+                                        <i class="fas fa-check me-1"></i>Confirm
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="updateStatus('{{ appointment.id }}', 'cancelled')">
+                                        <i class="fas fa-times me-1"></i>Cancel
+                                    </button>
+                                    <!-- CONFIRMED: Show View Details, Timeline + Status buttons -->
+                                    {% elif appointment.status == 'confirmed' %}
+                                    <button class="btn btn-sm btn-outline-primary" onclick="viewAppointment('{{ appointment.id }}')" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    {% if appointment.user %}
+                                    <button class="btn btn-sm btn-outline-warning" onclick="openTimelineModal('{{ appointment.user.id }}')" title="Patient Timeline">
+                                        <i class="fa-solid fa-timeline"></i>
+                                    </button>
+                                    {% endif %}
+                                    <button class="btn btn-sm btn-info" onclick="updateStatus('{{ appointment.id }}', 'under_consultation')">
+                                        <i class="fas fa-stethoscope me-1"></i>Start Consult
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="updateStatus('{{ appointment.id }}', 'cancelled')">
+                                        <i class="fas fa-times me-1"></i>Cancel
+                                    </button>
+                                    <!-- UNDER CONSULTATION: Show Rx, View, Timeline + Status buttons -->
+                                    {% elif appointment.status == 'under_consultation' %}
+                                    <button class="btn btn-sm btn-outline-success" onclick="openPrescriptionModal('{{ appointment.id }}')" title="Rx (Prescription)">
+                                        <i class="fa-solid fa-prescription"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="viewAppointment('{{ appointment.id }}')" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    {% if appointment.user %}
+                                    <button class="btn btn-sm btn-outline-warning" onclick="openTimelineModal('{{ appointment.user.id }}')" title="Patient Timeline">
+                                        <i class="fa-solid fa-timeline"></i>
+                                    </button>
+                                    {% endif %}
+                                    <button class="btn btn-sm btn-success" onclick="updateStatus('{{ appointment.id }}', 'completed')">
+                                        <i class="fas fa-check-circle me-1"></i>Complete
+                                    </button>
+                                    <!-- COMPLETED: Only View Prescription and Timeline -->
+                                    {% elif appointment.status == 'completed' %}
+                                    <button class="btn btn-sm btn-outline-success" onclick="viewPrescription('{{ appointment.id }}')" title="View Prescription">
+                                        <i class="fa-solid fa-file-medical"></i>
+                                    </button>
+                                    {% if appointment.user %}
+                                    <button class="btn btn-sm btn-outline-warning" onclick="openTimelineModal('{{ appointment.user.id }}')" title="Patient Timeline">
+                                        <i class="fa-solid fa-timeline"></i>
+                                    </button>
+                                    {% endif %}
+                                    <!-- CANCELLED: Only Timeline -->
+                                    {% elif appointment.status == 'cancelled' %}
+                                    {% if appointment.user %}
+                                    <button class="btn btn-sm btn-outline-warning" onclick="openTimelineModal('{{ appointment.user.id }}')" title="Patient Timeline">
+                                        <i class="fa-solid fa-timeline"></i>
+                                    </button>
+                                    {% endif %}
+                                    {% endif %}
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
         {% else %}
-            <!-- Empty State -->
-            <div class="text-center py-5">
-                <div class="empty-state">
-                    <i class="fas fa-calendar-times fa-4x text-muted mb-4"></i>
-                    <h4 class="text-muted mb-3">No Appointments Found</h4>
-                    <p class="text-muted mb-4">
-                        {% if selected_date == date.today().strftime('%Y-%m-%d') %}
-                            You don't have any appointments scheduled for today.
-                        {% else %}
-                            No appointments found for {{ filter_date.strftime('%B %d, %Y') }}.
-                        {% endif %}
-                    </p>
-                    <a href="?date={{ date.today().strftime('%Y-%m-%d') }}&view={{ view_type }}" class="btn btn-primary">
-                        <i class="fas fa-calendar-day me-2"></i>View Today's Appointments
-                    </a>
+        <!-- Kanban View -->
+        <!-- Kanban View -->
+        <div class="appointments-kanban">
+            <div class="row g-4">
+                <!-- SCHEDULED Column -->
+                <div class="col-lg-3">
+                    <div class="kanban-column">
+                        <div class="kanban-header bg-warning text-white p-3 rounded-top">
+                            <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Scheduled</h5>
+                        </div>
+                        <div class="kanban-body bg-light p-3 rounded-bottom">
+                            {% for appointment in appointments if appointment.status == 'scheduled' %}
+                            <div class="kanban-card bg-white rounded-3 p-3 mb-3 shadow-sm">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div class="time-badge bg-warning text-dark px-2 py-1 rounded-pill small">
+                                        {{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}
+                                    </div>
+                                </div>
+                                <h6 class="fw-bold mb-1">{{ appointment.user.full_name if appointment.user else 'N/A' }}</h6>
+                                <p class="text-muted small mb-2">
+                                    <i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}
+                                </p>
+                                <p class="small mb-3">{{ appointment.symptoms[:60] if appointment.symptoms else 'N/A' }}{% if appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
+                                <!-- SCHEDULED: Only Confirm and Cancel buttons -->
+                                {% if appointment.appointment_date == date.today() %}
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-sm btn-primary" onclick="updateStatus('{{ appointment.id }}', 'confirmed')">
+                                        <i class="fas fa-check me-1"></i>Confirm
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="updateStatus('{{ appointment.id }}', 'cancelled')">
+                                        <i class="fas fa-times me-1"></i>Cancel
+                                    </button>
+                                </div>
+                                {% else %}
+                                <div class="text-center text-muted small">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    {{ appointment.appointment_date.strftime('%b %d') }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <!-- CONFIRMED Column -->
+                <div class="col-lg-3">
+                    <div class="kanban-column">
+                        <div class="kanban-header bg-primary text-white p-3 rounded-top">
+                            <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>Confirmed</h5>
+                        </div>
+                        <div class="kanban-body bg-light p-3 rounded-bottom">
+                            {% for appointment in appointments if appointment.status == 'confirmed' %}
+                            <div class="kanban-card bg-white rounded-3 p-3 mb-3 shadow-sm">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div class="time-badge bg-primary text-white px-2 py-1 rounded-pill small">
+                                        {{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}
+                                    </div>
+                                    <!-- CONFIRMED: View Details and Timeline buttons -->
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="viewAppointment('{{ appointment.id }}')" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        {% if appointment.user %}
+                                        <button class="btn btn-sm btn-outline-warning" onclick="openTimelineModal('{{ appointment.user.id }}')" title="Patient Timeline">
+                                            <i class="fa-solid fa-timeline"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <h6 class="fw-bold mb-1">{{ appointment.user.full_name if appointment.user else 'N/A' }}</h6>
+                                <p class="text-muted small mb-2">
+                                    <i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}
+                                </p>
+                                <p class="small mb-3">{{ appointment.symptoms[:60] if appointment.symptoms else 'N/A' }}{% if appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
+                                <!-- CONFIRMED: Status action buttons -->
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-sm btn-info" onclick="updateStatus('{{ appointment.id }}', 'under_consultation')">
+                                        <i class="fas fa-stethoscope me-1"></i>Start Consultation
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="updateStatus('{{ appointment.id }}', 'cancelled')">
+                                        <i class="fas fa-times me-1"></i>Cancel
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <!-- UNDER CONSULTATION Column -->
+                <div class="col-lg-3">
+                    <div class="kanban-column">
+                        <div class="kanban-header bg-info text-white p-3 rounded-top">
+                            <h5 class="mb-0"><i class="fas fa-stethoscope me-2"></i>Consultation</h5>
+                        </div>
+                        <div class="kanban-body bg-light p-3 rounded-bottom">
+                            {% for appointment in appointments if appointment.status == 'under_consultation' %}
+                            <div class="kanban-card bg-white rounded-3 p-3 mb-3 shadow-sm">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div class="time-badge bg-info text-white px-2 py-1 rounded-pill small">
+                                        {{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}
+                                    </div>
+                                    <!-- UNDER CONSULTATION: Rx, View, Timeline buttons -->
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-outline-success" onclick="openPrescriptionModal('{{ appointment.id }}')" title="Rx (Prescription)">
+                                            <i class="fa-solid fa-prescription"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="viewAppointment('{{ appointment.id }}')" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        {% if appointment.user %}
+                                        <button class="btn btn-sm btn-outline-warning" onclick="openTimelineModal('{{ appointment.user.id }}')" title="Patient Timeline">
+                                            <i class="fa-solid fa-timeline"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <h6 class="fw-bold mb-1">{{ appointment.user.full_name if appointment.user else 'N/A' }}</h6>
+                                <p class="text-muted small mb-2">
+                                    <i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}
+                                </p>
+                                <p class="small mb-3">{{ appointment.symptoms[:60] if appointment.symptoms else 'N/A' }}{% if appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
+                                <!-- UNDER CONSULTATION: Status action button -->
+                                <div class="d-grid">
+                                    <button class="btn btn-sm btn-success" onclick="updateStatus('{{ appointment.id }}', 'completed')">
+                                        <i class="fas fa-check-circle me-1"></i>Complete Consultation
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <!-- COMPLETED Column -->
+                <div class="col-lg-3">
+                    <div class="kanban-column">
+                        <div class="kanban-header bg-success text-white p-3 rounded-top">
+                            <h5 class="mb-0"><i class="fas fa-check-double me-2"></i>Completed</h5>
+                        </div>
+                        <div class="kanban-body bg-light p-3 rounded-bottom">
+                            {% for appointment in appointments if appointment.status == 'completed' %}
+                            <div class="kanban-card bg-white rounded-3 p-3 mb-3 shadow-sm">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div class="time-badge bg-success text-white px-2 py-1 rounded-pill small">
+                                        {{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}
+                                    </div>
+                                    <!-- COMPLETED: Only Timeline button -->
+                                    {% if appointment.user %}
+                                    <button class="btn btn-sm btn-outline-warning" onclick="openTimelineModal('{{ appointment.user.id }}')" title="Patient Timeline">
+                                        <i class="fa-solid fa-timeline"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                                <h6 class="fw-bold mb-1">{{ appointment.user.full_name if appointment.user else 'N/A' }}</h6>
+                                <p class="text-muted small mb-2">
+                                    <i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}
+                                </p>
+                                <p class="small mb-3">{{ appointment.symptoms[:60] if appointment.symptoms else 'N/A' }}{% if appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
+                                <!-- COMPLETED: View Prescription button -->
+                                <div class="d-grid">
+                                    <button class="btn btn-sm btn-outline-success" onclick="viewPrescription('{{ appointment.id }}')">
+                                        <i class="fa-solid fa-file-medical me-1"></i>View Prescription
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
+        {% endif %}
+        {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-5">
+            <div class="empty-state">
+                <i class="fas fa-calendar-times fa-4x text-muted mb-4"></i>
+                <h4 class="text-muted mb-3">No Appointments Found</h4>
+                <p class="text-muted mb-4">
+                    {% if selected_date == date.today().strftime('%Y-%m-%d') %}
+                    You don't have any appointments scheduled for today.
+                    {% else %}
+                    No appointments found for {{ filter_date.strftime('%B %d, %Y') }}.
+                    {% endif %}
+                </p>
+                <a href="?date={{ date.today().strftime('%Y-%m-%d') }}&view={{ view_type }}" class="btn btn-primary">
+                    <i class="fas fa-calendar-day me-2"></i>View Today's Appointments
+                </a>
+            </div>
+        </div>
         {% endif %}
     </div>
 </div>
-
 <!-- Appointment Details Modal -->
 <div class="modal fade" id="appointmentDetailsModal" tabindex="-1" aria-labelledby="appointmentDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -390,9 +488,8 @@
         </div>
     </div>
 </div>
-
 <style>
-.bg-gradient-primary {
+    .bg-gradient-primary {
     background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
 }
 
@@ -479,7 +576,47 @@
     }
 }
 </style>
-
+<!-- Prescription Readonly Modal -->
+<div class="modal fade prescription-readonly-modal" id="prescriptionReadonlyModal" tabindex="-1" aria-labelledby="prescriptionReadonlyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="prescriptionReadonlyModalLabel">
+                    <i class="fa-solid fa-file-medical me-2"></i>
+                    Prescription Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="prescriptionReadonlyContent">
+                <!-- Prescription HTML will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="timelineModal" tabindex="-1" aria-labelledby="timelineModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="timelineModalLabel">
+                    <i class="fa-solid fa-timeline me-2"></i>
+                    Patient Timeline
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="timelineContent">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-info" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Loading patient timeline...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
 function viewAppointment(appointmentId) {
     fetch(`{{ url_for("doctor.doctor_appointment_details", appointment_id=0) }}`.replace('0', appointmentId))
@@ -520,39 +657,22 @@ function viewAppointment(appointmentId) {
     });
 }
 
-function handleRxClick(appointmentId, status) {
-    fetch(`/doctor/appointment/${appointmentId}/prescription-info`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.has_prescription) {
-                // Show read-only/history modal
-                fetch(`/doctor/prescription/${data.prescription_id}/view`)
-                    .then(resp => resp.text())
-                    .then(html => {
-                        document.getElementById('timelinePrescriptionContent').innerHTML = html;
-                        var modal = new bootstrap.Modal(document.getElementById('timelinePrescriptionModal'));
-                        modal.show();
-                    });
-            } else if (status !== 'completed') {
-                // Open in edit mode
-                document.getElementById('prescriptionAppointmentId').value = appointmentId;
-                document.getElementById('prescriptionForm').reset();
-                const modal = new bootstrap.Modal(document.getElementById('prescriptionModal'));
-                modal.show();
-            } else {
-                showAlert('info', 'No prescription available and appointment is completed.');
-            }
-        });
-}
-
 function openPrescriptionModal(appointmentId) {
     document.getElementById('prescriptionAppointmentId').value = appointmentId;
     document.getElementById('prescriptionForm').reset();
     const modal = new bootstrap.Modal(document.getElementById('prescriptionModal'));
     modal.show();
 }
+
 function updateStatus(appointmentId, newStatus) {
-    if (confirm(`Are you sure you want to mark this appointment as ${newStatus}?`)) {
+    const statusMessages = {
+        'confirmed': 'Are you sure you want to confirm this appointment?',
+        'under_consultation': 'Start consultation with this patient?',
+        'completed': 'Mark this consultation as completed?',
+        'cancelled': 'Are you sure you want to cancel this appointment?'
+    };
+
+    if (confirm(statusMessages[newStatus] || 'Are you sure?')) {
         fetch(`{{ url_for("doctor.doctor_update_appointment_status", appointment_id=0) }}`.replace('0', appointmentId), {
             method: 'POST',
             headers: {
@@ -572,6 +692,9 @@ function updateStatus(appointmentId, newStatus) {
             } else {
                 showAlert('danger', data.message);
             }
+        })
+        .catch(error => {
+            showAlert('danger', 'An error occurred while updating the appointment.');
         });
     }
 }
@@ -590,43 +713,83 @@ function showAlert(type, message) {
         alertDiv.remove();
     }, 5000);
 }
-</script>
 
-<!-- Patient Timeline Modal -->
-<div class="modal fade" id="timelineModal" tabindex="-1" aria-labelledby="timelineModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header bg-info text-white">
-                <h5 class="modal-title" id="timelineModalLabel">
-                    <i class="fa-solid fa-timeline me-2"></i>
-                    Patient Timeline
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="timelineContent">
-                <div class="text-center py-5">
-                    <div class="spinner-border text-info" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+function viewPrescription(appointmentId) {
+    fetch(`/doctor/appointment/${appointmentId}/prescription-info`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.has_prescription) {
+                // Load prescription HTML into modal
+                fetch(`/doctor/prescription/${data.prescription_id}/view?ajax=1`)
+                    .then(resp => resp.text())
+                    .then(html => {
+                        document.getElementById('prescriptionReadonlyContent').innerHTML = html;
+                        var modal = new bootstrap.Modal(document.getElementById('prescriptionReadonlyModal'));
+                        modal.show();
+                    });
+            } else {
+                showAlert('info', 'No prescription found for this appointment.');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading prescription:', error);
+            showAlert('danger', 'Failed to load prescription details.');
+        });
+}
 
-<script>
 function openTimelineModal(patientId) {
-    const modal = new bootstrap.Modal(document.getElementById('timelineModal'));
-    document.getElementById('timelineContent').innerHTML = `<div class='text-center py-5'><div class='spinner-border text-info' role='status'><span class='visually-hidden'>Loading...</span></div></div>`;
+    const modalEl = document.getElementById('timelineModal');
+    if (!modalEl) {
+        showAlert('danger', 'Timeline modal not found.');
+        return;
+    }
+    const modal = new bootstrap.Modal(modalEl);
+
+    // Show loading spinner
+    const timelineContent = document.getElementById('timelineContent');
+    if (timelineContent) {
+        timelineContent.innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-info" role="status">
+                    <span class="visually-hidden">Loading timeline...</span>
+                </div>
+                <p class="mt-2 text-muted">Loading patient timeline...</p>
+            </div>
+        `;
+    }
+
     modal.show();
+
+    // Fetch timeline data
     fetch(`/doctor/patient/${patientId}/timeline?ajax=1`)
-        .then(response => response.text())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text();
+        })
         .then(html => {
-            document.getElementById('timelineContent').innerHTML = html;
+            if (timelineContent) {
+                timelineContent.innerHTML = html;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading timeline:', error);
+            if (timelineContent) {
+                timelineContent.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-exclamation-triangle fa-2x text-danger mb-3"></i>
+                        <h5 class="text-danger">Failed to load timeline</h5>
+                        <p class="text-muted">Please try again later.</p>
+                        <button class="btn btn-primary" onclick="openTimelineModal('${patientId}')">
+                            <i class="fas fa-redo me-1"></i>Retry
+                        </button>
+                    </div>
+                `;
+            }
         });
 }
 </script>
-
 <!-- Prescription Modal -->
 <div class="modal fade" id="prescriptionModal" tabindex="-1" aria-labelledby="prescriptionModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -661,7 +824,6 @@ function openTimelineModal(patientId) {
         </div>
     </div>
 </div>
-
 <script>
 // Medicine fields template
 function medicineFields(index) {
@@ -748,74 +910,156 @@ function addMedicineCard() {
 // Initialize when document is ready
 document.addEventListener('DOMContentLoaded', function() {
     // Add medicine button event listener
-    document.getElementById('addMedicineBtn').addEventListener('click', addMedicineCard);
-    
+    const addMedicineBtn = document.getElementById('addMedicineBtn');
+    if (addMedicineBtn) {
+        addMedicineBtn.addEventListener('click', addMedicineCard);
+    }
+
     // Remove medicine button event delegation
-    document.getElementById('medicinesList').addEventListener('click', function(e) {
-        if (e.target.classList.contains('removeMedicineBtn') || 
-            e.target.closest('.removeMedicineBtn')) {
-            const card = e.target.closest('.medicine-card');
-            if (card) {
-                card.remove();
+    const medicinesList = document.getElementById('medicinesList');
+    if (medicinesList) {
+        medicinesList.addEventListener('click', function(e) {
+            if (e.target.classList.contains('removeMedicineBtn') || e.target.closest('.removeMedicineBtn')) {
+                const card = e.target.closest('.medicine-card');
+                if (card) {
+                    card.remove();
+                }
             }
-        }
-    });
-    
+        });
+    }
+
     // Form submission handler
-    document.getElementById('prescriptionForm').addEventListener('submit', function(e) {
-        const cards = document.querySelectorAll('.medicine-card');
-        const medicines = [];
-        
-        // Validate at least one medicine is added
-        if (cards.length === 0) {
-            e.preventDefault();
-            alert('Please add at least one medicine.');
-            return;
-        }
-        
-        // Collect medicine data
-        for (const card of cards) {
-            const name = card.querySelector('.medicine-name').value;
-            const type = card.querySelector('.medicine-type').value;
-            const dosage = card.querySelector('.medicine-dosage').value;
-            const frequency = card.querySelector('.medicine-frequency').value;
-            const days = card.querySelector('.medicine-days').value;
-            const timing = card.querySelector('.medicine-timing').value;
-            const quantity = card.querySelector('.medicine-quantity').value;
-            const notes = card.querySelector('.medicine-notes').value;
-            
-            // Basic validation
-            if (!name || !type || !dosage || !frequency || !days || !timing) {
+    const prescriptionForm = document.getElementById('prescriptionForm');
+    if (prescriptionForm) {
+        prescriptionForm.addEventListener('submit', function(e) {
+            const cards = document.querySelectorAll('.medicine-card');
+            const medicines = [];
+
+            // Validate at least one medicine is added
+            if (cards.length === 0) {
                 e.preventDefault();
-                alert('Please fill all required fields for each medicine.');
+                alert('Please add at least one medicine.');
                 return;
             }
-            
-            medicines.push({
-                name: name,
-                type: type,
-                dosage: dosage,
-                frequency: frequency,
-                days: days,
-                timing: timing,
-                quantity: quantity,
-                notes: notes
-            });
-        }
-        
-        // Store medicines as JSON in hidden input
-        document.getElementById('medicinesJsonInput').value = JSON.stringify(medicines);
-    });
-    
+
+            // Collect medicine data
+            for (const card of cards) {
+                const name = card.querySelector('.medicine-name').value;
+                const type = card.querySelector('.medicine-type').value;
+                const dosage = card.querySelector('.medicine-dosage').value;
+                const frequency = card.querySelector('.medicine-frequency').value;
+                const days = card.querySelector('.medicine-days').value;
+                const timing = card.querySelector('.medicine-timing').value;
+                const quantity = card.querySelector('.medicine-quantity').value;
+                const notes = card.querySelector('.medicine-notes').value;
+
+                // Basic validation
+                if (!name || !type || !dosage || !frequency || !days || !timing) {
+                    e.preventDefault();
+                    alert('Please fill all required fields for each medicine.');
+                    return;
+                }
+
+                medicines.push({
+                    name: name,
+                    type: type,
+                    dosage: dosage,
+                    frequency: frequency,
+                    days: days,
+                    timing: timing,
+                    quantity: quantity,
+                    notes: notes
+                });
+            }
+
+            // Store medicines as JSON in hidden input
+            document.getElementById('medicinesJsonInput').value = JSON.stringify(medicines);
+        });
+    }
+
     // Add one medicine card by default when modal is shown
     const prescriptionModal = document.getElementById('prescriptionModal');
-    prescriptionModal.addEventListener('shown.bs.modal', function() {
-        // Reset medicine index and clear existing cards
-        medicineIndex = 0;
-        document.getElementById('medicinesList').innerHTML = '';
-        // Add one default medicine card
-        addMedicineCard();
-    });
+    if (prescriptionModal) {
+        prescriptionModal.addEventListener('shown.bs.modal', function() {
+            // Reset medicine index and clear existing cards
+            medicineIndex = 0;
+            const medicinesList = document.getElementById('medicinesList');
+            if (medicinesList) {
+                medicinesList.innerHTML = '';
+            }
+            // Add one default medicine card
+            addMedicineCard();
+        });
+    }
 });
 </script>
+<style>
+/* Add to your existing CSS */
+.kanban-card .btn-outline-warning {
+    border-color: #ffc107;
+    color: #ffc107;
+    padding: 0.25rem 0.5rem;
+}
+
+.kanban-card .btn-outline-warning:hover {
+    background-color: #ffc107;
+    color: #000;
+    border-color: #ffc107;
+}
+
+.time-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.kanban-card {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.kanban-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+</style>
+<style>
+/* ...existing code... */
+/* Prescription Readonly Modal Table Styling */
+.prescription-readonly-modal .table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+.prescription-readonly-modal th, .prescription-readonly-modal td {
+    padding: 0.75rem;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid #dee2e6;
+}
+.prescription-readonly-modal th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #3282b8;
+}
+.prescription-readonly-modal .medicine-row {
+    background: #fff;
+}
+.prescription-readonly-modal .medicine-row:nth-child(even) {
+    background: #f6fafd;
+}
+.prescription-readonly-modal .table-responsive {
+    margin-top: 1rem;
+}
+.prescription-readonly-modal .prescription-header {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #0f4c75;
+    margin-bottom: 0.5rem;
+}
+.prescription-readonly-modal .prescription-section {
+    margin-bottom: 1.5rem;
+}
+/* ...existing code... */
+</style>
 {% endblock %}

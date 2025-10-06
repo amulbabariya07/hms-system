@@ -1,76 +1,253 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container py-5">
-    <h2 class="mb-4">Patient Timeline</h2>
-    <div class="timeline">
-        {% for appt in appointments %}
-        <div class="timeline-item d-flex mb-4">
-            <div class="timeline-date text-end pe-4" style="min-width:120px;">
-                <div class="fw-bold text-primary">{{ appt.appointment_date.strftime('%d %b %Y') }}</div>
-                <div class="small text-muted">{{ appt.appointment_time.strftime('%I:%M %p') if appt.appointment_time else '' }}</div>
-            </div>
-            <div class="timeline-content bg-white rounded shadow-sm p-4 flex-fill">
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex align-items-center justify-content-between">
                 <div>
-                    <span class="badge bg-info">{{ appt.status|capitalize }}</span>
+                    <h2 class="fw-bold text-primary mb-2">
+                        <i class="fa-solid fa-timeline me-3"></i>
+                        Patient Medical Timeline
+                    </h2>
+                    <p class="text-muted mb-0">Complete history of appointments and prescriptions</p>
                 </div>
-                <div class="mb-2">
-                    <strong>Booked by:</strong> Dr. {{ appt.doctor.full_name }} ({{ appt.doctor.specialization.name if appt.doctor.specialization else 'N/A' }})
+                <div class="text-end">
+                    <span class="badge bg-primary fs-6 px-3 py-2">
+                        <i class="fas fa-calendar-check me-2"></i>
+                        {{ appointments|length }} Appointments
+                    </span>
                 </div>
-                <div class="mb-2">
-                    <strong>Department:</strong> {{ appt.doctor.specialization.name if appt.doctor.specialization else 'N/A' }}
-                </div>
-                <div class="mb-2">
-                    <strong>Reason:</strong> {{ appt.reason or 'N/A' }}
-                </div>
-                {% if appt.prescriptions %}
-                {% set pres = appt.prescriptions[0] %}
-                <div>
-                    <strong>Prescription Date:</strong> {{ pres.created_at.strftime('%d %b %Y') }}
-                    <div class="table-responsive mt-2">
-                        <table class="table table-bordered table-sm align-middle mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Type</th>
-                                    <th>Dosage</th>
-                                    <th>Frequency</th>
-                                    <th>Days</th>
-                                    <th>Timing</th>
-                                    <th>Quantity</th>
-                                    <th>Notes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for med in pres.medicines %}
-                                <tr>
-                                    <td>{{ med.name }}</td>
-                                    <td>{{ med.type }}</td>
-                                    <td>{{ med.dosage }}</td>
-                                    <td>{{ med.frequency }}</td>
-                                    <td>{{ med.days }}</td>
-                                    <td>{{ med.timing }}</td>
-                                    <td>{{ med.quantity or '-' }}</td>
-                                    <td>{{ med.notes or '-' }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% if pres.instructions %}
-                    <div class="mt-2"><strong>Instructions:</strong> {{ pres.instructions }}</div>
-                    {% endif %}
-                </div>
-                {% else %}
-                <div><strong>No prescription for this appointment.</strong></div>
-                {% endif %}
             </div>
         </div>
-        {% endfor %}
+    </div>
+
+    <!-- Timeline Section -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <div class="timeline-container">
+                {% for appt in appointments %}
+                <div class="timeline-item position-relative mb-5">
+                    <!-- Timeline Connector -->
+                    <div class="timeline-connector"></div>
+                    
+                    <!-- Timeline Dot -->
+                    <div class="timeline-dot 
+                        {% if appt.status == 'completed' %}bg-success
+                        {% elif appt.status == 'under_consultation' %}bg-info
+                        {% elif appt.status == 'confirmed' %}bg-primary
+                        {% elif appt.status == 'scheduled' %}bg-warning
+                        {% elif appt.status == 'cancelled' %}bg-danger
+                        {% endif %}">
+                        <i class="fas 
+                            {% if appt.status == 'completed' %}fa-check
+                            {% elif appt.status == 'under_consultation' %}fa-stethoscope
+                            {% elif appt.status == 'confirmed' %}fa-calendar-check
+                            {% elif appt.status == 'scheduled' %}fa-clock
+                            {% elif appt.status == 'cancelled' %}fa-times
+                            {% endif %}"></i>
+                    </div>
+
+                    <!-- Timeline Card -->
+                    <div class="timeline-card card border-0 shadow-sm">
+                        <!-- Card Header -->
+                        <div class="card-header bg-gradient-primary text-white py-3">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-calendar-day me-2"></i>
+                                        {{ appt.appointment_date.strftime('%B %d, %Y') }}
+                                    </h5>
+                                </div>
+                                <div class="col-md-6 text-md-end">
+                                    <span class="badge bg-white text-primary fs-6">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ appt.appointment_time.strftime('%I:%M %p') if appt.appointment_time else 'Time N/A' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="card-body">
+                            <!-- Status and Doctor Info -->
+                            <div class="row mb-3">
+                                <div class="col-sm-6">
+                                    <span class="badge 
+                                        {% if appt.status == 'completed' %}bg-success
+                                        {% elif appt.status == 'under_consultation' %}bg-info
+                                        {% elif appt.status == 'confirmed' %}bg-primary
+                                        {% elif appt.status == 'scheduled' %}bg-warning
+                                        {% elif appt.status == 'cancelled' %}bg-danger
+                                        {% endif %} fs-6 px-3 py-2">
+                                        {{ appt.status|replace('_', ' ')|title }}
+                                    </span>
+                                </div>
+                                <div class="col-sm-6 text-sm-end">
+                                    <small class="text-muted">
+                                        <i class="fas fa-user-md me-1"></i>
+                                        Dr. {{ appt.doctor.full_name }}
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Appointment Details -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-start">
+                                        <i class="fas fa-stethoscope text-primary mt-1 me-3"></i>
+                                        <div>
+                                            <h6 class="mb-1 text-primary">Medical Department</h6>
+                                            <p class="mb-0 text-dark">{{ appt.doctor.specialization.name if appt.doctor.specialization else 'General' }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-start">
+                                        <i class="fas fa-file-medical text-primary mt-1 me-3"></i>
+                                        <div>
+                                            <h6 class="mb-1 text-primary">Consultation Reason</h6>
+                                            <p class="mb-0 text-dark">{{ appt.reason or 'Regular checkup' }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Prescription Section -->
+                            {% if appt.prescriptions %}
+                            {% set pres = appt.prescriptions[0] %}
+                            <div class="prescription-section border-top pt-3">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="text-success mb-0">
+                                        <i class="fa-solid fa-prescription me-2"></i>
+                                        Medical Prescription
+                                    </h5>
+                                    <small class="text-muted">
+                                        Issued: {{ pres.created_at.strftime('%b %d, %Y at %I:%M %p') }}
+                                    </small>
+                                </div>
+
+                                <!-- Medicines Table -->
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="table-success">
+                                            <tr>
+                                                <th>Medicine</th>
+                                                <th>Type</th>
+                                                <th>Dosage</th>
+                                                <th>Frequency</th>
+                                                <th>Duration</th>
+                                                <th>Timing</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for med in pres.medicines %}
+                                            <tr>
+                                                <td>
+                                                    <strong class="text-primary">{{ med.name }}</strong>
+                                                    {% if med.quantity %}
+                                                    <br><small class="text-muted">Qty: {{ med.quantity }}</small>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-light text-dark text-capitalize">
+                                                        {{ med.type }}
+                                                    </span>
+                                                </td>
+                                                <td>{{ med.dosage }}</td>
+                                                <td>
+                                                    <span class="badge bg-info text-capitalize">
+                                                        {{ med.frequency|replace('_', ' ') }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-warning text-dark">
+                                                        {{ med.days }} days
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-secondary text-capitalize">
+                                                        {{ med.timing|replace('_', ' ') }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Special Instructions -->
+                                {% if pres.instructions %}
+                                <div class="alert alert-light border mt-3">
+                                    <h6 class="alert-heading text-primary mb-2">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Doctor's Instructions
+                                    </h6>
+                                    <p class="mb-0 text-dark">{{ pres.instructions }}</p>
+                                </div>
+                                {% endif %}
+
+                                <!-- Medicine Notes -->
+                                {% for med in pres.medicines %}
+                                    {% if med.notes %}
+                                    <div class="card bg-light border-0 mt-2">
+                                        <div class="card-body py-2">
+                                            <small class="text-muted">
+                                                <strong>{{ med.name }}:</strong> {{ med.notes }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <!-- No Prescription -->
+                            <div class="text-center py-4">
+                                <i class="fa-solid fa-file-medical fa-2x text-muted mb-3"></i>
+                                <h6 class="text-muted">No Prescription Issued</h6>
+                                <p class="text-muted small mb-0">No medications were prescribed for this appointment</p>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Card Footer -->
+                        <div class="card-footer bg-light border-0">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <small class="text-muted">
+                                        <i class="fas fa-history me-1"></i>
+                                        Appointment ID: #{{ appt.id }}
+                                    </small>
+                                </div>
+                                <div class="col-md-6 text-md-end">
+                                    {% if appt.prescriptions %}
+                                    <button class="btn btn-outline-success btn-sm" onclick="openPrescriptionWizard('{{ appt.prescriptions[0].id }}')">
+                                        <i class="fa-solid fa-expand me-1"></i>
+                                        View Full Prescription
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <!-- Timeline End -->
+                <div class="timeline-end text-center py-4">
+                    <div class="timeline-dot bg-secondary">
+                        <i class="fas fa-flag"></i>
+                    </div>
+                    <p class="text-muted mt-2">Timeline Begins</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
 <!-- Prescription Modal -->
 <div class="modal fade" id="timelinePrescriptionModal" tabindex="-1" aria-labelledby="timelinePrescriptionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="timelinePrescriptionModalLabel">
@@ -85,6 +262,7 @@
         </div>
     </div>
 </div>
+
 <script>
 function openPrescriptionWizard(id) {
     fetch(`/doctor/prescription/${id}/view`)
@@ -93,36 +271,142 @@ function openPrescriptionWizard(id) {
             document.getElementById('timelinePrescriptionContent').innerHTML = html;
             var modal = new bootstrap.Modal(document.getElementById('timelinePrescriptionModal'));
             modal.show();
+        })
+        .catch(error => {
+            console.error('Error loading prescription:', error);
+            alert('Failed to load prescription details.');
         });
 }
 </script>
+
 <style>
-.timeline {
-    border-left: 3px solid #0d6efd;
-    margin-left: 60px;
+.timeline-container {
+    position: relative;
+    padding-left: 40px;
 }
+
 .timeline-item {
     position: relative;
 }
-.timeline-item:before {
-    content: '';
+
+.timeline-connector {
     position: absolute;
-    left: -32px;
-    top: 18px;
-    width: 16px;
-    height: 16px;
-    background: #0d6efd;
-    border-radius: 50%;
-    border: 3px solid #fff;
+    left: -40px;
+    top: 0;
+    bottom: -50px;
+    width: 2px;
+    background: linear-gradient(to bottom, #0d6efd, #6c757d);
     z-index: 1;
 }
-.timeline-date {
-    min-width: 120px;
-    color: #0d6efd;
+
+.timeline-dot {
+    position: absolute;
+    left: -48px;
+    top: 20px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    border: 4px solid white;
+    box-shadow: 0 0 0 3px #0d6efd;
+    z-index: 2;
+}
+
+.timeline-card {
+    margin-left: 20px;
+    transition: all 0.3s ease;
+    border-left: 4px solid #0d6efd;
+}
+
+.timeline-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.timeline-end .timeline-dot {
+    position: relative;
+    left: 0;
+    margin: 0 auto;
+    background: #6c757d;
+    box-shadow: 0 0 0 3px #f8f9fa;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
+}
+
+.card-header h5 {
     font-weight: 600;
 }
-.timeline-content {
-    margin-left: 16px;
+
+.table th {
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.prescription-section {
+    background: #f8f9fa;
+    margin: 0 -1rem;
+    padding: 1rem;
+    border-radius: 0.375rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .timeline-container {
+        padding-left: 30px;
+    }
+    
+    .timeline-dot {
+        left: -38px;
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+    
+    .timeline-connector {
+        left: -30px;
+    }
+    
+    .timeline-card {
+        margin-left: 15px;
+    }
+    
+    .card-header .row {
+        text-align: center;
+    }
+    
+    .card-header .col-md-6 {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.timeline-item {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.timeline-item:nth-child(even) {
+    animation-delay: 0.1s;
+}
+
+.timeline-item:nth-child(odd) {
+    animation-delay: 0.2s;
 }
 </style>
 {% endblock %}

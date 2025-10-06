@@ -97,7 +97,23 @@ class Appointment(db.Model):
     appointment_date = db.Column(db.Date, nullable=False)
     appointment_time = db.Column(db.Time)
     reason = db.Column(db.Text, nullable=True)
-    status = db.Column(db.String(20), default='scheduled')  # scheduled, completed, cancelled
+    status = db.Column(db.String(20), default='scheduled')  # scheduled, today_scheduled, confirmed, under_consultation, completed, cancelled
+    def get_display_status(self):
+        today = datetime.utcnow().date()
+        if self.status == 'scheduled' and self.appointment_date == today:
+            return 'Today Scheduled'
+        elif self.status == 'scheduled':
+            return 'Scheduled'
+        elif self.status == 'confirmed':
+            return 'Confirmed'
+        elif self.status == 'under_consultation':
+            return 'Under Consultation'
+        elif self.status == 'completed':
+            return 'Completed'
+        elif self.status == 'cancelled':
+            return 'Cancelled'
+        else:
+            return self.status.title()
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

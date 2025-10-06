@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fa-solid fa-prescription me-2"></i>Prescription Details (Read Only)</h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="mb-3">Patient: {{ appointment.patient_name }}</h5>
+                    <p><strong>Date:</strong> {{ appointment.appointment_date.strftime('%d %b %Y') if appointment.appointment_date else 'N/A' }}
+                        <span class="ms-3"><strong>Doctor:</strong> {{ doctor.full_name }}</span>
+                    </p>
+                    <hr>
+                    <h6 class="mb-2">Medicines</h6>
+                    {% if medicines %}
+                        <ul class="list-group mb-3">
+                        {% for med in medicines %}
+                            <li class="list-group-item">
+                                <strong>{{ med.name }}</strong> ({{ med.type }})<br>
+                                Dosage: {{ med.dosage }} | Frequency: {{ med.frequency }} | Days: {{ med.days }}<br>
+                                Timing: {{ med.timing }} | Quantity: {{ med.quantity }}<br>
+                                {% if med.notes %}<em>Notes: {{ med.notes }}</em>{% endif %}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">No medicines prescribed.</p>
+                    {% endif %}
+                    <hr>
+                    <h6 class="mb-2">Instructions</h6>
+                    <p>{{ prescription.instructions if prescription.instructions else 'No instructions provided.' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

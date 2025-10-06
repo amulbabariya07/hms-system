@@ -184,21 +184,12 @@ def doctor_appointments():
     
     appointments = appointments_query.order_by(Appointment.appointment_time).all()
 
-    # Compute display status for each appointment
-    today = date.today()
+    # Compute display status for each appointment using model helper
     for appt in appointments:
-        if appt.status == 'cancelled':
-            appt.display_status = 'Cancelled'
-        elif appt.status == 'completed':
-            appt.display_status = 'Appointment Done'
-        elif appt.appointment_date == today:
-            appt.display_status = 'Today Scheduled'
-        elif appt.status == 'scheduled':
-            appt.display_status = 'Appointment Booked'
-        else:
-            appt.display_status = appt.status.title()
+        appt.display_status = appt.get_display_status()
 
     # Get statistics
+    today = date.today()
     today_appointments = Appointment.query.filter_by(doctor_id=doctor_id, appointment_date=today).count()
     total_appointments = Appointment.query.filter_by(doctor_id=doctor_id).count()
     completed_appointments = Appointment.query.filter_by(doctor_id=doctor_id, status='completed').count()
@@ -230,17 +221,20 @@ def doctor_update_appointment_status(appointment_id):
             id=appointment_id, 
             doctor_id=session['doctor_id']
         ).first_or_404()
-        
         new_status = request.json.get('status')
-        
-        if new_status not in ['scheduled', 'completed', 'cancelled']:
-            return jsonify({'success': False, 'message': 'Invalid status'})
-        
+        valid_transitions = {
+            'scheduled': ['confirmed', 'cancelled'],
+            'confirmed': ['under_consultation', 'cancelled'],
+            'under_consultation': ['completed', 'cancelled'],
+            'completed': [],
+            'cancelled': [],
+        }
+        # Allow 'scheduled' to 'today_scheduled' as a display state, not a DB state
+        if appointment.status not in valid_transitions or new_status not in valid_transitions[appointment.status]:
+            return jsonify({'success': False, 'message': 'Invalid status transition'})
         appointment.status = new_status
         db.session.commit()
-        
         return jsonify({'success': True, 'message': f'Appointment status updated to {new_status}'})
-    
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': 'An error occurred while updating the appointment.'})
@@ -406,3 +400,15 @@ def add_prescription():
     flash('Prescription added successfully!', 'success')
     return redirect(url_for('doctor.doctor_appointments'))
 
+@doctor_bp.route('/appointment/<int:appointment_id>/prescription-info')
+def get_prescription_info(appointment_id):
+    if 'doctor_logged_in' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    from app.models import MedicalPrescription
+    prescription = MedicalPrescription.query.filter_by(appointment_id=appointment_id).first()
+    
+    return jsonify({
+        'has_prescription': prescription is not None,
+        'prescription_id': prescription.id if prescription else None
+    })

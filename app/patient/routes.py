@@ -707,10 +707,16 @@ def patient_timeline():
         return redirect(url_for('patient.patient_login'))
 
     patient_id = session['user_id']
+
+    from sqlalchemy import desc, nullslast
     appointments = Appointment.query.options(
         joinedload(Appointment.doctor).joinedload(Doctor.specialization),
         joinedload(Appointment.prescriptions).joinedload(MedicalPrescription.medicines)
-    ).filter_by(patient_id=patient_id).order_by(Appointment.appointment_date.desc(), Appointment.appointment_time.desc()).all()
+    ).filter_by(patient_id=patient_id)
+    appointments = appointments.order_by(
+        desc(Appointment.appointment_date),
+        nullslast(desc(Appointment.appointment_time))
+    ).all()
 
     return render_template('patient/patient_timeline.html', appointments=appointments)
 
