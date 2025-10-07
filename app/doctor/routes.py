@@ -273,7 +273,7 @@ def doctor_profile():
     if 'doctor_logged_in' not in session:
         return redirect(url_for('doctor.doctor_login'))
 
-    doctor = Doctor.query.get(session['doctor_logged_in'])
+    doctor = Doctor.query.get(session['doctor_id'])
     specializations = Specialization.query.order_by(Specialization.name).all()
     return render_template('doctor/profile.html', doctor=doctor, specializations=specializations)
 
@@ -291,7 +291,7 @@ def edit_profile():
     if 'doctor_logged_in' not in session:
         return redirect(url_for('doctor.doctor_login'))
 
-    doctor = Doctor.query.get(session['doctor_logged_in'])
+    doctor = Doctor.query.get(session['doctor_id'])
     specializations = Specialization.query.order_by(Specialization.name).all()
 
     doctor.full_name = request.form.get('full_name')
