@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4 text-primary"><i class="fas fa-file-alt me-2"></i> Intake Form (Read Only)</h2>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Personal Information</h5>
+            <p><strong>Name:</strong> {{ intake.first_name }} {{ intake.last_name }}</p>
+            <p><strong>Date of Birth:</strong> {{ intake.date_of_birth }}</p>
+            <p><strong>Age:</strong> {{ intake.age }}</p>
+            <p><strong>Gender:</strong> {{ intake.gender }}</p>
+            <p><strong>Blood Group:</strong> {{ intake.blood_group }}</p>
+            <p><strong>National ID:</strong> {{ intake.national_id }}</p>
+            <p><strong>Marital Status:</strong> {{ intake.marital_status }}</p>
+            <p><strong>Occupation:</strong> {{ intake.occupation }}</p>
+            <p><strong>Education Level:</strong> {{ intake.education_level }}</p>
+            <p><strong>Language Preference:</strong> {{ intake.language_preference }}</p>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Contact Details</h5>
+            <p><strong>Phone:</strong> {{ intake.phone_number }}</p>
+            <p><strong>Alternate Phone:</strong> {{ intake.alternate_phone }}</p>
+            <p><strong>Email:</strong> {{ intake.email_address }}</p>
+            <p><strong>Permanent Address:</strong> {{ intake.permanent_address }}</p>
+            <p><strong>Current Address:</strong> {{ intake.current_address }}</p>
+            <p><strong>Emergency Contact:</strong> {{ intake.emergency_contact_name }} ({{ intake.emergency_contact_relationship }}) - {{ intake.emergency_contact_phone }}</p>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Insurance Information</h5>
+            <p><strong>Provider:</strong> {{ intake.insurance_provider }}</p>
+            <p><strong>Policy Number:</strong> {{ intake.insurance_policy_number }}</p>
+            <p><strong>Coverage Details:</strong> {{ intake.coverage_details }}</p>
+            <p><strong>Validity Period:</strong> {{ intake.validity_period }}</p>
+            <p><strong>Primary Policy Holder:</strong> {{ intake.primary_policy_holder }}</p>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Medical History</h5>
+            <p><strong>Allergies:</strong> {{ intake.allergies }}</p>
+            <p><strong>Past Illnesses:</strong> {{ intake.past_illnesses }}</p>
+            <p><strong>Past Surgeries:</strong> {{ intake.past_surgeries }}</p>
+            <p><strong>Current Medications:</strong> {{ intake.current_medications }}</p>
+            <p><strong>Family History:</strong> {{ intake.family_history }}</p>
+            <p><strong>Vaccination Status:</strong> {{ intake.vaccination_status }}</p>
+            <p><strong>Chronic Conditions:</strong> {{ intake.chronic_conditions }}</p>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Lifestyle & Social History</h5>
+            <p><strong>Smoking Status:</strong> {{ intake.smoking_status }}</p>
+            <p><strong>Alcohol Use:</strong> {{ intake.alcohol_use }}</p>
+            <p><strong>Drug Use:</strong> {{ intake.drug_use }}</p>
+            <p><strong>Exercise Habits:</strong> {{ intake.exercise_habits }}</p>
+            <p><strong>Diet Pattern:</strong> {{ intake.diet_pattern }}</p>
+            <p><strong>Sleep Pattern:</strong> {{ intake.sleep_pattern }}</p>
+            <p><strong>Stress Level:</strong> {{ intake.stress_level }}</p>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Reproductive / OB-GYN History</h5>
+            <p><strong>Menstrual Cycle:</strong> {{ intake.menstrual_cycle }}</p>
+            <p><strong>Last Menstrual Period:</strong> {{ intake.last_menstrual_period }}</p>
+            <p><strong>Pregnancy Status:</strong> {{ intake.pregnancy_status }}</p>
+            <p><strong>Number of Pregnancies:</strong> {{ intake.number_of_pregnancies }}</p>
+            <p><strong>Number of Children:</strong> {{ intake.number_of_children }}</p>
+            <p><strong>Contraceptive Use:</strong> {{ intake.contraceptive_use }}</p>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Visit / Clinical Data</h5>
+            <p><strong>Reason for Visit:</strong> {{ intake.reason_for_visit }}</p>
+            <p><strong>Symptoms:</strong> {{ intake.symptoms }}</p>
+            <p><strong>Diagnosis:</strong> {{ intake.diagnosis }}</p>
+            <p><strong>Treatment Plan:</strong> {{ intake.treatment_plan }}</p>
+            <p><strong>Doctor Assigned:</strong> {{ intake.doctor_assigned }}</p>
+            <p><strong>Visit Date:</strong> {{ intake.visit_date }}</p>
+            <p><strong>Next Appointment Date:</strong> {{ intake.next_appointment_date }}</p>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Consent & Legal</h5>
+            <p><strong>Consent Form Signed:</strong> {{ 'Yes' if intake.consent_form_signed else 'No' }}</p>
+            <p><strong>Consent Date:</strong> {{ intake.consent_date }}</p>
+            <p><strong>Legal Guardian Name:</strong> {{ intake.legal_guardian_name }}</p>
+            <p><strong>Guardian Relationship:</strong> {{ intake.guardian_relationship }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

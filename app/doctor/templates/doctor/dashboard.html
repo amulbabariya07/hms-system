@@ -175,7 +175,7 @@
                         </div>
                         <div>
                             <h6 class="fw-bold mb-1">Total Patients</h6>
-                            <p class="text-muted mb-0">0 patients registered</p>
+                            <p class="text-muted mb-0">{{ total_patients }} patients registered</p>
                         </div>
                     </div>
                     <div class="stat-item d-flex align-items-center mb-3">
@@ -184,7 +184,7 @@
                         </div>
                         <div>
                             <h6 class="fw-bold mb-1">Today's Appointments</h6>
-                            <p class="text-muted mb-0">0 appointments scheduled</p>
+                            <p class="text-muted mb-0">{{ todays_appointments }} appointments scheduled</p>
                         </div>
                     </div>
                     <div class="stat-item d-flex align-items-center">
@@ -193,7 +193,13 @@
                         </div>
                         <div>
                             <h6 class="fw-bold mb-1">Practice Hours</h6>
-                            <p class="text-muted mb-0">Configure in settings</p>
+                            <p class="text-muted mb-0">
+                                {% if practice_hours %}
+                                    {{ practice_hours }}
+                                {% else %}
+                                    Configure in settings
+                                {% endif %}
+                            </p>
                         </div>
                     </div>
                 </div>

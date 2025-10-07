@@ -1,3 +1,4 @@
+
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from app import db
 from app.models import Doctor, Appointment, User, Specialization
@@ -10,6 +11,24 @@ def clean_mobile_number(number):
 
 doctor_bp = Blueprint('doctor', __name__, template_folder='templates')
 
+@doctor_bp.route('/patient/<int:patient_id>/intake-readonly')
+def patient_intake_readonly(patient_id):
+    from app.models import PatientIntakeForm, User
+    # Find appointment for this patient
+    appointment = Appointment.query.filter_by(patient_id=patient_id).first()
+    intake_form = None
+    if appointment:
+        # Intake form created_by matches patient id as string
+        intake_form = PatientIntakeForm.query.filter_by(created_by=str(patient_id)).first()
+    patient = User.query.get(patient_id)
+    if not intake_form:
+        return "No intake form found for this patient.", 404
+    return render_template('doctor/patient_intake_readonly.html', intake=intake_form, patient=patient)
+    patient = User.query.get(patient_id)
+    if not intake_form:
+        return "No intake form found for this patient.", 404
+    return render_template('doctor/patient_intake_readonly.html', intake=intake_form, patient=patient)
+    
 @doctor_bp.route('/prescription/<int:prescription_id>/view', methods=['GET'])
 def view_prescription_readonly(prescription_id):
     from app.models import MedicalPrescription, Medicine, Doctor
@@ -24,16 +43,19 @@ def view_prescription_readonly(prescription_id):
 
 @doctor_bp.route('/patient/<int:patient_id>/timeline')
 def patient_timeline(patient_id):
-    from app.models import Appointment
+    from app.models import Appointment, PatientIntakeForm
     appointments = (
         Appointment.query
         .filter_by(patient_id=patient_id)
         .order_by(Appointment.appointment_date.desc(), Appointment.appointment_time.desc())
         .all()
     )
+    # Fetch intake form for this patient
+    intake_form = PatientIntakeForm.query.filter_by(created_by=str(patient_id)).first()
     return render_template(
         'doctor/patient_timeline.html',
-        appointments=appointments
+        appointments=appointments,
+        intake_form=intake_form
     )
 
 @doctor_bp.route('/login')
@@ -150,7 +172,17 @@ def doctor_dashboard():
         return redirect(url_for('doctor.doctor_login'))
     
     doctor = Doctor.query.get(session['doctor_id'])
-    return render_template('doctor/dashboard.html', doctor=doctor)
+    # Total patients for this doctor
+    total_patients = User.query.join(Appointment).filter(Appointment.doctor_id == doctor.id).distinct().count()
+    # Today's appointments for this doctor
+    today = date.today()
+    todays_appointments = Appointment.query.filter_by(doctor_id=doctor.id, appointment_date=today).count()
+    # Practice hours (if stored in Doctor model, else None)
+    practice_hours = getattr(doctor, 'practice_hours', None)
+    return render_template('doctor/dashboard.html', doctor=doctor,
+                           total_patients=total_patients,
+                           todays_appointments=todays_appointments,
+                           practice_hours=practice_hours)
 
 @doctor_bp.route('/appointments')
 def doctor_appointments():
@@ -194,11 +226,22 @@ def doctor_appointments():
     total_appointments = Appointment.query.filter_by(doctor_id=doctor_id).count()
     completed_appointments = Appointment.query.filter_by(doctor_id=doctor_id, status='completed').count()
 
+    # Appointment status counts
+    scheduled_count = Appointment.query.filter_by(doctor_id=doctor_id, status='scheduled').count()
+    confirmed_count = Appointment.query.filter_by(doctor_id=doctor_id, status='confirmed').count()
+    consultation_count = Appointment.query.filter_by(doctor_id=doctor_id, status='under_consultation').count()
+    completed_count = Appointment.query.filter_by(doctor_id=doctor_id, status='completed').count()
+    cancelled_count = Appointment.query.filter_by(doctor_id=doctor_id, status='cancelled').count()
+
     stats = {
         'today': today_appointments,
         'total': total_appointments,
         'completed': completed_appointments,
-        'pending': total_appointments - completed_appointments
+        'pending': total_appointments - completed_appointments,
+        'scheduled': scheduled_count,
+        'confirmed': confirmed_count,
+        'consultation': consultation_count,
+        'cancelled': cancelled_count
     }
 
     return render_template('doctor/appointments.html', 

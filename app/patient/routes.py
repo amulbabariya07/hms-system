@@ -120,8 +120,8 @@ def patient_intake_form():
         flash('Please log in to access the intake form.', 'warning')
         return redirect(url_for('patient.patient_login'))
 
-    user_id_str = str(session['user_id'])
-    form_data = PatientIntakeForm.query.filter_by(created_by=user_id_str).first()
+    user_id = session['user_id']
+    form_data = PatientIntakeForm.query.filter_by(created_by=str(user_id)).first()
 
     # Check edit mode
     edit_mode = request.args.get("edit") == "1"
@@ -131,7 +131,7 @@ def patient_intake_form():
             form_to_update = form_data
         else:
             form_to_update = PatientIntakeForm(
-                created_by=user_id_str,
+                created_by=str(user_id),
                 registration_date=datetime.utcnow(),
                 status='Active'
             )
@@ -166,8 +166,8 @@ def download_intake_form_pdf():
         flash('Please log in to access the intake form.', 'warning')
         return redirect(url_for('patient.patient_login'))
 
-    user_id_str = str(session['user_id'])
-    form = PatientIntakeForm.query.filter_by(created_by=user_id_str).first()
+    user_id = session['user_id']
+    form = PatientIntakeForm.query.filter_by(user_id=user_id).first()
     if not form:
         flash('No intake form found.', 'danger')
         return redirect(url_for('patient.patient_intake_form'))
@@ -556,6 +556,14 @@ def book_appointment_post():
         # Convert to datetime - use a default time (e.g., 10:00 AM)
         appointment_datetime = datetime.strptime(appointment_date, "%Y-%m-%d")
         default_time = time(10, 0)  # 10:00 AM as default
+
+        # Prevent booking for past dates
+        today = datetime.today().date()
+        if appointment_datetime.date() < today:
+            if is_ajax:
+                return jsonify(success=False, message="Cannot book appointment for past dates.")
+            flash("You can only book appointments for today or future dates.", "danger")
+            return redirect(url_for('patient.book_appointment'))
 
         patient = User.query.get(session['user_id'])
         doctor = Doctor.query.get(doctor_id)

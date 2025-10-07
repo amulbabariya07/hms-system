@@ -168,7 +168,8 @@ class PatientIntakeForm(db.Model):
     __tablename__ = 'patient_intake_form'
 
     # 1. Personal Information
-    id = Column(Integer, primary_key=True)  # Patient_ID
+    id = Column(Integer, primary_key=True)
+    created_by = db.Column(db.String(100)) 
     first_name = Column(String(100), nullable=False)
     last_name = Column(String(100), nullable=False)
     date_of_birth = Column(Date, nullable=False)

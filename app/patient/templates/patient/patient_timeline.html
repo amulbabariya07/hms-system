@@ -1,105 +1,684 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">My Medical Timeline</h2>
-        <a href="{{ url_for('patient.download_timeline_report') }}" class="btn btn-success btn-lg rounded-pill">
+{% include "patient/header.html" %}
+<div class="bg-dark-subtle">
+    <div class="container py-5 ">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="display-6 fw-bold text-primary mb-2">My Medical Timeline</h1>
+            <p class="text-muted">Complete overview of your healthcare journey - from booking to follow-up</p>
+        </div>
+        <a href="{{ url_for('patient.download_timeline_report') }}" class="btn btn-success btn-lg rounded-pill shadow-sm">
             <i class="fas fa-file-download me-2"></i> Download Report
         </a>
     </div>
-    <div class="timeline">
-        {% for appt in appointments %}
-        <div class="timeline-item d-flex mb-4">
-            <div class="timeline-date text-end pe-4" style="min-width:120px;">
-                <div class="fw-bold text-primary">{{ appt.appointment_date.strftime('%d %b %Y') }}</div>
-                <div class="small text-muted">{{ appt.appointment_time.strftime('%I:%M %p') if appt.appointment_time else '' }}</div>
-            </div>
-            <div class="timeline-content bg-white rounded shadow-sm p-4 flex-fill">
-                <div>
-                    <span class="badge bg-info">{{ appt.status|capitalize }}</span>
+    
+    <!-- Timeline Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body py-3">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Filter by Status</label>
+                    <select class="form-select timeline-filter" id="status-filter">
+                        <option value="all">All Statuses</option>
+                        <option value="scheduled">Scheduled</option>
+                        <option value="today_scheduled">Today Scheduled</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="under_consultation">Under Consultation</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
                 </div>
-                <div class="mb-2">
-                    <strong>Doctor:</strong> Dr. {{ appt.doctor.full_name }} ({{ appt.doctor.specialization.name if appt.doctor.specialization else 'N/A' }})
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Filter by Doctor</label>
+                    <select class="form-select timeline-filter" id="doctor-filter">
+                        <option value="all">All Doctors</option>
+                        {% for appt in appointments %}
+                        <option value="{{ appt.doctor.id }}">Dr. {{ appt.doctor.full_name }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
-                <div class="mb-2">
-                    <strong>Department:</strong> {{ appt.doctor.specialization.name if appt.doctor.specialization else 'N/A' }}
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Date Range</label>
+                    <input type="date" class="form-control timeline-filter" id="date-filter">
                 </div>
-                <div class="mb-2">
-                    <strong>Reason:</strong> {{ appt.reason or 'N/A' }}
-                </div>
-                {% if appt.prescriptions %}
-                {% set pres = appt.prescriptions[0] %}
-                <div>
-                    <strong>Prescription Date:</strong> {{ pres.created_at.strftime('%d %b %Y') }}
-                    <div class="table-responsive mt-2">
-                        <table class="table table-bordered table-sm align-middle mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Type</th>
-                                    <th>Dosage</th>
-                                    <th>Frequency</th>
-                                    <th>Days</th>
-                                    <th>Timing</th>
-                                    <th>Quantity</th>
-                                    <th>Notes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for med in pres.medicines %}
-                                <tr>
-                                    <td>{{ med.name }}</td>
-                                    <td>{{ med.type }}</td>
-                                    <td>{{ med.dosage }}</td>
-                                    <td>{{ med.frequency }}</td>
-                                    <td>{{ med.days }}</td>
-                                    <td>{{ med.timing }}</td>
-                                    <td>{{ med.quantity or '-' }}</td>
-                                    <td>{{ med.notes or '-' }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Search</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="timeline-search" placeholder="Search appointments...">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
                     </div>
-                    {% if pres.instructions %}
-                    <div class="mt-2"><strong>Instructions:</strong> {{ pres.instructions }}</div>
-                    {% endif %}
                 </div>
-                {% else %}
-                <div><strong>No prescription for this appointment.</strong></div>
-                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ appointments|length }}</h4>
+                            <p class="mb-0">Total Appointments</p>
+                        </div>
+                        <div class="icon-circle">
+                            <i class="fas fa-calendar-check fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ appointments|selectattr('status', 'equalto', 'completed')|list|length }}</h4>
+                            <p class="mb-0">Completed</p>
+                        </div>
+                        <div class="icon-circle">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ appointments|selectattr('status', 'in', ['scheduled', 'today_scheduled', 'confirmed', 'under_consultation'])|list|length }}</h4>
+                            <p class="mb-0">Upcoming</p>
+                        </div>
+                        <div class="icon-circle">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">
+                                {{ appointments 
+                                   | selectattr('prescriptions', 'defined') 
+                                   | selectattr('prescriptions', '!=', []) 
+                                   | list 
+                                   | length }}
+                            </h4>
+                            <p class="mb-0">With Prescriptions</p>
+                            <p class="mb-0">With Prescriptions</p>
+                        </div>
+                        <div class="icon-circle">
+                            <i class="fas fa-prescription fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Timeline -->
+    <div class="timeline-container">
+        {% for appt in appointments %}
+        <div class="timeline-item" data-status="{{ appt.status }}" data-doctor="{{ appt.doctor.id }}" data-date="{{ appt.appointment_date.strftime('%Y-%m-%d') }}">
+            <div class="timeline-marker">
+                <div class="timeline-date">
+                    <div class="date-day">{{ appt.appointment_date.strftime('%d') }}</div>
+                    <div class="date-month">{{ appt.appointment_date.strftime('%b') }}</div>
+                    <div class="date-year">{{ appt.appointment_date.strftime('%Y') }}</div>
+                </div>
+                <div class="timeline-time">{{ appt.appointment_time.strftime('%I:%M %p') if appt.appointment_time else '' }}</div>
+                <div class="timeline-status status-{{ appt.status }}">
+                    {{ appt.get_display_status() }}
+                </div>
+            </div>
+            
+            <div class="timeline-card card shadow-sm border-0">
+                <div class="card-header bg-transparent border-0 pb-0">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge status-badge status-{{ appt.status }}">{{ appt.get_display_status() }}</span>
+                                {% if appt.payments %}
+                                <span class="badge bg-success ms-2">
+                                    <i class="fas fa-check-circle me-1"></i> Paid
+                                </span>
+                                {% endif %}
+                            </div>
+                            <h5 class="card-title mb-1">Appointment with Dr. {{ appt.doctor.full_name }}</h5>
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-stethoscope me-1"></i>
+                                {{ appt.doctor.specialization.name if appt.doctor.specialization else 'General' }}
+                            </p>
+                        </div>
+                        <div class="timeline-actions">
+                            <button class="btn btn-sm btn-outline-primary timeline-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#appointment-{{ loop.index }}">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="collapse show" id="appointment-{{ loop.index }}">
+                    <div class="card-body pt-3">
+                        <!-- Appointment Progress Timeline -->
+                        <div class="appointment-progress mb-4">
+                            <div class="progress-steps">
+                                {% set steps = [
+                                    {'status': 'scheduled', 'icon': 'calendar-check', 'label': 'Booked'},
+                                    {'status': 'today_scheduled', 'icon': 'clock', 'label': 'Today'},
+                                    {'status': 'confirmed', 'icon': 'check-circle', 'label': 'Confirmed'},
+                                    {'status': 'under_consultation', 'icon': 'user-md', 'label': 'Consultation'},
+                                    {'status': 'completed', 'icon': 'check-double', 'label': 'Completed'}
+                                ] %}
+                                
+                                {% for step in steps %}
+                                <div class="progress-step {% if step.status == appt.status %}active{% endif %}">
+                                    <div class="step-icon">
+                                        <i class="fas fa-{{ step.icon }}"></i>
+                                    </div>
+                                    <div class="step-label">{{ step.label }}</div>
+                                </div>
+                                {% if not loop.last %}
+                                <div class="progress-connector"></div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Basic Information -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <i class="fas fa-user-md text-primary me-2"></i>
+                                    <span class="fw-semibold">Doctor:</span> Dr. {{ appt.doctor.full_name }}
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-graduation-cap text-primary me-2"></i>
+                                    <span class="fw-semibold">Qualification:</span> {{ appt.doctor.qualification }}
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-hospital text-primary me-2"></i>
+                                    <span class="fw-semibold">Hospital:</span> {{ appt.doctor.hospital_affiliation or 'N/A' }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <i class="fas fa-stethoscope text-primary me-2"></i>
+                                    <span class="fw-semibold">Department:</span> {{ appt.doctor.specialization.name if appt.doctor.specialization else 'N/A' }}
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-briefcase text-primary me-2"></i>
+                                    <span class="fw-semibold">Experience:</span> {{ appt.doctor.experience_years }} years
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-id-card text-primary me-2"></i>
+                                    <span class="fw-semibold">License:</span> {{ appt.doctor.license_number }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Reason for Visit -->
+                        {% if appt.reason %}
+                        <div class="info-item mb-3">
+                            <i class="fas fa-comment-medical text-primary me-2"></i>
+                            <span class="fw-semibold">Reason for Visit:</span> {{ appt.reason }}
+                        </div>
+                        {% endif %}
+
+                        <!-- Payment Information -->
+                        {% if appt.payments %}
+                        {% set payment = appt.payments[0] %}
+                        <div class="payment-info mb-3">
+                            <div class="info-item">
+                                <i class="fas fa-credit-card text-success me-2"></i>
+                                <span class="fw-semibold">Payment:</span> 
+                                <span class="text-success">₹{{ "%.2f"|format(payment.amount) }} - {{ payment.status|upper }}</span>
+                                <small class="text-muted ms-2">(Ref: {{ payment.razorpay_payment_id }})</small>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Prescription Section -->
+                        {% if appt.prescriptions %}
+                        {% set pres = appt.prescriptions[0] %}
+                        <div class="prescription-section mt-4">
+                            <div class="section-header">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="fas fa-prescription text-success me-2 fs-5"></i>
+                                    <h6 class="mb-0 fw-bold text-success">Prescription Details</h6>
+                                    <span class="badge bg-light text-dark ms-2">{{ pres.created_at.strftime('%d %b %Y') }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-3">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Medicine</th>
+                                            <th>Type</th>
+                                            <th>Dosage</th>
+                                            <th>Frequency</th>
+                                            <th>Duration</th>
+                                            <th>Timing</th>
+                                            <th>Quantity</th>
+                                            <th>Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for med in pres.medicines %}
+                                        <tr>
+                                            <td>
+                                                <div class="fw-semibold">{{ med.name }}</div>
+                                                {% if med.quantity %}
+                                                <small class="text-muted">Qty: {{ med.quantity }}</small>
+                                                {% endif %}
+                                            </td>
+                                            <td><span class="badge bg-info text-dark">{{ med.type }}</span></td>
+                                            <td>{{ med.dosage }}</td>
+                                            <td>{{ med.frequency }}</td>
+                                            <td>{{ med.days }} days</td>
+                                            <td>{{ med.timing }}</td>
+                                            <td>{{ med.quantity or '-' }}</td>
+                                            <td>{{ med.notes or '-' }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            {% if pres.instructions %}
+                            <div class="instructions-card card bg-light border-0">
+                                <div class="card-body py-3">
+                                    <h6 class="card-title mb-2"><i class="fas fa-info-circle text-primary me-2"></i>Additional Instructions</h6>
+                                    <p class="mb-0">{{ pres.instructions }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Download Prescription Button -->
+                            <div class="mt-3">
+                                <a href="{{ url_for('patient.download_prescription_pdf', appointment_id=appt.id) }}" 
+                                   class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-download me-1"></i> Download Prescription
+                                </a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-light border mt-3" role="alert">
+                            <i class="fas fa-info-circle me-2"></i> No prescription provided for this appointment.
+                        </div>
+                        {% endif %}
+
+                        <!-- Action Buttons -->
+                        <div class="timeline-actions mt-4 pt-3 border-top">
+                            <div class="btn-group" role="group">
+                                {% if appt.status in ['scheduled', 'today_scheduled', 'confirmed'] %}
+                                <a href="#" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#rescheduleModal{{ appt.id }}">
+                                    <i class="fas fa-calendar-alt me-1"></i> Reschedule
+                                </a>
+                                <a href="{{ url_for('patient.cancel_appointment', appointment_id=appt.id) }}" 
+                                   class="btn btn-outline-danger btn-sm"
+                                   onclick="return confirm('Are you sure you want to cancel this appointment?')">
+                                    <i class="fas fa-times me-1"></i> Cancel
+                                </a>
+                                {% endif %}
+                                
+                                <a href="{{ url_for('patient.download_appointment', appointment_id=appt.id) }}" 
+                                   class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-file-pdf me-1"></i> Download Summary
+                                </a>
+                                
+                                {% if appt.payments %}
+                                <a href="{{ url_for('patient.download_payment_receipt', payment_id=appt.payments[0].id) }}" 
+                                   class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-receipt me-1"></i> Receipt
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         {% endfor %}
+        
+        {% if not appointments %}
+        <div class="text-center py-5">
+            <div class="empty-state">
+                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No appointments found</h4>
+                <p class="text-muted">You don't have any medical appointments in your timeline yet.</p>
+                <a href="{{ url_for('patient.book_appointment') }}" class="btn btn-primary mt-2">
+                    <i class="fas fa-plus me-1"></i> Book Your First Appointment
+                </a>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
+</div>
+
+
 <style>
-.timeline {
-    border-left: 3px solid #0d6efd;
-    margin-left: 60px;
-}
-.timeline-item {
+.timeline-container {
     position: relative;
+    padding-left: 40px;
 }
-.timeline-item:before {
+
+.timeline-container:before {
     content: '';
     position: absolute;
-    left: -32px;
-    top: 18px;
-    width: 16px;
-    height: 16px;
-    background: #0d6efd;
-    border-radius: 50%;
-    border: 3px solid #fff;
-    z-index: 1;
+    top: 0;
+    bottom: 0;
+    left: 20px;
+    width: 3px;
+    background: linear-gradient(to bottom, #0d6efd, #6f42c1);
+    border-radius: 3px;
 }
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -40px;
+    top: 0;
+    width: 80px;
+    text-align: center;
+    z-index: 2;
+}
+
 .timeline-date {
-    min-width: 120px;
-    color: #0d6efd;
+    background: #0d6efd;
+    color: white;
+    border-radius: 8px;
+    padding: 8px 5px;
+    margin-bottom: 5px;
+    box-shadow: 0 3px 10px rgba(13, 110, 253, 0.2);
+}
+
+.date-day {
+    font-size: 1.5rem;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.date-month {
+    font-size: 0.85rem;
     font-weight: 600;
 }
-.timeline-content {
-    margin-left: 16px;
+
+.date-year {
+    font-size: 0.75rem;
+    opacity: 0.9;
+}
+
+.timeline-time {
+    font-size: 0.8rem;
+    color: #6c757d;
+    background: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    display: inline-block;
+    border: 1px solid #e9ecef;
+    margin-bottom: 5px;
+}
+
+.timeline-status {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 12px;
+    display: inline-block;
+    font-weight: 600;
+}
+
+.timeline-card {
+    margin-left: 50px;
+    border-left: 3px solid #0d6efd !important;
+    transition: all 0.3s ease;
+}
+
+.timeline-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08) !important;
+}
+
+.status-badge {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+.status-scheduled { background-color: #d1edff; color: #0d6efd; }
+.status-today_scheduled { background-color: #fff3cd; color: #856404; }
+.status-confirmed { background-color: #d4edda; color: #155724; }
+.status-under_consultation { background-color: #e2e3e5; color: #383d41; }
+.status-completed { background-color: #d1e7dd; color: #0f5132; }
+.status-cancelled { background-color: #f8d7da; color: #721c24; }
+
+.info-item {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+}
+
+.prescription-section {
+    border-top: 1px dashed #dee2e6;
+    padding-top: 15px;
+}
+
+.instructions-card {
+    border-left: 3px solid #0d6efd !important;
+}
+
+.timeline-toggle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.empty-state {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Progress Steps */
+.appointment-progress {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.step-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e9ecef;
+    color: #6c757d;
+    margin-bottom: 5px;
+    transition: all 0.3s ease;
+}
+
+.progress-step.active .step-icon {
+    background: #0d6efd;
+    color: white;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
+}
+
+.step-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6c757d;
+}
+
+.progress-step.active .step-label {
+    color: #0d6efd;
+}
+
+.progress-connector {
+    flex-grow: 1;
+    height: 2px;
+    background: #e9ecef;
+    margin: 0 10px;
+}
+
+.progress-step.active ~ .progress-step .step-icon {
+    background: #e9ecef;
+    color: #6c757d;
+}
+
+.progress-step.active ~ .progress-step .step-label {
+    color: #6c757d;
+}
+
+/* Stats Cards */
+.icon-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .timeline-container {
+        padding-left: 30px;
+    }
+    
+    .timeline-container:before {
+        left: 15px;
+    }
+    
+    .timeline-marker {
+        left: -30px;
+        width: 60px;
+    }
+    
+    .timeline-card {
+        margin-left: 40px;
+    }
+    
+    .date-day {
+        font-size: 1.2rem;
+    }
+    
+    .date-month, .date-year {
+        font-size: 0.7rem;
+    }
+    
+    .progress-steps {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .progress-step {
+        margin: 5px;
+    }
+    
+    .progress-connector {
+        display: none;
+    }
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filter functionality
+    const filters = document.querySelectorAll('.timeline-filter');
+    const searchInput = document.getElementById('timeline-search');
+    
+    function filterTimeline() {
+        const statusFilter = document.getElementById('status-filter').value;
+        const doctorFilter = document.getElementById('doctor-filter').value;
+        const dateFilter = document.getElementById('date-filter').value;
+        const searchTerm = searchInput.value.toLowerCase();
+        
+        document.querySelectorAll('.timeline-item').forEach(item => {
+            const status = item.getAttribute('data-status');
+            const doctor = item.getAttribute('data-doctor');
+            const date = item.getAttribute('data-date');
+            const text = item.textContent.toLowerCase();
+            
+            const statusMatch = statusFilter === 'all' || status === statusFilter;
+            const doctorMatch = doctorFilter === 'all' || doctor === doctorFilter;
+            const dateMatch = !dateFilter || date === dateFilter;
+            const searchMatch = text.includes(searchTerm);
+            
+            if (statusMatch && doctorMatch && dateMatch && searchMatch) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+    
+    filters.forEach(filter => {
+        filter.addEventListener('change', filterTimeline);
+    });
+    
+    searchInput.addEventListener('input', filterTimeline);
+    
+    // Toggle collapse state
+    document.querySelectorAll('.timeline-toggle').forEach(button => {
+        button.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            if (icon.classList.contains('fa-chevron-down')) {
+                icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+            } else {
+                icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+            }
+        });
+    });
+
+    // Auto-collapse all timeline items except first one
+    document.querySelectorAll('.collapse').forEach((collapse, index) => {
+        if (index !== 0) {
+            collapse.classList.remove('show');
+            const toggleBtn = collapse.previousElementSibling.querySelector('.timeline-toggle');
+            if (toggleBtn) {
+                const icon = toggleBtn.querySelector('i');
+                icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+            }
+        }
+    });
+});
+</script>
+{% include 'patient/footer.html' %}
 {% endblock %}

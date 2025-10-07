@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 {% include "doctor/dr_header.html" %}
-
 <!-- Breadcrumb -->
 <div class="bg-light py-3">
     <div class="container">
@@ -14,40 +13,58 @@
     </div>
 </div>
 <!-- Header Section -->
-<div class="bg-gradient-primary text-white py-4">
-    <div class="container">
+<!-- Appointment Overview Header -->
+<div class="bg-gradient-primary text-white py-5 position-relative overflow-hidden">
+    <div class="p-3 position-relative">
         <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-6 fw-bold mb-2">
-                    <i class="fas fa-calendar-check me-3"></i>
+            <!-- Title Section -->
+            <div class="col-lg-5 mb-4 mb-lg-0">
+                <h1 class="display-5 fw-bold mb-3">
+                    <i class="fas fa-calendar-check me-2 text-warning"></i>
                     View Appointments
                 </h1>
-                <p class="lead mb-0">Manage your patient appointments efficiently</p>
+                <p class="lead opacity-75">
+                    Manage, track, and review your patient appointments seamlessly.
+                </p>
             </div>
-            <div class="col-lg-6">
-                <div class="row g-3 text-center">
-                    <div class="col-3">
-                        <div class="stat-card bg-white bg-opacity-20 rounded-3 p-3">
-                            <div class="stat-number fw-bold fs-4">{{ stats.today }}</div>
-                            <div class="stat-label small">Today</div>
+            <!-- Stats Section -->
+            <div class="col-lg-7">
+                <div class="row g-3 justify-content-center">
+                    <!-- Stat Card -->
+                    <div class="col-4 col-md-2">
+                        <div class="stat-card text-center p-3 rounded-4 bg-glass shadow-sm">
+                            <div class="fw-bold fs-4">{{ stats.scheduled }}</div>
+                            <div class="small opacity-75">Scheduled</div>
                         </div>
                     </div>
-                    <div class="col-3">
-                        <div class="stat-card bg-white bg-opacity-20 rounded-3 p-3">
-                            <div class="stat-number fw-bold fs-4">{{ stats.total }}</div>
-                            <div class="stat-label small">Total</div>
+                    <div class="col-4 col-md-2">
+                        <div class="stat-card text-center p-3 rounded-4 bg-glass shadow-sm">
+                            <div class="fw-bold fs-4">{{ stats.confirmed }}</div>
+                            <div class="small opacity-75">Confirmed</div>
                         </div>
                     </div>
-                    <div class="col-3">
-                        <div class="stat-card bg-white bg-opacity-20 rounded-3 p-3">
-                            <div class="stat-number fw-bold fs-4">{{ stats.completed }}</div>
-                            <div class="stat-label small">Completed</div>
+                    <div class="col-4 col-md-2">
+                        <div class="stat-card text-center p-3 rounded-4 bg-glass shadow-sm">
+                            <div class="fw-bold fs-4">{{ stats.consultation }}</div>
+                            <div class="small opacity-75">Consultation</div>
                         </div>
                     </div>
-                    <div class="col-3">
-                        <div class="stat-card bg-white bg-opacity-20 rounded-3 p-3">
-                            <div class="stat-number fw-bold fs-4">{{ stats.pending }}</div>
-                            <div class="stat-label small">Pending</div>
+                    <div class="col-4 col-md-2">
+                        <div class="stat-card text-center p-3 rounded-4 bg-glass shadow-sm">
+                            <div class="fw-bold fs-4">{{ stats.completed }}</div>
+                            <div class="small opacity-75">Completed</div>
+                        </div>
+                    </div>
+                    <div class="col-4 col-md-2">
+                        <div class="stat-card text-center p-3 rounded-4 bg-glass shadow-sm">
+                            <div class="fw-bold fs-4">{{ stats.cancelled }}</div>
+                            <div class="small opacity-75">Cancelled</div>
+                        </div>
+                    </div>
+                    <div class="col-4 col-md-2">
+                        <div class="stat-card text-center p-3 rounded-4 bg-glass shadow-sm">
+                            <div class="fw-bold fs-4">{{ stats.total }}</div>
+                            <div class="small opacity-75">Total</div>
                         </div>
                     </div>
                 </div>
@@ -55,6 +72,22 @@
         </div>
     </div>
 </div>
+<!-- Custom Styles -->
+<style>
+    .bg-gradient {
+    background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
+  }
+  .bg-glass {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease, background 0.3s ease;
+  }
+  .bg-glass:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.25);
+  }
+</style>
 <!-- Controls Section -->
 <div class="bg-white py-4 shadow-sm">
     <div class="container">
@@ -104,7 +137,7 @@
     </div>
 </div>
 <!-- Appointments Content -->
-<div class="py-5">
+<div class="py-5 bg-body-secondary">
     <div class="container">
         {% if appointments %}
         {% if view_type == 'list' %}
@@ -115,10 +148,9 @@
                 <table class="table table-hover">
                     <thead class="table-light">
                         <tr>
-                            <th>Time</th>
+                            <th>#</th>
                             <th>Patient</th>
                             <th>Contact</th>
-                            <th>Symptoms</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -126,16 +158,7 @@
                     <tbody>
                         {% for appointment in appointments %}
                         <tr>
-                            <td>
-                                <div class="time-slot">
-                                    <div class="fw-bold text-primary">
-                                        {{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}
-                                    </div>
-                                    <small class="text-muted">
-                                        {{ appointment.appointment_date.strftime('%b %d') if appointment.appointment_date else 'N/A' }}
-                                    </small>
-                                </div>
-                            </td>
+                            <td class="fw-bold text-primary">{{ loop.index }}</td>
                             <td>
                                 <div class="patient-info">
                                     <div class="fw-bold">{{ appointment.user.full_name if appointment.user else 'N/A' }}</div>
@@ -154,12 +177,6 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="symptoms">
-                                    {{ appointment.symptoms[:50] if appointment.symptoms is defined and appointment.symptoms else 'N/A' }}
-                                    {% if appointment.symptoms is defined and appointment.symptoms and appointment.symptoms|length > 50 %}...{% endif %}
-                                </div>
-                            </td>
-                            <td>
                                 <span class="badge status-badge 
                             {% if appointment.status == 'completed' %}bg-success
                             {% elif appointment.status == 'under_consultation' %}bg-info
@@ -173,6 +190,9 @@
                             </td>
                             <td>
                                 <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-primary" onclick="openIntakeReadonly('{{ appointment.user.id }}')" title="Patient Intake Form">
+                                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                    </button>
                                     <!-- SCHEDULED: Only Confirm and Cancel -->
                                     {% if appointment.status == 'scheduled' and appointment.appointment_date == date.today() %}
                                     <button class="btn btn-sm btn-primary" onclick="updateStatus('{{ appointment.id }}', 'confirmed')">
@@ -255,14 +275,16 @@
                             <div class="kanban-card bg-white rounded-3 p-3 mb-3 shadow-sm">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <div class="time-badge bg-warning text-dark px-2 py-1 rounded-pill small">
-                                        {{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}
+                                        #{{ loop.index }}
                                     </div>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="openIntakeReadonly('{{ appointment.user.id }}')" title="Intake Form">
+                                        <i class="fas fa-file-alt"></i>
+                                    </button>
                                 </div>
                                 <h6 class="fw-bold mb-1">{{ appointment.user.full_name if appointment.user else 'N/A' }}</h6>
                                 <p class="text-muted small mb-2">
                                     <i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}
                                 </p>
-                                <p class="small mb-3">{{ appointment.symptoms[:60] if appointment.symptoms else 'N/A' }}{% if appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
                                 <!-- SCHEDULED: Only Confirm and Cancel buttons -->
                                 {% if appointment.appointment_date == date.today() %}
                                 <div class="d-grid gap-2">
@@ -281,6 +303,12 @@
                                 {% endif %}
                             </div>
                             {% endfor %}
+                            {% if appointments | selectattr('status', 'equalto', 'scheduled') | list | length == 0 %}
+                            <div class="text-center p-4 bg-white rounded-3 shadow-sm">
+                                <i class="fas fa-calendar-times fa-2x text-muted mb-2"></i>
+                                <p class="text-muted mb-0">No scheduled appointments</p>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -295,9 +323,8 @@
                             <div class="kanban-card bg-white rounded-3 p-3 mb-3 shadow-sm">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <div class="time-badge bg-primary text-white px-2 py-1 rounded-pill small">
-                                        {{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}
+                                        #{{ loop.index }}
                                     </div>
-                                    <!-- CONFIRMED: View Details and Timeline buttons -->
                                     <div class="btn-group">
                                         <button class="btn btn-sm btn-outline-primary" onclick="viewAppointment('{{ appointment.id }}')" title="View Details">
                                             <i class="fas fa-eye"></i>
@@ -307,14 +334,15 @@
                                             <i class="fa-solid fa-timeline"></i>
                                         </button>
                                         {% endif %}
+                                        <button class="btn btn-sm btn-outline-primary" onclick="openIntakeReadonly('{{ appointment.user.id }}')" title="Intake Form">
+                                            <i class="fas fa-file-alt"></i>
+                                        </button>
                                     </div>
                                 </div>
                                 <h6 class="fw-bold mb-1">{{ appointment.user.full_name if appointment.user else 'N/A' }}</h6>
                                 <p class="text-muted small mb-2">
                                     <i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}
                                 </p>
-                                <p class="small mb-3">{{ appointment.symptoms[:60] if appointment.symptoms else 'N/A' }}{% if appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
-                                <!-- CONFIRMED: Status action buttons -->
                                 <div class="d-grid gap-2">
                                     <button class="btn btn-sm btn-info" onclick="updateStatus('{{ appointment.id }}', 'under_consultation')">
                                         <i class="fas fa-stethoscope me-1"></i>Start Consultation
@@ -325,6 +353,12 @@
                                 </div>
                             </div>
                             {% endfor %}
+                            {% if appointments | selectattr('status', 'equalto', 'confirmed') | list | length == 0 %}
+                            <div class="text-center p-4 bg-white rounded-3 shadow-sm">
+                                <i class="fas fa-clipboard-check fa-2x text-muted mb-2"></i>
+                                <p class="text-muted mb-0">No confirmed appointments</p>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -339,9 +373,8 @@
                             <div class="kanban-card bg-white rounded-3 p-3 mb-3 shadow-sm">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <div class="time-badge bg-info text-white px-2 py-1 rounded-pill small">
-                                        {{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}
+                                        #{{ loop.index }}
                                     </div>
-                                    <!-- UNDER CONSULTATION: Rx, View, Timeline buttons -->
                                     <div class="btn-group">
                                         <button class="btn btn-sm btn-outline-success" onclick="openPrescriptionModal('{{ appointment.id }}')" title="Rx (Prescription)">
                                             <i class="fa-solid fa-prescription"></i>
@@ -354,14 +387,15 @@
                                             <i class="fa-solid fa-timeline"></i>
                                         </button>
                                         {% endif %}
+                                        <button class="btn btn-sm btn-outline-primary" onclick="openIntakeReadonly('{{ appointment.user.id }}')" title="Intake Form">
+                                            <i class="fas fa-file-alt"></i>
+                                        </button>
                                     </div>
                                 </div>
                                 <h6 class="fw-bold mb-1">{{ appointment.user.full_name if appointment.user else 'N/A' }}</h6>
                                 <p class="text-muted small mb-2">
                                     <i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}
                                 </p>
-                                <p class="small mb-3">{{ appointment.symptoms[:60] if appointment.symptoms else 'N/A' }}{% if appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
-                                <!-- UNDER CONSULTATION: Status action button -->
                                 <div class="d-grid">
                                     <button class="btn btn-sm btn-success" onclick="updateStatus('{{ appointment.id }}', 'completed')">
                                         <i class="fas fa-check-circle me-1"></i>Complete Consultation
@@ -369,6 +403,12 @@
                                 </div>
                             </div>
                             {% endfor %}
+                            {% if appointments | selectattr('status', 'equalto', 'under_consultation') | list | length == 0 %}
+                            <div class="text-center p-4 bg-white rounded-3 shadow-sm">
+                                <i class="fas fa-stethoscope fa-2x text-muted mb-2"></i>
+                                <p class="text-muted mb-0">No consultations in progress</p>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -381,23 +421,27 @@
                         <div class="kanban-body bg-light p-3 rounded-bottom">
                             {% for appointment in appointments if appointment.status == 'completed' %}
                             <div class="kanban-card bg-white rounded-3 p-3 mb-3 shadow-sm">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <div class="time-badge bg-success text-white px-2 py-1 rounded-pill small">
-                                        {{ appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A' }}
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <span class="time-badge bg-success text-white px-2 py-1 rounded-pill small">
+                                            #{{ loop.index }}
+                                        </span>
                                     </div>
-                                    <!-- COMPLETED: Only Timeline button -->
-                                    {% if appointment.user %}
-                                    <button class="btn btn-sm btn-outline-warning" onclick="openTimelineModal('{{ appointment.user.id }}')" title="Patient Timeline">
-                                        <i class="fa-solid fa-timeline"></i>
-                                    </button>
-                                    {% endif %}
+                                    <div class="btn-group" role="group">
+                                        {% if appointment.user %}
+                                        <button class="btn btn-sm btn-outline-warning" onclick="openTimelineModal('{{ appointment.user.id }}')" title="Patient Timeline">
+                                            <i class="fa-solid fa-timeline"></i>
+                                        </button>
+                                        {% endif %}
+                                        <button class="btn btn-sm btn-outline-primary" onclick="openIntakeReadonly('{{ appointment.user.id }}')" title="Intake Form">
+                                            <i class="fas fa-file-alt"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <h6 class="fw-bold mb-1">{{ appointment.user.full_name if appointment.user else 'N/A' }}</h6>
                                 <p class="text-muted small mb-2">
                                     <i class="fas fa-phone me-1"></i>{{ appointment.user.mobile_number if appointment.user else 'N/A' }}
                                 </p>
-                                <p class="small mb-3">{{ appointment.symptoms[:60] if appointment.symptoms else 'N/A' }}{% if appointment.symptoms and appointment.symptoms|length > 60 %}...{% endif %}</p>
-                                <!-- COMPLETED: View Prescription button -->
                                 <div class="d-grid">
                                     <button class="btn btn-sm btn-outline-success" onclick="viewPrescription('{{ appointment.id }}')">
                                         <i class="fa-solid fa-file-medical me-1"></i>View Prescription
@@ -405,6 +449,12 @@
                                 </div>
                             </div>
                             {% endfor %}
+                            {% if appointments | selectattr('status', 'equalto', 'completed') | list | length == 0 %}
+                            <div class="text-center p-4 bg-white rounded-3 shadow-sm">
+                                <i class="fas fa-check-double fa-2x text-muted mb-2"></i>
+                                <p class="text-muted mb-0">No completed appointments</p>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -433,7 +483,7 @@
     </div>
 </div>
 <!-- Appointment Details Modal -->
-<div class="modal fade" id="appointmentDetailsModal" tabindex="-1" aria-labelledby="appointmentDetailsModalLabel" aria-hidden="true">
+<div class="modal bg-body-secondary fade" id="appointmentDetailsModal" tabindex="-1" aria-labelledby="appointmentDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
@@ -579,7 +629,7 @@
     </div>
 </div>
 <script>
-function viewAppointment(appointmentId) {
+    function viewAppointment(appointmentId) {
     fetch(`{{ url_for("doctor.doctor_appointment_details", appointment_id=0) }}`.replace('0', appointmentId))
     .then(response => response.json())
     .then(data => {
@@ -748,6 +798,17 @@ function openTimelineModal(patientId) {
                     </div>
                 `;
             }
+        });
+}
+
+function openIntakeReadonly(patientId) {
+    fetch(`/doctor/patient/${patientId}/intake-readonly?ajax=1`)
+        .then(response => response.text())
+        .then(html => {
+            // Show in modal (reuse timeline modal for simplicity)
+            document.getElementById('timelineContent').innerHTML = html;
+            const modal = new bootstrap.Modal(document.getElementById('timelineModal'));
+            modal.show();
         });
 }
 </script>
@@ -992,35 +1053,44 @@ document.addEventListener('DOMContentLoaded', function() {
     width: 100%;
     margin-bottom: 1rem;
 }
-.prescription-readonly-modal th, .prescription-readonly-modal td {
+
+.prescription-readonly-modal th,
+.prescription-readonly-modal td {
     padding: 0.75rem;
     text-align: left;
     vertical-align: middle;
     border-bottom: 1px solid #dee2e6;
 }
+
 .prescription-readonly-modal th {
     background: #f8f9fa;
     font-weight: 600;
     color: #3282b8;
 }
+
 .prescription-readonly-modal .medicine-row {
     background: #fff;
 }
+
 .prescription-readonly-modal .medicine-row:nth-child(even) {
     background: #f6fafd;
 }
+
 .prescription-readonly-modal .table-responsive {
     margin-top: 1rem;
 }
+
 .prescription-readonly-modal .prescription-header {
     font-size: 1.1rem;
     font-weight: 500;
     color: #0f4c75;
     margin-bottom: 0.5rem;
 }
+
 .prescription-readonly-modal .prescription-section {
     margin-bottom: 1.5rem;
 }
+
 /* ...existing code... */
 </style>
 {% include "doctor/dr_footer.html" %}
