@@ -1,10 +1,6 @@
-from app.admin.mail_setting import get_mail_settings
-import smtplib
-from email.mime.text import MIMEText
-
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from app import db
-from app.models import User, Doctor, Appointment, ContactQuery
+from app.models import User, Doctor, Appointment, ContactQuery, PatientIntakeForm, MedicalPrescription, Medicine
 from datetime import datetime
 import re
 
@@ -99,10 +95,21 @@ def receptionist_dashboard():
 @login_required
 def receptionist_patients():
     try:
-        patients = User.query.all() if User else []
-    except:
+        search_query = request.args.get('search', '').strip()
+        
+        if search_query:
+            # Search by patient name or mobile number
+            patients = User.query.filter(
+                (User.full_name.ilike(f'%{search_query}%')) | 
+                (User.mobile_number.ilike(f'%{search_query}%'))
+            ).all()
+        else:
+            patients = User.query.all() if User else []
+    except Exception as e:
         patients = []
-    return render_template('receptionist/patients.html', patients=patients)
+        flash(f'Error loading patients: {str(e)}', 'danger')
+    
+    return render_template('receptionist/patients.html', patients=patients, search_query=search_query)
 
 @receptionist_bp.route('/patients/add', methods=['GET', 'POST'])
 @login_required
@@ -204,23 +211,64 @@ def receptionist_edit_patient(patient_id):
 @login_required
 def receptionist_appointments():
     try:
-        appointments = Appointment.query.all() if Appointment else []
-    except:
+        search_query = request.args.get('search', '').strip()
+        date_filter = request.args.get('date', '').strip()
+        status_filter = request.args.get('status', 'all')
+        
+        # Flag: are we showing today's appointments? Only apply smart ordering if date_filter is empty
+        today_only = False
+        if not date_filter:
+            today_only = True
+            date_filter = datetime.now().date().isoformat()  # default to today
+        
+        appointments_query = Appointment.query
+        
+        # Apply search filter
+        if search_query:
+            appointments_query = appointments_query.join(User).join(Doctor).filter(
+                (User.full_name.ilike(f'%{search_query}%')) | 
+                (Doctor.full_name.ilike(f'%{search_query}%')) |
+                (Appointment.patient_name.ilike(f'%{search_query}%'))
+            )
+        
+        # Apply date filter
+        if date_filter:
+            try:
+                filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
+                appointments_query = appointments_query.filter(Appointment.appointment_date == filter_date)
+            except ValueError:
+                flash('Invalid date format. Please use YYYY-MM-DD.', 'warning')
+        
+        # Apply status filter
+        if status_filter != 'all':
+            appointments_query = appointments_query.filter(Appointment.status == status_filter)
+        
+        appointments = appointments_query.all()
+        
+        # Compute display status
+        for appt in appointments:
+            appt.display_status = appt.get_display_status() if hasattr(appt, 'get_display_status') else appt.status.title()
+        
+        # Smart ordering ONLY for today
+        if today_only:
+            under_consultation = [a for a in appointments if a.status == 'under_consultation']
+            scheduled_today = [a for a in appointments if a.status == 'scheduled']
+            completed_or_cancelled = [a for a in appointments if a.status in ['completed', 'cancelled']]
+            # Concatenate lists: top highlighted, then scheduled, then completed
+            appointments = under_consultation + scheduled_today + completed_or_cancelled
+
+    except Exception as e:
         appointments = []
-    # Compute display status for each appointment
-    today = datetime.now().date()
-    for appt in appointments:
-        if appt.status == 'cancelled':
-            appt.display_status = 'Cancelled'
-        elif appt.status == 'completed':
-            appt.display_status = 'Appointment Done'
-        elif appt.appointment_date == today:
-            appt.display_status = 'Today Scheduled'
-        elif appt.status == 'scheduled':
-            appt.display_status = 'Appointment Booked'
-        else:
-            appt.display_status = appt.status.title()
-    return render_template('receptionist/appointments.html', appointments=appointments)
+        flash(f'Error loading appointments: {str(e)}', 'danger')
+    
+    return render_template(
+        'receptionist/appointments.html',
+        appointments=appointments,
+        search_query=search_query,
+        date_filter=date_filter,
+        status_filter=status_filter
+    )
+
 
 @receptionist_bp.route('/appointments/create', methods=['GET', 'POST'])
 @login_required
@@ -264,6 +312,113 @@ def create_appointment():
     
     return render_template('receptionist/create_appointment.html', patients=patients, doctors=doctors)
 
+@receptionist_bp.route('/appointments/edit/<int:appointment_id>', methods=['GET', 'POST'])
+@login_required
+def edit_appointment_page(appointment_id):
+    """Edit appointment details via modal"""
+    try:
+        appointment = Appointment.query.get_or_404(appointment_id)
+        
+        if request.method == 'POST':
+            try:
+                # Get form data
+                appointment_date = request.form.get('appointment_date')
+                appointment_time = request.form.get('appointment_time')
+                reason = request.form.get('reason')
+                status = request.form.get('status')
+                
+                # Validation
+                if not all([appointment_date, appointment_time, status]):
+                    return jsonify({'success': False, 'message': 'All required fields must be filled.'})
+                
+                # Convert date and time
+                try:
+                    appointment_date = datetime.strptime(appointment_date, '%Y-%m-%d').date()
+                    appointment_time = datetime.strptime(appointment_time, '%H:%M').time()
+                except ValueError:
+                    return jsonify({'success': False, 'message': 'Invalid date or time format.'})
+                
+                # Update appointment
+                appointment.appointment_date = appointment_date
+                appointment.appointment_time = appointment_time
+                appointment.reason = reason
+                appointment.status = status
+                appointment.updated_at = datetime.utcnow()
+                
+                db.session.commit()
+                return jsonify({'success': True, 'message': 'Appointment updated successfully!'})
+                
+            except Exception as e:
+                db.session.rollback()
+                return jsonify({'success': False, 'message': f'Error updating appointment: {str(e)}'})
+        
+        # GET request - return appointment data
+        return jsonify({
+            'success': True,
+            'appointment': {
+                'id': appointment.id,
+                'appointment_date': appointment.appointment_date.strftime('%Y-%m-%d') if appointment.appointment_date else '',
+                'appointment_time': appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else '',
+                'reason': appointment.reason if appointment.reason else '',
+                'status': appointment.status
+            }
+        })
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': f'Error loading appointment details: {str(e)}'})
+
+@receptionist_bp.route('/appointments/update/<int:appointment_id>', methods=['POST'])
+@login_required
+def update_appointment(appointment_id):
+    """Update appointment details"""
+    try:
+        appointment = Appointment.query.get_or_404(appointment_id)
+        
+        patient_id = request.form.get('patient_id')
+        doctor_id = request.form.get('doctor_id')
+        patient_name = request.form.get('patient_name')
+        appointment_date = request.form.get('appointment_date')
+        appointment_time = request.form.get('appointment_time')
+        reason = request.form.get('reason')
+        status = request.form.get('status')
+
+        # Validation
+        if not all([patient_id, doctor_id, patient_name, appointment_date, appointment_time, status]):
+            flash('All required fields must be filled.', 'danger')
+            return redirect(url_for('receptionist.edit_appointment_page', appointment_id=appointment_id))
+
+        if status not in ['scheduled', 'completed', 'cancelled', 'confirmed', 'under_consultation']:
+            flash('Invalid status selected.', 'danger')
+            return redirect(url_for('receptionist.edit_appointment_page', appointment_id=appointment_id))
+
+        try:
+            appointment_date = datetime.strptime(appointment_date, '%Y-%m-%d').date()
+            appointment_time = datetime.strptime(appointment_time, '%H:%M').time()
+        except ValueError:
+            flash('Invalid date or time format.', 'danger')
+            return redirect(url_for('receptionist.edit_appointment_page', appointment_id=appointment_id))
+
+        # Update appointment information
+        appointment.patient_id = patient_id
+        appointment.doctor_id = doctor_id
+        appointment.patient_name = patient_name
+        appointment.appointment_date = appointment_date
+        appointment.appointment_time = appointment_time
+        appointment.reason = reason
+        appointment.status = status
+        appointment.updated_at = datetime.utcnow()
+
+        db.session.commit()
+        flash('Appointment updated successfully!', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error updating appointment: {str(e)}', 'danger')
+    
+    return redirect(url_for('receptionist.receptionist_appointments'))
+
 @receptionist_bp.route('/appointments/details/<int:appointment_id>')
 @login_required
 def receptionist_appointment_details(appointment_id):
@@ -276,54 +431,18 @@ def receptionist_appointment_details(appointment_id):
                 'patient_name': appointment.user.full_name if appointment.user else 'N/A',
                 'patient_mobile': appointment.user.mobile_number if appointment.user else 'N/A',
                 'doctor_name': appointment.doctor.full_name if appointment.doctor else 'N/A',
-                'doctor_specialization': appointment.doctor.specialization if appointment.doctor else 'N/A',
+                'doctor_specialization': appointment.doctor.specialization if appointment.doctor and hasattr(appointment.doctor, 'specialization') else 'N/A',
                 'appointment_date': appointment.appointment_date.strftime('%Y-%m-%d') if appointment.appointment_date else 'N/A',
                 'appointment_time': appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A',
-                'symptoms': appointment.symptoms if hasattr(appointment, 'symptoms') else 'N/A',
+                'reason': appointment.reason if appointment.reason else 'N/A',
+                'symptoms': appointment.symptoms if appointment.symptoms else 'N/A',
                 'status': appointment.status,
-                'created_at': appointment.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                'display_status': appointment.get_display_status() if hasattr(appointment, 'get_display_status') else appointment.status.title(),
+                'created_at': appointment.created_at.strftime('%Y-%m-%d %H:%M:%S') if appointment.created_at else ''
             }
         })
     except Exception as e:
-        return jsonify({'success': False, 'message': 'Error fetching appointment details'})
-
-@receptionist_bp.route('/appointments/edit/<int:appointment_id>', methods=['POST'])
-@login_required
-def receptionist_edit_appointment(appointment_id):
-    try:
-        appointment = Appointment.query.get_or_404(appointment_id)
-        
-        appointment_date = request.form.get('appointment_date')
-        appointment_time = request.form.get('appointment_time')
-        symptoms = request.form.get('symptoms', '')
-        status = request.form.get('status')
-
-        # Validation
-        if not all([appointment_date, appointment_time, status]):
-            return jsonify({'success': False, 'message': 'Date, time and status are required.'})
-
-        if status not in ['scheduled', 'completed', 'cancelled']:
-            return jsonify({'success': False, 'message': 'Invalid status'})
-
-        try:
-            appointment_date = datetime.strptime(appointment_date, '%Y-%m-%d').date()
-            appointment_time = datetime.strptime(appointment_time, '%H:%M').time()
-        except ValueError:
-            return jsonify({'success': False, 'message': 'Invalid date or time format'})
-
-        # Update appointment information
-        appointment.appointment_date = appointment_date
-        appointment.appointment_time = appointment_time
-        if hasattr(appointment, 'symptoms'):
-            appointment.symptoms = symptoms
-        appointment.status = status
-
-        db.session.commit()
-        return jsonify({'success': True, 'message': 'Appointment updated successfully!'})
-
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'success': False, 'message': 'An error occurred while updating the appointment.'})
+        return jsonify({'success': False, 'message': f'Error fetching appointment details: {str(e)}'})
 
 @receptionist_bp.route('/appointments/delete/<int:appointment_id>', methods=['POST'])
 @login_required
@@ -337,7 +456,6 @@ def receptionist_delete_appointment(appointment_id):
         db.session.rollback()
         return jsonify({'success': False, 'message': 'An error occurred while deleting the appointment.'})
 
-
 # New routes for patients queries management
 @receptionist_bp.route('/queries')
 @login_required
@@ -348,6 +466,7 @@ def patients_queries():
         status_filter = request.args.get('status', 'all')
         priority_filter = request.args.get('priority', 'all')
         query_type_filter = request.args.get('query_type', 'all')
+        search_query = request.args.get('search', '').strip()
         view_type = request.args.get('view', 'list')  # list or kanban
         
         # Base query
@@ -360,6 +479,15 @@ def patients_queries():
             queries = queries.filter(ContactQuery.priority == priority_filter)
         if query_type_filter != 'all':
             queries = queries.filter(ContactQuery.query_type == query_type_filter)
+        
+        # Apply search filter
+        if search_query:
+            queries = queries.filter(
+                (ContactQuery.name.ilike(f'%{search_query}%')) |
+                (ContactQuery.email.ilike(f'%{search_query}%')) |
+                (ContactQuery.phone.ilike(f'%{search_query}%')) |
+                (ContactQuery.message.ilike(f'%{search_query}%'))
+            )
         
         # Order by created_at descending (newest first)
         queries = queries.order_by(ContactQuery.created_at.desc()).all()
@@ -388,6 +516,7 @@ def patients_queries():
                          current_status=status_filter,
                          current_priority=priority_filter,
                          current_query_type=query_type_filter,
+                         search_query=search_query,
                          view_type=view_type)
 
 @receptionist_bp.route('/queries/<int:query_id>')
@@ -450,7 +579,6 @@ def delete_query(query_id):
     
     return redirect(url_for('receptionist.patients_queries'))
 
-
 @receptionist_bp.route('/queries/<int:query_id>/details')
 @login_required
 def get_query_details(query_id):
@@ -480,10 +608,13 @@ def get_query_details(query_id):
     except Exception as e:
         return jsonify({'success': False, 'message': 'Error fetching query details'})
 
-
 @receptionist_bp.route('/queries/<int:query_id>/reply', methods=['POST'])
 @login_required
 def reply_to_query(query_id):
+    from app.admin.mail_setting import get_mail_settings
+    import smtplib
+    from email.mime.text import MIMEText
+    
     data = request.get_json()
     message = data.get('message')
     recipient_email = data.get('email')
@@ -530,3 +661,38 @@ def reply_to_query(query_id):
 
     except Exception as e:
         return jsonify({'success': False, 'message': 'An error occurred while sending the reply. Please check your email configuration or try again later.'})
+
+@receptionist_bp.route('/patient/<int:patient_id>/intake-readonly')
+@login_required
+def patient_intake_readonly(patient_id):
+    # Find appointment for this patient
+    appointment = Appointment.query.filter_by(patient_id=patient_id).first()
+    intake_form = None
+    if appointment:
+        # Intake form created_by matches patient id as string
+        intake_form = PatientIntakeForm.query.filter_by(created_by=str(patient_id)).first()
+    patient = User.query.get(patient_id)
+    if not intake_form:
+        return "No intake form found for this patient.", 404
+    return render_template('doctor/patient_intake_readonly.html', intake=intake_form, patient=patient)
+
+@receptionist_bp.route('/prescription/<int:prescription_id>/view', methods=['GET'])
+@login_required
+def view_prescription_readonly(prescription_id):
+    pres = MedicalPrescription.query.get_or_404(prescription_id)
+    medicines = pres.medicines
+    doctor = pres.doctor
+    appointment = pres.appointment
+    return render_template('doctor/prescription_readonly.html', prescription=pres, medicines=medicines, doctor=doctor, appointment=appointment)
+
+@receptionist_bp.route('/appointment/<int:appointment_id>/prescription-info')
+@login_required
+def get_prescription_info(appointment_id):
+    prescription = MedicalPrescription.query.filter_by(appointment_id=appointment_id).first()
+    if prescription:
+        return jsonify({
+            'has_prescription': True,
+            'prescription_id': prescription.id
+        })
+    else:
+        return jsonify({'has_prescription': False})

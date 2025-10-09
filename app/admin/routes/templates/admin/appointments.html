@@ -160,6 +160,15 @@
                             </td>
                             <td class="text-end">
                                 <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-primary" onclick="openIntakeReadonly('{{ appointment.user.id }}')" title="Patient Intake Form">
+                                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-warning" onclick="openTimelineModal('{{ appointment.user.id }}')" title="Patient Timeline">
+                                        <i class="fa-solid fa-timeline"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success" onclick="viewPrescription('{{ appointment.id }}')" title="View Prescription">
+                                        <i class="fa-solid fa-file-medical"></i>
+                                    </button>
                                     <button type="button" class="btn btn-sm btn-outline-primary" 
                                             title="View Details" 
                                             onclick="openAppointmentWizard({{ appointment.id }}, 'view')">
@@ -195,262 +204,352 @@
             {% endif %}
         </div>
     </div>
-</div>
 
-<!-- Appointment Wizard Modal -->
-<div class="modal fade" id="appointmentWizardModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-xl modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-info text-white">
-        <h5 class="modal-title">
-          <i class="fas fa-calendar-check me-2"></i>Appointment Wizard
-        </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body" id="appointmentWizardContent">
-        <div class="text-center py-5">
-          <div class="spinner-border text-info" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<div class="modal fade" id="editAppointmentModal" tabindex="-1" aria-labelledby="editAppointmentModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-warning text-dark">
-                <h5 class="modal-title" id="editAppointmentModalLabel">
-                    <i class="fas fa-edit me-2"></i>Edit Appointment
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editAppointmentForm">
-                    <input type="hidden" id="editAppointmentId" name="appointment_id">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="editPatientName" class="form-label">Patient Name</label>
-                            <input type="text" class="form-control" id="editPatientName" readonly>
+    <div class="modal fade" id="editAppointmentModal" tabindex="-1" aria-labelledby="editAppointmentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="editAppointmentModalLabel">
+                        <i class="fas fa-edit me-2"></i>Edit Appointment
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editAppointmentForm">
+                        <input type="hidden" id="editAppointmentId" name="appointment_id">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="editPatientName" class="form-label">Patient Name</label>
+                                <input type="text" class="form-control" id="editPatientName" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editDoctorName" class="form-label">Doctor</label>
+                                <input type="text" class="form-control" id="editDoctorName" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editAppointmentDate" class="form-label">Appointment Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="editAppointmentDate" name="appointment_date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editAppointmentTime" class="form-label">Appointment Time <span class="text-danger">*</span></label>
+                                <input type="time" class="form-control" id="editAppointmentTime" name="appointment_time" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editStatus" class="form-label">Status <span class="text-danger">*</span></label>
+                                <select class="form-select" id="editStatus" name="status" required>
+                                    <option value="scheduled">Scheduled</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editPriority" class="form-label">Priority</label>
+                                <select class="form-select" id="editPriority" name="priority">
+                                    <option value="normal">Normal</option>
+                                    <option value="urgent">Urgent</option>
+                                    <option value="emergency">Emergency</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label for="editReason" class="form-label">Reason/Symptoms <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="editReason" name="reason" rows="3" required placeholder="Describe the reason for the appointment..."></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label for="editNotes" class="form-label">Admin Notes</label>
+                                <textarea class="form-control" id="editNotes" name="notes" rows="2" placeholder="Any additional notes for internal use..."></textarea>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label for="editDoctorName" class="form-label">Doctor</label>
-                            <input type="text" class="form-control" id="editDoctorName" readonly>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="editAppointmentDate" class="form-label">Appointment Date <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" id="editAppointmentDate" name="appointment_date" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="editAppointmentTime" class="form-label">Appointment Time <span class="text-danger">*</span></label>
-                            <input type="time" class="form-control" id="editAppointmentTime" name="appointment_time" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="editStatus" class="form-label">Status <span class="text-danger">*</span></label>
-                            <select class="form-select" id="editStatus" name="status" required>
-                                <option value="scheduled">Scheduled</option>
-                                <option value="completed">Completed</option>
-                                <option value="cancelled">Cancelled</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="editPriority" class="form-label">Priority</label>
-                            <select class="form-select" id="editPriority" name="priority">
-                                <option value="normal">Normal</option>
-                                <option value="urgent">Urgent</option>
-                                <option value="emergency">Emergency</option>
-                            </select>
-                        </div>
-                        <div class="col-12">
-                            <label for="editReason" class="form-label">Reason/Symptoms <span class="text-danger">*</span></label>
-                            <textarea class="form-control" id="editReason" name="reason" rows="3" required placeholder="Describe the reason for the appointment..."></textarea>
-                        </div>
-                        <div class="col-12">
-                            <label for="editNotes" class="form-label">Admin Notes</label>
-                            <textarea class="form-control" id="editNotes" name="notes" rows="2" placeholder="Any additional notes for internal use..."></textarea>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-warning" onclick="submitEditAppointment()">
-                    <i class="fas fa-save me-2"></i>Update Appointment
-                </button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning" onclick="submitEditAppointment()">
+                        <i class="fas fa-save me-2"></i>Update Appointment
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-// Filter functionality
-document.getElementById('statusFilter').addEventListener('change', filterAppointments);
-document.getElementById('dateFilter').addEventListener('change', filterAppointments);
-document.getElementById('searchAppointments').addEventListener('keyup', filterAppointments);
+    <script>
+    // Filter functionality
+    document.getElementById('statusFilter').addEventListener('change', filterAppointments);
+    document.getElementById('dateFilter').addEventListener('change', filterAppointments);
+    document.getElementById('searchAppointments').addEventListener('keyup', filterAppointments);
 
-function filterAppointments() {
-    const statusFilter = document.getElementById('statusFilter').value;
-    const dateFilter = document.getElementById('dateFilter').value;
-    const searchTerm = document.getElementById('searchAppointments').value.toLowerCase();
-    const tableRows = document.querySelectorAll('#appointmentsTable tbody tr');
-    
-    tableRows.forEach(row => {
-        let showRow = true;
+    function filterAppointments() {
+        const statusFilter = document.getElementById('statusFilter').value;
+        const dateFilter = document.getElementById('dateFilter').value;
+        const searchTerm = document.getElementById('searchAppointments').value.toLowerCase();
+        const tableRows = document.querySelectorAll('#appointmentsTable tbody tr');
         
-        // Status filter
-        if (statusFilter && row.dataset.status !== statusFilter) {
-            showRow = false;
-        }
-        
-        // Date filter
-        // Note: The date in the row's data-date is expected to be in YYYY-MM-DD format
-        if (dateFilter && row.dataset.date !== dateFilter) {
-            showRow = false;
-        }
-        
-        // Search filter (searches the entire text content of the row)
-        const patientName = row.cells[1].textContent.toLowerCase();
-        const doctorName = row.cells[2].textContent.toLowerCase();
-        if (searchTerm && !patientName.includes(searchTerm) && !doctorName.includes(searchTerm)) {
-            showRow = false;
-        }
-        
-        row.style.display = showRow ? '' : 'none';
-    });
-}
-
-// Update appointment status
-function updateAppointmentStatus(appointmentId, status) {
-    if (!confirm(`Are you sure you want to mark this appointment as ${status}?`)) {
-        return;
-    }
-    
-    fetch(`{{ url_for("admin.admin_update_appointment_status", appointment_id=0) }}`.replace('0', appointmentId), {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            // Include CSRF token if your app uses it
-        },
-        body: JSON.stringify({ status: status })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showAlert('success', data.message);
-            setTimeout(() => location.reload(), 1500);
-        } else {
-            showAlert('danger', data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showAlert('danger', 'An error occurred. Please try again.');
-    });
-}
-
-
-// Submit edit appointment form
-function submitEditAppointment() {
-    const form = document.getElementById('editAppointmentForm');
-    if (!form.checkValidity()) {
-        form.classList.add('was-validated');
-        return;
-    }
-    const formData = new FormData(form);
-    const appointmentId = document.getElementById('editAppointmentId').value;
-    
-    const submitBtn = document.querySelector('#editAppointmentModal .btn-warning');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Updating...';
-    submitBtn.disabled = true;
-    
-    fetch(`{{ url_for("admin.admin_edit_appointment", appointment_id=0) }}`.replace('0', appointmentId), {
-        method: 'POST',
-        body: new URLSearchParams(formData) // Sending as form-urlencoded
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editAppointmentModal'));
-            modal.hide();
-            showAlert('success', data.message);
-            setTimeout(() => location.reload(), 1500);
-        } else {
-            showAlert('danger', data.message || 'An unknown error occurred.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showAlert('danger', 'An error occurred while updating the appointment.');
-    })
-    .finally(() => {
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    });
-}
-
-// Placeholder for export functionality
-function exportAppointments() {
-    // This could be implemented to create and download a CSV file
-    showAlert('info', 'Export functionality is not yet implemented.');
-}
-
-// Dynamically create and show alert messages
-function showAlert(type, message) {
-    const alertWrapper = document.createElement('div');
-    alertWrapper.innerHTML = `
-        <div class="alert alert-${type} alert-dismissible fade show" role="alert" style="min-width: 300px;">
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    `;
-    const toastContainer = document.createElement('div');
-    toastContainer.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999;';
-    toastContainer.appendChild(alertWrapper);
-    document.body.appendChild(toastContainer);
-
-    const toast = new bootstrap.Alert(alertWrapper.firstChild);
-    setTimeout(() => {
-        toast.close();
-        // Clean up the container after the last toast is closed
-        setTimeout(() => {
-             if (toastContainer.childElementCount === 0) {
-                toastContainer.remove();
+        tableRows.forEach(row => {
+            let showRow = true;
+            
+            // Status filter
+            if (statusFilter && row.dataset.status !== statusFilter) {
+                showRow = false;
             }
-        }, 500); // Wait for fade out
-    }, 5000);
-}
-// Open appointment wizard (view/edit)
-function openAppointmentWizard(appointmentId, mode) {
-    const modal = new bootstrap.Modal(document.getElementById('appointmentWizardModal'));
-    const contentDiv = document.getElementById('appointmentWizardContent');
-    
-    // Show loading
-    contentDiv.innerHTML = `
-        <div class="text-center py-5">
-          <div class="spinner-border text-info" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </div>
-    `;
+            
+            // Date filter
+            // Note: The date in the row's data-date is expected to be in YYYY-MM-DD format
+            if (dateFilter && row.dataset.date !== dateFilter) {
+                showRow = false;
+            }
+            
+            // Search filter (searches the entire text content of the row)
+            const patientName = row.cells[1].textContent.toLowerCase();
+            const doctorName = row.cells[2].textContent.toLowerCase();
+            if (searchTerm && !patientName.includes(searchTerm) && !doctorName.includes(searchTerm)) {
+                showRow = false;
+            }
+            
+            row.style.display = showRow ? '' : 'none';
+        });
+    }
 
-    // Load template from Flask route
-    fetch(`{{ url_for("admin.appointment_details") }}?id=${appointmentId}&mode=${mode}`)
-        .then(response => response.text())
-        .then(html => {
-            contentDiv.innerHTML = html;
+    // Update appointment status
+    function updateAppointmentStatus(appointmentId, status) {
+        if (!confirm(`Are you sure you want to mark this appointment as ${status}?`)) {
+            return;
+        }
+        
+        fetch(`{{ url_for("admin.admin_update_appointment_status", appointment_id=0) }}`.replace('0', appointmentId), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Include CSRF token if your app uses it
+            },
+            body: JSON.stringify({ status: status })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('success', data.message);
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showAlert('danger', data.message);
+            }
         })
         .catch(error => {
-            console.error("Error loading appointment wizard:", error);
-            contentDiv.innerHTML = `<div class="alert alert-danger">Failed to load appointment details.</div>`;
+            console.error('Error:', error);
+            showAlert('danger', 'An error occurred. Please try again.');
         });
+    }
 
-    modal.show();
-}
 
-</script>
+    // Submit edit appointment form
+    function submitEditAppointment() {
+        const form = document.getElementById('editAppointmentForm');
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
+        }
+        const formData = new FormData(form);
+        const appointmentId = document.getElementById('editAppointmentId').value;
+        
+        const submitBtn = document.querySelector('#editAppointmentModal .btn-warning');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Updating...';
+        submitBtn.disabled = true;
+        
+        fetch(`{{ url_for("admin.admin_edit_appointment", appointment_id=0) }}`.replace('0', appointmentId), {
+            method: 'POST',
+            body: new URLSearchParams(formData) // Sending as form-urlencoded
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editAppointmentModal'));
+                modal.hide();
+                showAlert('success', data.message);
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showAlert('danger', data.message || 'An unknown error occurred.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('danger', 'An error occurred while updating the appointment.');
+        })
+        .finally(() => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    }
+
+    // Placeholder for export functionality
+    function exportAppointments() {
+        // This could be implemented to create and download a CSV file
+        showAlert('info', 'Export functionality is not yet implemented.');
+    }
+
+    // Dynamically create and show alert messages
+    function showAlert(type, message) {
+        const alertWrapper = document.createElement('div');
+        alertWrapper.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert" style="min-width: 300px;">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        const toastContainer = document.createElement('div');
+        toastContainer.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999;';
+        toastContainer.appendChild(alertWrapper);
+        document.body.appendChild(toastContainer);
+
+        const toast = new bootstrap.Alert(alertWrapper.firstChild);
+        setTimeout(() => {
+            toast.close();
+            // Clean up the container after the last toast is closed
+            setTimeout(() => {
+                 if (toastContainer.childElementCount === 0) {
+                    toastContainer.remove();
+                }
+            }, 500); // Wait for fade out
+        }, 5000);
+    }
+    // Open appointment wizard (view/edit)
+    function openAppointmentWizard(appointmentId, mode) {
+        const modal = new bootstrap.Modal(document.getElementById('appointmentWizardModal'));
+        const contentDiv = document.getElementById('appointmentWizardContent');
+        
+        // Show loading
+        contentDiv.innerHTML = `
+            <div class="text-center py-5">
+              <div class="spinner-border text-info" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+        `;
+
+        // Load template from Flask route
+        fetch(`{{ url_for("admin.appointment_details") }}?id=${appointmentId}&mode=${mode}`)
+            .then(response => response.text())
+            .then(html => {
+                contentDiv.innerHTML = html;
+            })
+            .catch(error => {
+                console.error("Error loading appointment wizard:", error);
+                contentDiv.innerHTML = `<div class="alert alert-danger">Failed to load appointment details.</div>`;
+            });
+
+        modal.show();
+    }
+
+    function openIntakeReadonly(patientId) {
+        fetch(`/admin/patient/${patientId}/intake-readonly?ajax=1`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(html => {
+                if (html.trim().length === 0) {
+                    showAlert('info', 'No intake form found for this patient.');
+                    return;
+                }
+                document.getElementById('appointmentWizardContent').innerHTML = html;
+                const modal = new bootstrap.Modal(document.getElementById('appointmentWizardModal'));
+                modal.show();
+            })
+            .catch(error => {
+                console.error('Error loading intake form:', error);
+                showAlert('danger', 'Failed to load intake form.');
+            });
+    }
+
+    function openTimelineModal(patientId) {
+        const modalEl = document.getElementById('appointmentWizardModal');
+        if (!modalEl) {
+            showAlert('danger', 'Timeline modal not found.');
+            return;
+        }
+        const modal = new bootstrap.Modal(modalEl);
+        // Show loading spinner
+        const timelineContent = document.getElementById('appointmentWizardContent');
+        if (timelineContent) {
+            timelineContent.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="spinner-border text-info" role="status">
+                        <span class="visually-hidden">Loading timeline...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Loading patient timeline...</p>
+                </div>
+            `;
+        }
+        modal.show();
+        // Fetch timeline data
+        fetch(`/admin/patient/${patientId}/timeline?ajax=1`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(html => {
+                if (timelineContent) {
+                    timelineContent.innerHTML = html;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading timeline:', error);
+                if (timelineContent) {
+                    timelineContent.innerHTML = `
+                        <div class="text-center py-5">
+                            <i class="fas fa-exclamation-triangle fa-2x text-danger mb-3"></i>
+                            <h5 class="text-danger">Failed to load timeline</h5>
+                            <p class="text-muted">Please try again later.</p>
+                            <button class="btn btn-primary" onclick="openTimelineModal('${patientId}')">
+                                <i class="fas fa-redo me-1"></i>Retry
+                            </button>
+                        </div>
+                    `;
+                }
+            });
+    }
+
+    function viewPrescription(appointmentId) {
+        fetch(`/admin/appointment/${appointmentId}/prescription-info`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.has_prescription && data.prescription_id) {
+                    fetch(`/admin/prescription/${data.prescription_id}/view?ajax=1`)
+                        .then(resp => {
+                            if (!resp.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return resp.text();
+                        })
+                        .then(html => {
+                            if (html.trim().length === 0) {
+                                showAlert('info', 'Prescription data not found.');
+                                return;
+                            }
+                            document.getElementById('appointmentWizardContent').innerHTML = html;
+                            var modal = new bootstrap.Modal(document.getElementById('appointmentWizardModal'));
+                            modal.show();
+                        })
+                        .catch(error => {
+                            console.error('Error loading prescription:', error);
+                            showAlert('danger', 'Failed to load prescription details.');
+                        });
+                } else {
+                    showAlert('info', 'No prescription found for this appointment.');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading prescription info:', error);
+                showAlert('danger', 'Failed to load prescription details.');
+            });
+    }
+
+    </script>
 {% endblock %}

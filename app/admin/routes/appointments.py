@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash, session, jsonify
 from app import db
-from app.models import Appointment
+from app.models import Appointment, PatientIntakeForm, MedicalPrescription
 from datetime import datetime
 from . import admin_bp
 
@@ -109,3 +109,38 @@ def appointment_details():
     mode = request.args.get("mode", "view")  # "view" or "edit"
     appointment = Appointment.query.get_or_404(appointment_id)
     return render_template("wizard/appointment_details.html", appointment=appointment, mode=mode)
+
+@admin_bp.route('/patient/<int:patient_id>/intake-readonly')
+def admin_patient_intake_readonly(patient_id):
+    """Show readonly intake form for patient (admin)"""
+    intake_form = PatientIntakeForm.query.filter_by(patient_id=patient_id).first()
+    if not intake_form:
+        return '', 204
+    return render_template('doctor/patient_intake_readonly.html', intake_form=intake_form)
+
+@admin_bp.route('/patient/<int:patient_id>/timeline')
+def admin_patient_timeline(patient_id):
+    """Show patient timeline (admin)"""
+    # Copy doctor logic for timeline
+    from app.models import Appointment, MedicalPrescription
+    appointments = Appointment.query.filter_by(user_id=patient_id).order_by(Appointment.appointment_date.desc()).all()
+    prescriptions = MedicalPrescription.query.filter_by(patient_id=patient_id).order_by(MedicalPrescription.created_at.desc()).all()
+    timeline_data = {
+        'appointments': appointments,
+        'prescriptions': prescriptions
+    }
+    return render_template('doctor/patient_timeline.html', timeline=timeline_data)
+
+@admin_bp.route('/appointment/<int:appointment_id>/prescription-info')
+def admin_prescription_info(appointment_id):
+    """Return prescription info for appointment (admin)"""
+    prescription = MedicalPrescription.query.filter_by(appointment_id=appointment_id).first()
+    if prescription:
+        return jsonify({'has_prescription': True, 'prescription_id': prescription.id})
+    return jsonify({'has_prescription': False})
+
+@admin_bp.route('/prescription/<int:prescription_id>/view')
+def admin_view_prescription(prescription_id):
+    """Show readonly prescription for admin"""
+    prescription = MedicalPrescription.query.get_or_404(prescription_id)
+    return render_template('doctor/prescription_readonly.html', prescription=prescription)
