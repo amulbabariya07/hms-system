@@ -154,7 +154,10 @@ def admin_prescription_info(appointment_id):
 def admin_view_prescription(prescription_id):
     """Show readonly prescription for admin"""
     prescription = MedicalPrescription.query.get_or_404(prescription_id)
-    return render_template('doctor/prescription_readonly.html', prescription=prescription)
+    medicines = prescription.medicines if hasattr(prescription, 'medicines') else []
+    doctor = prescription.doctor if hasattr(prescription, 'doctor') else None
+    appointment = prescription.appointment if hasattr(prescription, 'appointment') else None
+    return render_template('doctor/prescription_readonly.html', prescription=prescription, medicines=medicines, doctor=doctor, appointment=appointment)
 
 @admin_bp.route('/appointments/delete/<int:appointment_id>', methods=['POST'])
 def admin_delete_appointment(appointment_id):

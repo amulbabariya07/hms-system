@@ -4,6 +4,23 @@
 {% block page_title %}{% endblock %}
 
 {% block content %}
+    <!-- Prescription Readonly Modal -->
+    <div class="modal fade prescription-readonly-modal" id="prescriptionReadonlyModal" tabindex="-1" aria-labelledby="prescriptionReadonlyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="prescriptionReadonlyModalLabel">
+                        <i class="fa-solid fa-file-medical me-2"></i>
+                        Prescription Details
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="prescriptionReadonlyContent">
+                    <!-- Prescription HTML will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Timeline Modal -->
     <div class="modal fade" id="timelineModal" tabindex="-1" aria-labelledby="timelineModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
@@ -575,13 +592,13 @@
                                 showAlert('info', 'Prescription data not found.');
                                 return;
                             }
-                            const wizardContent = document.getElementById('appointmentWizardContent');
-                            const modalEl = document.getElementById('appointmentWizardModal');
-                            if (!wizardContent || !modalEl) {
-                                showAlert('danger', 'Modal or content area not found.');
+                            const content = document.getElementById('prescriptionReadonlyContent');
+                            const modalEl = document.getElementById('prescriptionReadonlyModal');
+                            if (!content || !modalEl) {
+                                showAlert('danger', 'Prescription modal or content area not found.');
                                 return;
                             }
-                            wizardContent.innerHTML = html;
+                            content.innerHTML = html;
                             var modal = new bootstrap.Modal(modalEl);
                             modal.show();
                         })
