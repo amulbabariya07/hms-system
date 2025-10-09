@@ -4,6 +4,31 @@
 {% block page_title %}{% endblock %}
 
 {% block content %}
+    <!-- Timeline Modal -->
+    <div class="modal fade" id="timelineModal" tabindex="-1" aria-labelledby="timelineModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="timelineModalLabel">
+                        <i class="fa-solid fa-timeline me-2"></i>
+                        Patient Timeline
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="timelineContent">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-info" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Loading patient timeline...</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 <div class="appointments-content p-4">
     <div class="card shadow-sm mb-4">
         <div class="card-body">
@@ -169,16 +194,14 @@
                                     <button class="btn btn-sm btn-outline-success" onclick="viewPrescription('{{ appointment.id }}')" title="View Prescription">
                                         <i class="fa-solid fa-file-medical"></i>
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-outline-primary" 
-                                            title="View Details" 
-                                            onclick="openAppointmentWizard({{ appointment.id }}, 'view')">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" title="View Details" onclick="openAppointmentWizard({{ appointment.id }}, 'view')">
                                         <i class="fas fa-eye"></i>
                                     </button>
-
-                                    <button type="button" class="btn btn-sm btn-outline-secondary"  
-                                            title="Edit Appointment"
-                                            onclick="openAppointmentWizard({{ appointment.id }}, 'edit')">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit Appointment" onclick="openAppointmentWizard({{ appointment.id }}, 'edit')">
                                         <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteAppointment({{ appointment.id }})" title="Delete Appointment">
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                     {% if appointment.status == 'scheduled' %}
                                     <button type="button" class="btn btn-sm btn-outline-success" onclick="updateAppointmentStatus({{ appointment.id }}, 'completed')" title="Mark as Completed">
@@ -271,39 +294,61 @@
         </div>
     </div>
 
+    <!-- Intake Form Readonly Modal -->
+    <div class="modal fade" id="intakeReadonlyModal" tabindex="-1" aria-labelledby="intakeReadonlyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="intakeReadonlyModalLabel">
+                        <i class="fa fa-info-circle me-2"></i>
+                        Patient Intake Form
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="intakeReadonlyContent">
+                    <!-- Intake form HTML will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-    // Filter functionality
-    document.getElementById('statusFilter').addEventListener('change', filterAppointments);
-    document.getElementById('dateFilter').addEventListener('change', filterAppointments);
-    document.getElementById('searchAppointments').addEventListener('keyup', filterAppointments);
+    // Filter functionality with null checks
+    const statusFilterEl = document.getElementById('statusFilter');
+    if (statusFilterEl) {
+        statusFilterEl.addEventListener('change', filterAppointments);
+    }
+    const dateFilterEl = document.getElementById('dateFilter');
+    if (dateFilterEl) {
+        dateFilterEl.addEventListener('change', filterAppointments);
+    }
+    const searchAppointmentsEl = document.getElementById('searchAppointments');
+    if (searchAppointmentsEl) {
+        searchAppointmentsEl.addEventListener('keyup', filterAppointments);
+    }
 
     function filterAppointments() {
-        const statusFilter = document.getElementById('statusFilter').value;
-        const dateFilter = document.getElementById('dateFilter').value;
-        const searchTerm = document.getElementById('searchAppointments').value.toLowerCase();
+        const statusFilter = statusFilterEl ? statusFilterEl.value : '';
+        const dateFilter = dateFilterEl ? dateFilterEl.value : '';
+        const searchTerm = searchAppointmentsEl ? searchAppointmentsEl.value.toLowerCase() : '';
         const tableRows = document.querySelectorAll('#appointmentsTable tbody tr');
         
         tableRows.forEach(row => {
             let showRow = true;
-            
             // Status filter
             if (statusFilter && row.dataset.status !== statusFilter) {
                 showRow = false;
             }
-            
             // Date filter
-            // Note: The date in the row's data-date is expected to be in YYYY-MM-DD format
             if (dateFilter && row.dataset.date !== dateFilter) {
                 showRow = false;
             }
-            
-            // Search filter (searches the entire text content of the row)
-            const patientName = row.cells[1].textContent.toLowerCase();
-            const doctorName = row.cells[2].textContent.toLowerCase();
+            // Search filter
+            const patientName = row.cells[1]?.textContent?.toLowerCase() || '';
+            const doctorName = row.cells[2]?.textContent?.toLowerCase() || '';
             if (searchTerm && !patientName.includes(searchTerm) && !doctorName.includes(searchTerm)) {
                 showRow = false;
             }
-            
             row.style.display = showRow ? '' : 'none';
         });
     }
@@ -412,9 +457,13 @@
     }
     // Open appointment wizard (view/edit)
     function openAppointmentWizard(appointmentId, mode) {
-        const modal = new bootstrap.Modal(document.getElementById('appointmentWizardModal'));
+        const modalEl = document.getElementById('appointmentWizardModal');
         const contentDiv = document.getElementById('appointmentWizardContent');
-        
+        if (!modalEl || !contentDiv) {
+            showAlert('danger', 'Modal or content area not found.');
+            return;
+        }
+        const modal = new bootstrap.Modal(modalEl);
         // Show loading
         contentDiv.innerHTML = `
             <div class="text-center py-5">
@@ -423,7 +472,6 @@
               </div>
             </div>
         `;
-
         // Load template from Flask route
         fetch(`{{ url_for("admin.appointment_details") }}?id=${appointmentId}&mode=${mode}`)
             .then(response => response.text())
@@ -434,25 +482,25 @@
                 console.error("Error loading appointment wizard:", error);
                 contentDiv.innerHTML = `<div class="alert alert-danger">Failed to load appointment details.</div>`;
             });
-
         modal.show();
     }
 
     function openIntakeReadonly(patientId) {
         fetch(`/admin/patient/${patientId}/intake-readonly?ajax=1`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.text();
-            })
+            .then(response => response.text())
             .then(html => {
-                if (html.trim().length === 0) {
-                    showAlert('info', 'No intake form found for this patient.');
+                const content = document.getElementById('intakeReadonlyContent');
+                const modalEl = document.getElementById('intakeReadonlyModal');
+                if (!content || !modalEl) {
+                    showAlert('danger', 'Intake modal or content area not found.');
                     return;
                 }
-                document.getElementById('appointmentWizardContent').innerHTML = html;
-                const modal = new bootstrap.Modal(document.getElementById('appointmentWizardModal'));
+                if (html.trim().length === 0) {
+                    content.innerHTML = '<div class="alert alert-info">No intake form found for this patient.</div>';
+                } else {
+                    content.innerHTML = html;
+                }
+                const modal = new bootstrap.Modal(modalEl);
                 modal.show();
             })
             .catch(error => {
@@ -462,24 +510,22 @@
     }
 
     function openTimelineModal(patientId) {
-        const modalEl = document.getElementById('appointmentWizardModal');
-        if (!modalEl) {
-            showAlert('danger', 'Timeline modal not found.');
+        const modalEl = document.getElementById('timelineModal');
+        const timelineContent = document.getElementById('timelineContent');
+        if (!modalEl || !timelineContent) {
+            showAlert('danger', 'Timeline modal or content area not found.');
             return;
         }
-        const modal = new bootstrap.Modal(modalEl);
         // Show loading spinner
-        const timelineContent = document.getElementById('appointmentWizardContent');
-        if (timelineContent) {
-            timelineContent.innerHTML = `
-                <div class="text-center py-5">
-                    <div class="spinner-border text-info" role="status">
-                        <span class="visually-hidden">Loading timeline...</span>
-                    </div>
-                    <p class="mt-2 text-muted">Loading patient timeline...</p>
+        timelineContent.innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-info" role="status">
+                    <span class="visually-hidden">Loading timeline...</span>
                 </div>
-            `;
-        }
+                <p class="mt-2 text-muted">Loading patient timeline...</p>
+            </div>
+        `;
+        const modal = new bootstrap.Modal(modalEl);
         modal.show();
         // Fetch timeline data
         fetch(`/admin/patient/${patientId}/timeline?ajax=1`)
@@ -490,24 +536,20 @@
                 return response.text();
             })
             .then(html => {
-                if (timelineContent) {
-                    timelineContent.innerHTML = html;
-                }
+                timelineContent.innerHTML = html;
             })
             .catch(error => {
                 console.error('Error loading timeline:', error);
-                if (timelineContent) {
-                    timelineContent.innerHTML = `
-                        <div class="text-center py-5">
-                            <i class="fas fa-exclamation-triangle fa-2x text-danger mb-3"></i>
-                            <h5 class="text-danger">Failed to load timeline</h5>
-                            <p class="text-muted">Please try again later.</p>
-                            <button class="btn btn-primary" onclick="openTimelineModal('${patientId}')">
-                                <i class="fas fa-redo me-1"></i>Retry
-                            </button>
-                        </div>
-                    `;
-                }
+                timelineContent.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-exclamation-triangle fa-2x text-danger mb-3"></i>
+                        <h5 class="text-danger">Failed to load timeline</h5>
+                        <p class="text-muted">Please try again later.</p>
+                        <button class="btn btn-primary" onclick="openTimelineModal('${patientId}')">
+                            <i class="fas fa-redo me-1"></i>Retry
+                        </button>
+                    </div>
+                `;
             });
     }
 
@@ -533,8 +575,14 @@
                                 showAlert('info', 'Prescription data not found.');
                                 return;
                             }
-                            document.getElementById('appointmentWizardContent').innerHTML = html;
-                            var modal = new bootstrap.Modal(document.getElementById('appointmentWizardModal'));
+                            const wizardContent = document.getElementById('appointmentWizardContent');
+                            const modalEl = document.getElementById('appointmentWizardModal');
+                            if (!wizardContent || !modalEl) {
+                                showAlert('danger', 'Modal or content area not found.');
+                                return;
+                            }
+                            wizardContent.innerHTML = html;
+                            var modal = new bootstrap.Modal(modalEl);
                             modal.show();
                         })
                         .catch(error => {
@@ -549,6 +597,34 @@
                 console.error('Error loading prescription info:', error);
                 showAlert('danger', 'Failed to load prescription details.');
             });
+    }
+
+    function deleteAppointment(appointmentId) {
+        if (!confirm('Are you sure you want to delete this appointment? This action cannot be undone.')) {
+            return;
+        }
+
+        fetch(`{{ url_for("admin.admin_delete_appointment", appointment_id=0) }}`.replace('0', appointmentId), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Include CSRF token if your app uses it
+            },
+            body: JSON.stringify({ appointment_id: appointmentId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('success', 'Appointment deleted successfully.');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showAlert('danger', data.message || 'Failed to delete appointment.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('danger', 'An error occurred while deleting the appointment.');
+        });
     }
 
     </script>

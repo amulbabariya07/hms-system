@@ -113,23 +113,34 @@ def appointment_details():
 @admin_bp.route('/patient/<int:patient_id>/intake-readonly')
 def admin_patient_intake_readonly(patient_id):
     """Show readonly intake form for patient (admin)"""
-    intake_form = PatientIntakeForm.query.filter_by(patient_id=patient_id).first()
+    from app.models import User
+    appointment = Appointment.query.filter_by(patient_id=patient_id).first()
+    intake_form = None
+    if appointment:
+        intake_form = PatientIntakeForm.query.filter_by(created_by=str(patient_id)).first()
+    patient = User.query.get(patient_id)
     if not intake_form:
-        return '', 204
-    return render_template('doctor/patient_intake_readonly.html', intake_form=intake_form)
+        return "No intake form found for this patient.", 404
+    return render_template('doctor/patient_intake_readonly.html', intake=intake_form, patient=patient)
 
 @admin_bp.route('/patient/<int:patient_id>/timeline')
 def admin_patient_timeline(patient_id):
     """Show patient timeline (admin)"""
-    # Copy doctor logic for timeline
-    from app.models import Appointment, MedicalPrescription
-    appointments = Appointment.query.filter_by(user_id=patient_id).order_by(Appointment.appointment_date.desc()).all()
-    prescriptions = MedicalPrescription.query.filter_by(patient_id=patient_id).order_by(MedicalPrescription.created_at.desc()).all()
-    timeline_data = {
-        'appointments': appointments,
-        'prescriptions': prescriptions
-    }
-    return render_template('doctor/patient_timeline.html', timeline=timeline_data)
+    from app.models import Appointment, PatientIntakeForm, User
+    appointments = (
+        Appointment.query
+        .filter_by(patient_id=patient_id)
+        .order_by(Appointment.appointment_date.desc(), Appointment.appointment_time.desc())
+        .all()
+    )
+    intake_form = PatientIntakeForm.query.filter_by(created_by=str(patient_id)).first()
+    patient = User.query.get(patient_id)
+    return render_template(
+        'doctor/patient_timeline.html',
+        appointments=appointments,
+        intake_form=intake_form,
+        patient=patient
+    )
 
 @admin_bp.route('/appointment/<int:appointment_id>/prescription-info')
 def admin_prescription_info(appointment_id):
@@ -144,3 +155,16 @@ def admin_view_prescription(prescription_id):
     """Show readonly prescription for admin"""
     prescription = MedicalPrescription.query.get_or_404(prescription_id)
     return render_template('doctor/prescription_readonly.html', prescription=prescription)
+
+@admin_bp.route('/appointments/delete/<int:appointment_id>', methods=['POST'])
+def admin_delete_appointment(appointment_id):
+    if 'admin_logged_in' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    try:
+        appointment = Appointment.query.get_or_404(appointment_id)
+        db.session.delete(appointment)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Appointment deleted successfully!'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': 'An error occurred while deleting the appointment.'})
