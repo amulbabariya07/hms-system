@@ -1227,7 +1227,7 @@ def download_prescription_pdf(appointment_id):
     elements.append(Spacer(1, 40))
     footer_style = ParagraphStyle("Footer", parent=styles["Normal"], fontSize=9, textColor=colors.grey, alignment=1)
     elements.append(Paragraph("HelthCare+ • Your Trusted Medical Partner", footer_style))
-    elements.append(Paragraph("Contact: info@healthcareplus.com | +1 (555) 123-4567", footer_style))
+    elements.append(Paragraph("Contact: info@healthcareplus.com | +91 8320269460", footer_style))
 
     doc.build(elements)
     buffer.seek(0)

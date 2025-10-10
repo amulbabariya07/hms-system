@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash, session, jsonify
 from app import db
-from app.models import Appointment, PatientIntakeForm, MedicalPrescription
+from app.models import Appointment, PatientIntakeForm, MedicalPrescription, User, Doctor
 from datetime import datetime
 from . import admin_bp
 
@@ -49,59 +49,52 @@ def admin_update_appointment_status(appointment_id):
 
 @admin_bp.route('/appointments/details/<int:appointment_id>')
 def admin_appointment_details(appointment_id):
-    if 'admin_logged_in' not in session:
-        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
-
-    edit_mode = request.args.get('edit', 'false').lower() == 'true'
     try:
         appointment = Appointment.query.get_or_404(appointment_id)
-        # Render the wizard template with appointment and edit flag
-        return render_template(
-            'wizard/appointment_details.html',
-            appointment=appointment,
-            edit=edit_mode
-        )
+        return jsonify({
+            'success': True,
+            'appointment': {
+                'id': appointment.id,
+                'appointment_date': appointment.appointment_date.strftime('%Y-%m-%d') if appointment.appointment_date else '',
+                'appointment_time': appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else '',
+                'symptoms': appointment.symptoms or '',
+                'reason': appointment.reason or appointment.symptoms or '',
+                'status': appointment.status,
+                'patient_name': appointment.user.full_name if appointment.user else '',
+                'doctor_name': f"Dr. {appointment.doctor.full_name}" if appointment.doctor else ''
+            }
+        })
     except Exception as e:
-        return render_template('wizard/appointment_details.html', appointment=None, edit=edit_mode)
+        return jsonify({'success': False, 'message': 'Failed to load appointment details.'}), 500
 
 @admin_bp.route('/appointments/edit/<int:appointment_id>', methods=['POST'])
 def admin_edit_appointment(appointment_id):
     if 'admin_logged_in' not in session:
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
 
+    appointment = Appointment.query.get_or_404(appointment_id)
+    appointment_date = request.form.get('appointment_date')
+    appointment_time = request.form.get('appointment_time')
+    reason = request.form.get('reason')
+    status = request.form.get('status')
+
+    if not all([appointment_date, appointment_time, reason, status]):
+        return jsonify({'success': False, 'message': 'All fields must be filled.'})
+    
+    if status not in ['scheduled', 'confirmed', 'under_consultation', 'completed', 'cancelled']:
+        return jsonify({'success': False, 'message': 'Invalid status'})
+
     try:
-        appointment = Appointment.query.get_or_404(appointment_id)
-        
-        appointment_date = request.form.get('appointment_date')
-        appointment_time = request.form.get('appointment_time')
-        symptoms = request.form.get('symptoms')
-        status = request.form.get('status')
-
-        # Validation
-        if not all([appointment_date, appointment_time, symptoms, status]):
-            return jsonify({'success': False, 'message': 'All fields must be filled.'})
-
-        if status not in ['scheduled', 'completed', 'cancelled']:
-            return jsonify({'success': False, 'message': 'Invalid status'})
-
-        try:
-            appointment_date = datetime.strptime(appointment_date, '%Y-%m-%d').date()
-            appointment_time = datetime.strptime(appointment_time, '%H:%M').time()
-        except ValueError:
-            return jsonify({'success': False, 'message': 'Invalid date or time format'})
-
-        # Update appointment information
-        appointment.appointment_date = appointment_date
-        appointment.appointment_time = appointment_time
-        appointment.symptoms = symptoms
+        appointment.appointment_date = datetime.strptime(appointment_date, '%Y-%m-%d').date()
+        appointment.appointment_time = datetime.strptime(appointment_time, '%H:%M').time()
+        appointment.reason = reason
+        appointment.symptoms = reason  # Update symptoms as well for consistency
         appointment.status = status
-
         db.session.commit()
         return jsonify({'success': True, 'message': 'Appointment updated successfully!'})
-
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'message': 'An error occurred while updating the appointment.'})
+        return jsonify({'success': False, 'message': str(e)})
 
 @admin_bp.route("/appointment/details")
 def appointment_details():
@@ -167,7 +160,7 @@ def admin_delete_appointment(appointment_id):
         appointment = Appointment.query.get_or_404(appointment_id)
         db.session.delete(appointment)
         db.session.commit()
-        return jsonify({'success': True, 'message': 'Appointment deleted successfully!'})
+        return jsonify({'success': True, 'message': 'Appointment deleted successfully.'})
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': 'An error occurred while deleting the appointment.'})

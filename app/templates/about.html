@@ -347,7 +347,9 @@
                 <div class="card-body p-4">
                   <img src="{{ url_for('static', filename='image/doctor_icon.png') }}" class="rounded-circle mx-auto mb-3" alt="Doctor" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid var(--bs-primary-subtle);">
                   <h5 class="fw-bold text-primary mb-1">{{ doctor.full_name }}</h5>
-                  <p class="text-success fw-semibold mb-2">{{ doctor.specialization }}</p>
+                  <p class="text-success fw-semibold mb-2">
+                      {{ doctor.specialization | replace('<', '') | replace('>', '') }}
+                    </p>
                   <p class="text-muted small mb-3">{{ doctor.qualification }}</p>
                   <span class="badge bg-primary-subtle border border-primary-subtle text-primary-emphasis rounded-pill">{{ doctor.experience_years }} Years Experience</span>
                 </div>
