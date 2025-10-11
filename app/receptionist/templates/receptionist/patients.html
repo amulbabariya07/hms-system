@@ -80,9 +80,11 @@
                                         <button class="btn btn-sm btn-outline-secondary" title="Edit Patient" onclick="editPatient({{ patient.id }})">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-outline-success" title="Create Appointment">
+                                        <a href="{{ url_for('receptionist.create_appointment', patient_id=patient.id) }}" 
+                                           class="btn btn-sm btn-outline-success" 
+                                           title="Create Appointment">
                                             <i class="fas fa-calendar-plus"></i>
-                                        </button>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
@@ -231,107 +233,48 @@ function viewPatient(patientId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            const patient = data.patient;
+            const p = data.patient;
+            
             const content = `
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6 class="text-primary">Personal Information</h6>
-                        <p><strong>Name:</strong> ${patient.full_name}</p>
-                        <p><strong>Mobile:</strong> ${patient.mobile_number}</p>
-                        <p><strong>Email:</strong> ${patient.email || 'Not provided'}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <h6 class="text-primary">Additional Information</h6>
-                        <p><strong>Age:</strong> ${patient.age || 'Not provided'}</p>
-                        <p><strong>Gender:</strong> ${patient.gender || 'Not specified'}</p>
-                        <p><strong>Appointments:</strong> ${patient.appointment_count}</p>
-                    </div>
-                    <div class="col-12">
-                        <h6 class="text-primary">Account Information</h6>
-                        <p><strong>Registered:</strong> ${patient.created_at}</p>
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-3">
+                            <i class="fas fa-user-circle text-info" style="font-size: 6rem;"></i>
+                            <h5 class="mt-3 mb-0">${p.full_name}</h5>
+                            <span class="badge bg-secondary">Patient ID: ${p.id}</span>
+                        </div>
+                        <div class="col-md-8">
+                            <h6 class="border-bottom pb-2 text-primary"><i class="fas fa-info-circle me-2"></i> Personal Information</h6>
+                            <div class="row">
+                                <div class="col-6 mb-2"><strong>Age:</strong> ${p.age || 'N/A'}</div>
+                                <div class="col-6 mb-2"><strong>Gender:</strong> ${p.gender || 'N/A'}</div>
+                                <div class="col-6 mb-2"><strong>Mobile:</strong> ${p.mobile_number || 'N/A'}</div>
+                                <div class="col-6 mb-2"><strong>Email:</strong> ${p.email || 'N/A'}</div>
+                            </div>
+                            
+                            <h6 class="border-bottom pb-2 text-primary mt-3"><i class="fas fa-calendar-alt me-2"></i> Medical Information</h6>
+                            <div class="row">
+                                <div class="col-6 mb-2"><strong>Appointments:</strong> ${p.appointment_count || 0}</div>
+                                <div class="col-6 mb-2"><strong>Status:</strong> ${p.is_active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>'}</div>
+                            </div>
+                            
+                            <h6 class="border-bottom pb-2 text-primary mt-3"><i class="fas fa-clock me-2"></i> Account Info</h6>
+                            <div class="row">
+                                <div class="col-6 mb-2"><strong>Registered On:</strong> ${p.created_at}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
+
             document.getElementById('patientDetailsContent').innerHTML = content;
             const modal = new bootstrap.Modal(document.getElementById('patientDetailsModal'));
             modal.show();
-        }
-    });
-}
-
-function editPatient(patientId) {
-    fetch(`{{ url_for("receptionist.receptionist_patient_details", patient_id=0) }}`.replace('0', patientId))
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const patient = data.patient;
-            // Populate edit modal with patient data
-            document.getElementById('editPatientId').value = patient.id;
-            document.getElementById('editPatientName').value = patient.full_name;
-            document.getElementById('editPatientMobile').value = patient.mobile_number;
-            document.getElementById('editPatientEmail').value = patient.email || '';
-            document.getElementById('editPatientAge').value = patient.age || '';
-            document.getElementById('editPatientGender').value = patient.gender || '';
-            
-            const modal = new bootstrap.Modal(document.getElementById('editPatientModal'));
-            modal.show();
-        }
-    });
-}
-
-function submitEditPatient() {
-    const form = document.getElementById('editPatientForm');
-    const formData = new FormData(form);
-    const patientId = document.getElementById('editPatientId').value;
-    
-    // Show loading state
-    const submitBtn = document.querySelector('#editPatientModal .btn-primary');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
-    submitBtn.disabled = true;
-    
-    fetch(`{{ url_for("receptionist.receptionist_edit_patient", patient_id=0) }}`.replace('0', patientId), {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showAlert('success', data.message);
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editPatientModal'));
-            modal.hide();
-            setTimeout(() => {
-                location.reload();
-            }, 1500);
         } else {
-            showAlert('danger', data.message);
+            showAlert('danger', 'Unable to fetch patient details.');
         }
     })
-    .catch(error => {
-        showAlert('danger', 'An error occurred while updating the patient.');
-    })
-    .finally(() => {
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    });
-}
-
-function showAlert(type, message) {
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-    alertDiv.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : (type === 'danger' ? 'exclamation-triangle' : 'info-circle')} me-2"></i>
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    
-    const container = document.querySelector('.receptionist-card');
-    container.insertBefore(alertDiv, container.firstChild);
-    
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-        alertDiv.remove();
-    }, 5000);
+    .catch(() => showAlert('danger', 'Error fetching patient details.'));
 }
 </script>
 {% endblock %}

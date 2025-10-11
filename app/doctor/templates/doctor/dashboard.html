@@ -4,327 +4,672 @@
 {% include "doctor/dr_header.html" %}
 
 <!-- Welcome Section -->
-<div class="doctor-welcome-section bg-gradient-primary text-white py-5">
+<div class="doctor-dashboard">
     <div id="dr-loader" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99999;background:#fff;display:flex;align-items:center;justify-content:center;opacity:1;">
         <div id="dr-loader-animation" style="width:1000px;height:1000px;"></div>
     </div>
-    <div class="container">
-        <div class="row align-items-center min-vh-75">
-            <div class="col-lg-8">
-                <div class="welcome-content">
-                    <h1 class="display-3 fw-bold mb-4">
-                        Welcome, <br>
-                        <span class="text-warning">Dr. {{ doctor.full_name }}</span>
-                    </h1>
-                    <p class="lead mb-4 fs-4">
-                        {{ doctor.specialization }} Specialist | {{ doctor.experience_years }} Years Experience
-                    </p>
-                    <div class="doctor-info-cards row g-3 mb-4">
-                        <div class="col-md-4">
-                            <div class="info-card bg-white bg-opacity-20 rounded-4 p-3 text-center">
-                                <div class="info-icon mb-2">
-                                    <i class="fas fa-stethoscope fs-2"></i>
-                                </div>
-                                <div class="info-title fw-bold">Specialization</div>
-                                <div class="info-value">{{ doctor.specialization }}</div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="info-card bg-white bg-opacity-20 rounded-4 p-3 text-center">
-                                <div class="info-icon mb-2">
-                                    <i class="fas fa-calendar-alt fs-2"></i>
-                                </div>
-                                <div class="info-title fw-bold">Experience</div>
-                                <div class="info-value">{{ doctor.experience_years }} Years</div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="info-card bg-white bg-opacity-20 rounded-4 p-3 text-center">
-                                <div class="info-icon mb-2">
-                                    <i class="fas fa-id-card fs-2"></i>
-                                </div>
-                                <div class="info-title fw-bold">License</div>
-                                <div class="info-value">{{ doctor.license_number }}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="doctor-avatar text-center">
-                    <div class="avatar-circle">
-                        <i class="fas fa-user-md"></i>
-                    </div>
-                    <div class="status-badge mt-3">
-                        <span class="badge bg-success bg-gradient px-3 py-2 rounded-pill">
-                            <i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i>
-                            Active
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Dashboard Content -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row text-center mb-5">
-            <div class="col-lg-8 mx-auto">
-                <h2 class="display-5 fw-bold text-primary mb-4">Doctor Dashboard</h2>
-                <p class="lead text-muted">Manage your practice and patient care efficiently</p>
-            </div>
-        </div>
-        
-        <div class="row g-4">
-            <div class="col-lg-4 col-md-6">
-                <div class="dashboard-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift text-center">
-                    <div class="card-icon bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
-                        <i class="fas fa-users text-white fs-2"></i>
+    <!-- Modern Header Section -->
+    <section class="dashboard-header">
+        <div class="p-lg-5">
+            <div class="header-content">
+                <div class="doctor-profile-main">
+                    <div class="profile-avatar">
+                        <div class="avatar-circle">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div class="status-indicator">
+                            <span class="status-dot"></span>
+                            <span class="status-text">Active</span>
+                        </div>
                     </div>
-                    <h4 class="fw-bold text-primary mb-3">My Patients</h4>
-                    <p class="text-muted mb-4">View and manage your patient records and appointments.</p>
-                    <a href="{{ url_for('doctor.patients') }}" class="btn btn-outline-primary rounded-pill px-4">
-                        View Patients
-                    </a>
-                </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-6">
-                <div class="dashboard-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift text-center">
-                    <div class="card-icon bg-success bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
-                        <i class="fas fa-calendar-check text-white fs-2"></i>
+                    
+                    <div class="profile-info">
+                        <h1 class="greeting">Welcome Back, <span class="doctor-name">Dr. {{ doctor.full_name }}</span></h1>
+                        <p class="specialization">{{ doctor.specialization }} Specialist</p>
+                        <div class="doctor-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-award"></i>
+                                <span>{{ doctor.experience_years }} Years Experience</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-id-card"></i>
+                                <span>License: {{ doctor.license_number }}</span>
+                            </div>
+                        </div>
                     </div>
-                    <h4 class="fw-bold text-success mb-3">View Appointments</h4>
-                    <p class="text-muted mb-4">View and manage patient appointments in kanban or list view.</p>
-                    <a href="{{ url_for('doctor.doctor_appointments') }}" class="btn btn-outline-success rounded-pill px-4">
-                        <i class="fas fa-calendar-check me-2"></i>View Appointments
-                    </a>
                 </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-6">
-                <div class="dashboard-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift text-center">
-                    <div class="card-icon bg-info bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
-                        <i class="fas fa-prescription-bottle-alt text-white fs-2"></i>
-                    </div>
-                    <h4 class="fw-bold text-info mb-3">Prescriptions</h4>
-                    <p class="text-muted mb-4">Create and manage patient prescriptions and medications.</p>
-                    <button class="btn btn-outline-info rounded-pill px-4" disabled>
-                        Coming Soon
-                    </button>
-                </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-6">
-                <div class="dashboard-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift text-center">
-                    <div class="card-icon bg-warning bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
-                        <i class="fas fa-chart-line text-white fs-2"></i>
-                    </div>
-                    <h4 class="fw-bold text-warning mb-3">Analytics</h4>
-                    <p class="text-muted mb-4">View practice statistics and patient analytics.</p>
-                    <button class="btn btn-outline-warning rounded-pill px-4" disabled>
-                        Coming Soon
-                    </button>
-                </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-6">
-                <div class="dashboard-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift text-center">
-                    <div class="card-icon bg-danger bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
-                        <i class="fas fa-file-medical text-white fs-2"></i>
-                    </div>
-                    <h4 class="fw-bold text-danger mb-3">Medical Records</h4>
-                    <p class="text-muted mb-4">Access and update patient medical histories.</p>
-                    <button class="btn btn-outline-danger rounded-pill px-4" disabled>
-                        Coming Soon
-                    </button>
-                </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-6">
-                <div class="dashboard-card h-100 p-4 bg-white rounded-4 shadow-sm hover-lift text-center">
-                    <div class="card-icon bg-secondary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4">
-                        <i class="fas fa-cog text-white fs-2"></i>
-                    </div>
-                    <h4 class="fw-bold text-secondary mb-3">Settings</h4>
-                    <p class="text-muted mb-4">Configure your profile and practice preferences.</p>
-                    <a href="{{ url_for('doctor.doctor_profile') }}" class="btn btn-outline-secondary rounded-pill px-4">
-                        View Profile
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
-<!-- Quick Stats Section -->
-<section class="py-5">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h3 class="display-5 fw-bold text-primary mb-4">Your Practice Overview</h3>
-                <p class="lead text-muted mb-4">
-                    Monitor your practice performance and patient care metrics.
-                </p>
-                <div class="stats-list">
-                    <div class="stat-item d-flex align-items-center mb-3">
-                        <div class="stat-icon bg-success bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3">
-                            <i class="fas fa-user-check text-white"></i>
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon patients">
+                            <i class="fas fa-users"></i>
                         </div>
-                        <div>
-                            <h6 class="fw-bold mb-1">Total Patients</h6>
-                            <p class="text-muted mb-0">{{ total_patients }} patients registered</p>
+                        <div class="stat-info">
+                            <h3>{{ total_patients }}</h3>
+                            <p>Total Patients</p>
                         </div>
                     </div>
-                    <div class="stat-item d-flex align-items-center mb-3">
-                        <div class="stat-icon bg-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3">
-                            <i class="fas fa-calendar-day text-white"></i>
+                    <div class="stat-card">
+                        <div class="stat-icon appointments">
+                            <i class="fas fa-calendar-check"></i>
                         </div>
-                        <div>
-                            <h6 class="fw-bold mb-1">Today's Appointments</h6>
-                            <p class="text-muted mb-0">{{ todays_appointments }} appointments scheduled</p>
+                        <div class="stat-info">
+                            <h3>{{ todays_appointments }}</h3>
+                            <p>Today's Appointments</p>
                         </div>
                     </div>
-                    <div class="stat-item d-flex align-items-center">
-                        <div class="stat-icon bg-info bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3">
-                            <i class="fas fa-clock text-white"></i>
+                    <div class="stat-card">
+                        <div class="stat-icon hours">
+                            <i class="fas fa-clock"></i>
                         </div>
-                        <div>
-                            <h6 class="fw-bold mb-1">Practice Hours</h6>
-                            <p class="text-muted mb-0">
+                        <div class="stat-info">
+                            <h3>
                                 {% if practice_hours %}
-                                    {{ practice_hours }}
+                                    {{ practice_hours.split(':')[0] }}h
                                 {% else %}
-                                    Configure in settings
+                                    N/A
                                 {% endif %}
-                            </p>
+                            </h3>
+                            <p>Practice Hours</p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <div class="stats-image text-center">
-                    <img src="/placeholder.svg?height=400&width=500" 
-                         alt="Practice Analytics" 
-                         class="img-fluid rounded-4">
+        </div>
+    </section>
+
+    <!-- Main Dashboard Grid -->
+    <section class="dashboard-main">
+        <div class="container">
+            <div class="section-header">
+                <h2>Practice Management</h2>
+                <p>Efficient tools for patient care and practice management</p>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- Patients Card -->
+                <div class="feature-card patients-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="card-badge">Active</div>
+                    </div>
+                    <div class="card-content">
+                        <h3>My Patients</h3>
+                        <p>Access patient records, medical history, and treatment plans</p>
+                    </div>
+                    <div class="card-actions">
+                        <a href="{{ url_for('doctor.patients') }}" class="btn-primary">
+                            <i class="fas fa-arrow-right"></i>
+                            Manage Patients
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Appointments Card -->
+                <div class="feature-card appointments-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="card-badge">Today: {{ todays_appointments }}</div>
+                    </div>
+                    <div class="card-content">
+                        <h3>Appointments</h3>
+                        <p>View and manage patient appointments in multiple layouts</p>
+                    </div>
+                    <div class="card-actions">
+                        <a href="{{ url_for('doctor.doctor_appointments') }}" class="btn-primary">
+                            <i class="fas fa-arrow-right"></i>
+                            View Schedule
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Prescriptions Card -->
+                <div class="feature-card prescriptions-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-prescription-bottle-alt"></i>
+                        </div>
+                        <div class="card-badge coming-soon">Coming Soon</div>
+                    </div>
+                    <div class="card-content">
+                        <h3>Prescriptions</h3>
+                        <p>Digital prescription management and medication tracking</p>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-secondary" disabled>
+                            <i class="fas fa-clock"></i>
+                            Under Development
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Medical Records Card -->
+                <div class="feature-card records-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-file-medical"></i>
+                        </div>
+                        <div class="card-badge coming-soon">Coming Soon</div>
+                    </div>
+                    <div class="card-content">
+                        <h3>Medical Records</h3>
+                        <p>Comprehensive patient medical history and records</p>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-secondary" disabled>
+                            <i class="fas fa-clock"></i>
+                            Under Development
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Analytics Card -->
+                <div class="feature-card analytics-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="card-badge coming-soon">Coming Soon</div>
+                    </div>
+                    <div class="card-content">
+                        <h3>Practice Analytics</h3>
+                        <p>Insights and statistics for your medical practice</p>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-secondary" disabled>
+                            <i class="fas fa-clock"></i>
+                            Under Development
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Profile Card -->
+                <div class="feature-card profile-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-user-cog"></i>
+                        </div>
+                        <div class="card-badge">Ready</div>
+                    </div>
+                    <div class="card-content">
+                        <h3>Profile & Settings</h3>
+                        <p>Manage your profile, availability, and preferences</p>
+                    </div>
+                    <div class="card-actions">
+                        <a href="{{ url_for('doctor.doctor_profile') }}" class="btn-primary">
+                            <i class="fas fa-arrow-right"></i>
+                            Update Profile
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+
+    <!-- Recent Activity Section -->
+    <section class="recent-activity">
+        <div class="container">
+            <div class="section-header">
+                <h2>Recent Activity</h2>
+                <p>Latest updates from your practice</p>
+            </div>
+            <div class="activity-grid">
+                <div class="activity-card">
+                    <div class="activity-icon">
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Upcoming Appointments</h4>
+                        <p>You have {{ todays_appointments }} appointments scheduled for today</p>
+                        <span class="activity-time">Today</span>
+                    </div>
+                </div>
+                <div class="activity-card">
+                    <div class="activity-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>New Patients</h4>
+                        <p>{{ total_patients }} patients registered under your care</p>
+                        <span class="activity-time">This month</span>
+                    </div>
+                </div>
+                <div class="activity-card">
+                    <div class="activity-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Schedule Status</h4>
+                        <p>Your practice hours are {% if practice_hours %}{{ practice_hours }}{% else %}not set{% endif %}</p>
+                        <span class="activity-time">Current</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
 
 <!-- Footer -->
 {% include "doctor/dr_footer.html" %}
 
 <style>
-.bg-gradient-primary {
-    background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
+.doctor-dashboard {
+    background: #f8fafc;
+    min-height: 100vh;
 }
 
-.doctor-welcome-section {
-    min-height: 80vh;
+/* Loader Styles */
+.loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 99999;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
 }
 
-.min-vh-75 {
-    min-height: 75vh;
+.loader-animation {
+    width: 100px;
+    height: 100px;
 }
 
-.info-card {
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
+/* Header Section */
+.dashboard-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 0;
 }
 
-.info-card:hover {
-    transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.3) !important;
+.header-content {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 3rem;
+    align-items: center;
 }
 
-.card-icon {
-    width: 80px;
-    height: 80px;
+.doctor-profile-main {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
 }
 
-.stat-icon {
-    width: 50px;
-    height: 50px;
-}
-
-.dashboard-card {
-    transition: all 0.3s ease;
-    border: 1px solid rgba(0,0,0,0.05);
-}
-
-.dashboard-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-}
-
-.hover-lift {
-    transition: all 0.3s ease;
+.profile-avatar {
+    position: relative;
 }
 
 .avatar-circle {
-    width: 150px;
-    height: 150px;
-    background: linear-gradient(135deg, #0f4c75, #3282b8);
+    width: 120px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 4rem;
-    margin: 0 auto;
-    box-shadow: 0 20px 40px rgba(15, 76, 117, 0.3);
-    animation: avatarFloat 6s ease-in-out infinite;
-}
-
-@keyframes avatarFloat {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-10px) scale(1.05); }
-}
-
-.navbar {
+    font-size: 3rem;
     backdrop-filter: blur(10px);
-    background-color: rgba(255, 255, 255, 0.95) !important;
+    border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
-.navbar-brand {
-    font-size: 1.8rem !important;
+.status-indicator {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    color: #059669;
+    font-size: 0.875rem;
 }
 
-.nav-link {
-    color: #495057 !important;
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background: #059669;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.profile-info .greeting {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.doctor-name {
+    color: #fbbf24;
+}
+
+.specialization {
+    font-size: 1.25rem;
+    opacity: 0.9;
+    margin-bottom: 1rem;
+}
+
+.doctor-meta {
+    display: flex;
+    gap: 2rem;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+/* Quick Stats */
+.quick-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.stat-icon.patients { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+.stat-icon.appointments { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+.stat-icon.hours { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+
+.stat-info h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.stat-info p {
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+/* Main Dashboard */
+.dashboard-main {
+    padding: 4rem 0;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.section-header p {
+    font-size: 1.125rem;
+    color: #6b7280;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+}
+
+.feature-card {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     transition: all 0.3s ease;
+    border: 1px solid #f1f5f9;
 }
 
-.nav-link:hover {
-    color: #0f4c75 !important;
-    transform: translateY(-1px);
+.feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.card-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.patients-card .card-icon { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+.appointments-card .card-icon { background: linear-gradient(135deg, #10b981, #059669); }
+.prescriptions-card .card-icon { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+.records-card .card-icon { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.analytics-card .card-icon { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.profile-card .card-icon { background: linear-gradient(135deg, #6b7280, #4b5563); }
+
+.card-badge {
+    background: #10b981;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.card-badge.coming-soon {
+    background: #6b7280;
+}
+
+.card-content h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.75rem;
+}
+
+.card-content p {
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.card-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: #6b7280;
+}
+
+.btn-secondary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Recent Activity */
+.recent-activity {
+    padding: 4rem 0;
+    background: white;
+}
+
+.activity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.activity-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: #f8fafc;
+    border-radius: 1rem;
+    border-left: 4px solid #3b82f6;
+}
+
+.activity-icon {
+    width: 50px;
+    height: 50px;
+    background: #dbeafe;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3b82f6;
+    font-size: 1.25rem;
+}
+
+.activity-content h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.activity-content p {
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+.activity-time {
+    font-size: 0.875rem;
+    color: #9ca3af;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .header-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .quick-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 768px) {
-    .doctor-welcome-section {
-        min-height: auto;
-        padding: 3rem 0;
+    .doctor-profile-main {
+        flex-direction: column;
+        text-align: center;
     }
     
-    .display-3 {
-        font-size: 2.5rem;
+    .doctor-meta {
+        flex-direction: column;
+        gap: 1rem;
     }
     
-    .doctor-info-cards {
-        margin-top: 2rem;
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .quick-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-info .greeting {
+        font-size: 2rem;
+    }
+    
+    .section-header h2 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-header {
+        padding: 2rem 0;
     }
     
     .avatar-circle {
-        width: 120px;
-        height: 120px;
-        font-size: 3rem;
+        width: 100px;
+        height: 100px;
+        font-size: 2.5rem;
+    }
+    
+    .feature-card {
+        padding: 1.5rem;
+    }
+    
+    .card-actions {
+        flex-direction: column;
     }
 }
 </style>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.10.2/lottie.min.js"></script>
 <script src="{{ url_for('static', filename='lottie_loader.js') }}"></script>
 {% endblock %}
