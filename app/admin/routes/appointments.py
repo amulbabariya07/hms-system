@@ -156,11 +156,40 @@ def admin_view_prescription(prescription_id):
 def admin_delete_appointment(appointment_id):
     if 'admin_logged_in' not in session:
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
     try:
         appointment = Appointment.query.get_or_404(appointment_id)
+        
+        # Check and handle related records in the correct order
+        
+        # 1. First check for payments related to this appointment
+        from app.models import Payment  # Import Payment model if not already imported
+        payments = Payment.query.filter_by(appointment_id=appointment_id).all()
+        
+        # 2. Check for prescriptions
+        prescription = MedicalPrescription.query.filter_by(appointment_id=appointment_id).first()
+        
+        # 3. Delete related records first
+        if prescription:
+            db.session.delete(prescription)
+        
+        # Delete payments associated with this appointment
+        for payment in payments:
+            db.session.delete(payment)
+        
+        # 4. Finally delete the appointment
         db.session.delete(appointment)
         db.session.commit()
-        return jsonify({'success': True, 'message': 'Appointment deleted successfully.'})
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Appointment and related records deleted successfully.'
+        })
+        
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'message': 'An error occurred while deleting the appointment.'})
+        print(f"Error deleting appointment: {str(e)}")
+        return jsonify({
+            'success': False, 
+            'message': 'Cannot delete appointment because it has related records. Please contact administrator.'
+        }), 500

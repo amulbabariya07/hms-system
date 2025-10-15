@@ -147,8 +147,8 @@
                     </div>
                 </div>
                 <div class="col-md-2 col-lg-2 text-end">
-                    <button class="btn btn-outline-secondary w-100" onclick="exportAppointments()">
-                        <i class="fas fa-download me-2"></i>Export
+                    <button class="btn btn-outline-danger w-100" onclick="clearFilters()">
+                        <i class="fas fa-eraser me-2"></i>Clear Filters
                     </button>
                 </div>
             </div>
@@ -227,7 +227,8 @@
                     </thead>
                     <tbody>
                         {% for appointment in appointments %}
-                        <tr data-status="{{ appointment.status }}" data-date="{{ appointment.appointment_date.strftime('%Y-%m-%d') }}" style="vertical-align: middle;">
+                        <tr data-id="{{ appointment.id }}" data-status="{{ appointment.status }}" data-date="{{ appointment.appointment_date.strftime('%Y-%m-%d') }}" style="vertical-align: middle;">
+
                             <td>
                                 <span class="badge text-bg-secondary fw-semibold">#{{ appointment.id }}</span>
                             </td>
@@ -291,7 +292,9 @@
                                     <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit Appointment" onclick="editAppointment('{{ appointment.id }}')">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteAppointment('{{ appointment.id }}')" title="Delete Appointment">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                            onclick="deleteAppointment('{{ appointment.id }}', event)" 
+                                            title="Delete Appointment">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                     {% if appointment.status == 'scheduled' %}
@@ -456,31 +459,43 @@ function filterAppointments() {
 
 // Update appointment status
 function updateAppointmentStatus(appointmentId, status) {
-    if (!confirm(`Are you sure you want to mark this appointment as ${status}?`)) {
-        return;
-    }
+    if (!confirm(`Are you sure you want to mark this appointment as ${status}?`)) return;
 
     fetch(`/admin/appointments/update-status/${appointmentId}`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: status })
     })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
         if (data.success) {
             showAlert('success', data.message);
-            setTimeout(() => location.reload(), 1500);
+            
+            // Update table row and status badge dynamically
+            const row = document.querySelector(`#appointmentsTable tbody tr[data-id='${appointmentId}']`);
+            if (row) {
+                row.dataset.status = status;
+
+                const badgeTd = row.cells[5];
+                badgeTd.innerHTML = '';
+                let badgeClass = 'secondary';
+                let text = status.charAt(0).toUpperCase() + status.slice(1);
+                if (status === 'scheduled') badgeClass = 'warning';
+                if (status === 'completed') badgeClass = 'success';
+                if (status === 'cancelled') badgeClass = 'danger';
+
+                badgeTd.innerHTML = `<span class="badge text-bg-${badgeClass}">${text}</span>`;
+
+                // Update dashboard counts
+                updateAppointmentCounts();
+            }
         } else {
             showAlert('danger', data.message);
         }
     })
-    .catch(error => {
-        console.error('Error:', error);
-        showAlert('danger', 'An error occurred. Please try again.');
-    });
 }
+
+
 
 // Placeholder for export functionality
 function exportAppointments() {
@@ -489,22 +504,34 @@ function exportAppointments() {
 
 // Dynamically create and show alert messages
 function showAlert(type, message) {
-    const alertWrapper = document.createElement('div');
-    alertWrapper.innerHTML = `
-        <div class="alert alert-${type} alert-dismissible fade show" role="alert" style="min-width: 300px;">
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    // Create the alert element
+    const alertEl = document.createElement('div');
+    alertEl.className = `alert alert-${type} alert-dismissible fade show`;
+    alertEl.role = 'alert';
+    alertEl.style.minWidth = '300px';
+    alertEl.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
-    const toastContainer = document.createElement('div');
-    toastContainer.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999;';
-    toastContainer.appendChild(alertWrapper);
-    document.body.appendChild(toastContainer);
 
-    const toast = new bootstrap.Alert(alertWrapper.firstChild);
+    // Create container if it doesn't exist
+    let toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toastContainer';
+        toastContainer.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999;';
+        document.body.appendChild(toastContainer);
+    }
+
+    toastContainer.appendChild(alertEl);
+
+    // Initialize Bootstrap alert
+    const alertInstance = new bootstrap.Alert(alertEl);
+
+    // Auto dismiss after 5 seconds
     setTimeout(() => {
-        toast.close();
+        alertInstance.close();
         setTimeout(() => {
             if (toastContainer.childElementCount === 0) {
                 toastContainer.remove();
@@ -512,6 +539,7 @@ function showAlert(type, message) {
         }, 500);
     }, 5000);
 }
+
 
 // Open appointment wizard (view/edit)
 function openAppointmentWizard(appointmentId, mode) {
@@ -653,32 +681,23 @@ function viewPrescription(appointmentId) {
         });
 }
 
-function deleteAppointment(appointmentId) {
-    if (!confirm('Are you sure you want to delete this appointment? This action cannot be undone.')) {
-        return;
+const row = document.querySelector(`#appointmentsTable tbody tr[data-id='${appointmentId}']`);
+if (row) {
+    row.dataset.status = status;
+
+    const badgeTd = row.cells[5];
+    if (badgeTd) {
+        let badgeClass = 'secondary';
+        if (status === 'scheduled') badgeClass = 'warning';
+        if (status === 'completed') badgeClass = 'success';
+        if (status === 'cancelled') badgeClass = 'danger';
+
+        badgeTd.innerHTML = `<span class="badge text-bg-${badgeClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>`;
     }
 
-    fetch(`/admin/appointments/delete/${appointmentId}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ appointment_id: appointmentId })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showAlert('success', 'Appointment deleted successfully.');
-            setTimeout(() => location.reload(), 1500);
-        } else {
-            showAlert('danger', data.message || 'Failed to delete appointment.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showAlert('danger', 'An error occurred while deleting the appointment.');
-    });
+    updateAppointmentCounts();
 }
+
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize filters
@@ -692,5 +711,69 @@ document.addEventListener('DOMContentLoaded', function() {
         filterAppointments(); // apply filter on page load
     }
 });
+function clearFilters() {
+    const statusFilter = document.getElementById('statusFilter');
+    const dateFilter = document.getElementById('dateFilter');
+    const searchInput = document.getElementById('searchAppointments');
+
+    if (statusFilter) statusFilter.value = '';
+    if (dateFilter) dateFilter.value = new Date().toISOString().split('T')[0]; // reset to today
+    if (searchInput) searchInput.value = '';
+
+    filterAppointments(); // reapply filters
+}
+function deleteAppointment(appointmentId, event) {
+    if (!confirm('Are you sure you want to delete this appointment? This action cannot be undone.')) {
+        return;
+    }
+
+    const deleteBtn = event.target.closest('button') || event.target;
+    const originalHtml = deleteBtn.innerHTML;
+    deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Deleting...';
+    deleteBtn.disabled = true;
+
+    fetch(`/admin/appointments/delete/${appointmentId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            
+            // For hard delete - remove row
+            const row = document.querySelector(`#appointmentsTable tbody tr[data-id="${appointmentId}"]`);
+            if (row) {
+                row.remove();
+                
+                const remainingRows = document.querySelectorAll('#appointmentsTable tbody tr');
+                if (remainingRows.length === 0) {
+                    location.reload();
+                }
+            } else {
+                // For soft delete - reload page to reflect status change
+                setTimeout(() => location.reload(), 1500);
+            }
+        } else {
+            showAlert('danger', data.message);
+            deleteBtn.innerHTML = originalHtml;
+            deleteBtn.disabled = false;
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting appointment:', error);
+        showAlert('danger', 'Failed to delete appointment. Please try again.');
+        deleteBtn.innerHTML = originalHtml;
+        deleteBtn.disabled = false;
+    });
+}
 </script>
 {% endblock %}
