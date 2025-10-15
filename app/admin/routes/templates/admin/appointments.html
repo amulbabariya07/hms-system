@@ -301,9 +301,12 @@
                                     <button type="button" class="btn btn-sm btn-outline-success" onclick="updateAppointmentStatus('{{ appointment.id }}', 'completed')" title="Mark as Completed">
                                         <i class="fas fa-check"></i>
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="updateAppointmentStatus('{{ appointment.id }}', 'cancelled')" title="Cancel Appointment">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                            onclick="cancelAppointment('{{ appointment.id }}')" 
+                                            title="Cancel Appointment">
                                         <i class="fas fa-times"></i>
                                     </button>
+
                                     {% endif %}
                                 </div>
                             </td>
@@ -775,5 +778,27 @@ function deleteAppointment(appointmentId, event) {
         deleteBtn.disabled = false;
     });
 }
+function cancelAppointment(appointmentId) {
+    if (!confirm('Are you sure you want to cancel this appointment?')) return;
+
+    fetch(`/admin/appointments/cancel/${appointmentId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(resp => resp.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showAlert('danger', data.message);
+        }
+    })
+    .catch(err => {
+        console.error('Cancel error', err);
+        showAlert('danger', 'Failed to cancel appointment.');
+    });
+}
+
 </script>
 {% endblock %}

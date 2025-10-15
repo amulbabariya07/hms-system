@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash, session, jsonify
+from flask import render_template, request, redirect, url_for, flash, session, jsonify, current_app
 from app import db
 from app.models import Appointment, PatientIntakeForm, MedicalPrescription, User, Doctor
 from datetime import datetime
@@ -193,3 +193,61 @@ def admin_delete_appointment(appointment_id):
             'success': False, 
             'message': 'Cannot delete appointment because it has related records. Please contact administrator.'
         }), 500
+
+from app.models import Appointment, MedicalPrescription, Payment, User
+from app.admin.mail_setting import get_mail_settings
+from flask_mail import Mail, Message
+
+# Helper to send cancellation email
+def send_cancellation_email(to_email, appointment):
+    try:
+        smtp_conf = get_mail_settings()  # use your MailSetting helper
+        current_app.config.update({
+            'MAIL_SERVER': smtp_conf['MAIL_SERVER'],
+            'MAIL_PORT': smtp_conf['MAIL_PORT'],
+            'MAIL_USERNAME': smtp_conf['MAIL_USERNAME'],
+            'MAIL_PASSWORD': smtp_conf['MAIL_PASSWORD'],
+            'MAIL_USE_TLS': smtp_conf['MAIL_USE_TLS'],
+            'MAIL_USE_SSL': False,  # if needed
+            'MAIL_DEFAULT_SENDER': (smtp_conf['MAIL_DEFAULT_NAME'], smtp_conf['MAIL_DEFAULT_EMAIL'])
+        })
+        mail = Mail()
+        mail.init_app(current_app)
+
+        msg = Message(
+            subject="Appointment Cancelled",
+            recipients=[to_email],
+            body=f"Dear {appointment.user.full_name},\n\n"
+                 f"Your appointment scheduled on {appointment.appointment_date} at {appointment.appointment_time} "
+                 f"with Dr. {appointment.doctor.full_name} has been cancelled.\n\n"
+                 "If you have any questions, please contact us.\n\nThank you."
+        )
+        mail.send(msg)
+        print(f"Cancellation email sent to {to_email}")
+    except Exception as e:
+        print("Failed to send cancellation email:", e)
+
+
+# Route to cancel appointment
+@admin_bp.route('/appointments/cancel/<int:appointment_id>', methods=['POST'])
+def cancel_appointment(appointment_id):
+    if 'admin_logged_in' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    try:
+        appointment = Appointment.query.get_or_404(appointment_id)
+
+        # Cancel the appointment
+        appointment.status = 'cancelled'
+        db.session.commit()
+
+        # Send email to patient
+        if appointment.user and appointment.user.email:
+            send_cancellation_email(appointment.user.email, appointment)
+
+        return jsonify({'success': True, 'message': 'Appointment cancelled and email sent successfully.'})
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error cancelling appointment: {str(e)}")
+        return jsonify({'success': False, 'message': 'Failed to cancel appointment. Please try again.'}), 500

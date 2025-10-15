@@ -478,8 +478,10 @@ def receptionist_delete_appointment(appointment_id):
         db.session.commit()
         return jsonify({'success': True, 'message': 'Appointment deleted successfully!'})
     except Exception as e:
+        print("__________ e",e)
         db.session.rollback()
         return jsonify({'success': False, 'message': 'An error occurred while deleting the appointment.'})
+
 
 @receptionist_bp.route('/queries')
 @login_required
@@ -842,3 +844,63 @@ def download_payment_receipt(payment_id):
     buffer.seek(0)
 
     return send_file(buffer, as_attachment=True, download_name=f"Receipt_{payment.razorpay_payment_id}.pdf", mimetype='application/pdf')
+
+@receptionist_bp.route('/appointments/cancel/<int:appointment_id>', methods=['POST'])
+@login_required
+def cancel_appointment(appointment_id):
+    try:
+        appointment = Appointment.query.get_or_404(appointment_id)
+        appointment.status = 'cancelled'
+        appointment.updated_at = datetime.utcnow()
+        db.session.commit()
+
+        # Send cancellation email
+        send_appointment_cancellation_email(appointment)
+
+        return jsonify({'success': True, 'message': 'Appointment cancelled and email sent!'})
+    except Exception as e:
+        print("_______ cancel e",e)
+        db.session.rollback()
+        return jsonify({'success': False, 'message': f'Error cancelling appointment: {str(e)}'})
+
+import smtplib
+from email.mime.text import MIMEText
+from flask import render_template
+from app.models import MailSetting
+
+def send_appointment_cancellation_email(appointment):
+    if not appointment.patient or not appointment.patient.email:
+        return False  # no email to send
+
+    try:
+        mail_config = MailSetting.query.first()  # fetch SMTP config from DB
+        if not mail_config:
+            return False
+
+        subject = f"Appointment Cancelled | {appointment.appointment_date.strftime('%Y-%m-%d')}"
+        recipient_email = appointment.patient.email
+        patient_name = appointment.patient.full_name
+
+        html_body = render_template(
+            'email/appointment_cancelled.html',  # create this template
+            patient_name=patient_name,
+            appointment_date=appointment.appointment_date,
+            doctor_name=appointment.doctor.full_name if appointment.doctor else 'N/A'
+        )
+
+        msg = MIMEText(html_body, "html")
+        msg['Subject'] = subject
+        msg['From'] = f"{mail_config.mail_default_name} <{mail_config.mail_default_email}>"
+        msg['To'] = recipient_email
+
+        server = smtplib.SMTP(mail_config.mail_server, mail_config.mail_port)
+        if mail_config.mail_use_tls:
+            server.starttls()
+        server.login(mail_config.mail_username, mail_config.mail_password)
+        server.sendmail(mail_config.mail_default_email, [recipient_email], msg.as_string())
+        server.quit()
+
+        return True
+    except Exception as e:
+        print("Error sending cancellation email:", str(e))
+        return False

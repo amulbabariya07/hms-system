@@ -122,7 +122,7 @@
                                             <button class="btn btn-sm btn-primary" onclick="openIntakeReadonly('{{ appointment.user.id }}')"><i class="fa fa-info-circle"></i></button>
                                             <button class="btn btn-sm btn-outline-warning" onclick="openTimelineModal('{{ appointment.user.id }}')"><i class="fa-solid fa-timeline"></i></button>
                                             <button class="btn btn-sm btn-outline-success" onclick="viewPrescription('{{ appointment.id }}')"><i class="fa-solid fa-file-medical"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteAppointment('{{ appointment.id }}')"><i class="fas fa-trash"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="cancelAppointment('{{ appointment.id }}')"><i class="fas fa-trash"></i></button>
                                         </div>
                                     </td>
                                 </tr>
@@ -142,7 +142,7 @@
                                             <button class="btn btn-sm btn-primary" onclick="openIntakeReadonly('{{ appointment.user.id }}')"><i class="fa fa-info-circle"></i></button>
                                             <button class="btn btn-sm btn-outline-warning" onclick="openTimelineModal('{{ appointment.user.id }}')"><i class="fa-solid fa-timeline"></i></button>
                                             <button class="btn btn-sm btn-outline-success" onclick="viewPrescription('{{ appointment.id }}')"><i class="fa-solid fa-file-medical"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteAppointment('{{ appointment.id }}')"><i class="fas fa-trash"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="cancelAppointment('{{ appointment.id }}')"><i class="fas fa-trash"></i></button>
                                         </div>
                                     </td>
                                 </tr>
@@ -164,7 +164,7 @@
                                             <button class="btn btn-sm btn-primary" onclick="openIntakeReadonly('{{ appointment.user.id }}')"><i class="fa fa-info-circle"></i></button>
                                             <button class="btn btn-sm btn-outline-warning" onclick="openTimelineModal('{{ appointment.user.id }}')"><i class="fa-solid fa-timeline"></i></button>
                                             <button class="btn btn-sm btn-outline-success" onclick="viewPrescription('{{ appointment.id }}')"><i class="fa-solid fa-file-medical"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteAppointment('{{ appointment.id }}')"><i class="fas fa-trash"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="cancelAppointment('{{ appointment.id }}')"><i class="fas fa-trash"></i></button>
                                         </div>
                                     </td>
                                 </tr>
@@ -192,7 +192,7 @@
                                             <button class="btn btn-sm btn-primary" onclick="openIntakeReadonly('{{ appointment.user.id }}')"><i class="fa fa-info-circle"></i></button>
                                             <button class="btn btn-sm btn-outline-warning" onclick="openTimelineModal('{{ appointment.user.id }}')"><i class="fa-solid fa-timeline"></i></button>
                                             <button class="btn btn-sm btn-outline-success" onclick="viewPrescription('{{ appointment.id }}')"><i class="fa-solid fa-file-medical"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteAppointment('{{ appointment.id }}')"><i class="fas fa-trash"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="cancelAppointment('{{ appointment.id }}')"><i class="fas fa-trash"></i></button>
                                         </div>
                                     </td>
                                 </tr>
@@ -440,13 +440,15 @@ function submitEditAppointment() {
         });
 }
 
-function deleteAppointment(appointmentId) {
-    if (!confirm('Are you sure you want to delete this appointment? This action cannot be undone.')) return;
-    fetch(`{{ url_for('receptionist.receptionist_delete_appointment', appointment_id=0) }}`.replace('0', appointmentId), {
+function cancelAppointment(appointmentId) {
+    if (!confirm('Are you sure you want to cancel this appointment?')) return;
+
+    fetch(`{{ url_for('receptionist.cancel_appointment', appointment_id=0) }}`.replace('0', appointmentId), {
         method: 'POST',
         headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-            // No CSRF token sent
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/json'
+            // Add CSRF token here if your app requires it
         }
     })
     .then(resp => resp.json())
@@ -459,8 +461,8 @@ function deleteAppointment(appointmentId) {
         }
     })
     .catch(err => {
-        console.error('Delete error', err);
-        showAlert('danger', 'Failed to delete appointment');
+        console.error('Cancel error', err);
+        showAlert('danger', 'Failed to cancel appointment');
     });
 }
 
