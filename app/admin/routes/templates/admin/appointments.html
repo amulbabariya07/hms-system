@@ -680,9 +680,17 @@ function deleteAppointment(appointmentId) {
     });
 }
 
-// Initialize filters when page loads
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize filters
     initializeFilters();
+
+    // Set default date filter to today
+    const dateFilterEl = document.getElementById('dateFilter');
+    if (dateFilterEl) {
+        const today = new Date().toISOString().split('T')[0]; // format: YYYY-MM-DD
+        dateFilterEl.value = today;
+        filterAppointments(); // apply filter on page load
+    }
 });
 </script>
 {% endblock %}
