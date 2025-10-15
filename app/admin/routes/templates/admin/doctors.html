@@ -58,14 +58,19 @@
                             <td>{{ doctor.experience_years }} years</td>
                             <td>
                                 {% if doctor.is_verified %}
-                                <span class="badge rounded-pill text-bg-success">
-                                    <i class="fas fa-check-circle me-1"></i>Verified
-                                </span>
+                                    <span class="badge rounded-pill text-bg-success">
+                                        <i class="fas fa-check-circle me-1"></i>Verified
+                                    </span>
                                 {% else %}
-                                <span class="badge rounded-pill text-bg-warning">
-                                    <i class="fas fa-clock me-1"></i>Pending
-                                </span>
+                                    <span class="badge rounded-pill text-bg-warning">
+                                        <i class="fas fa-clock me-1"></i>Pending
+                                    </span>
                                 {% endif %}
+                                <br>
+                                <small class="{% if doctor.is_active %}text-success{% else %}text-danger{% endif %}">
+                                    <i class="fas fa-{% if doctor.is_active %}check{% else %}times{% endif %} me-1"></i>
+                                    {% if doctor.is_active %}Active{% else %}Inactive{% endif %}
+                                </small>
                             </td>
                             <td>{{ doctor.created_at.strftime('%b %d, %Y') }}</td>
                             <td class="text-center">
@@ -81,8 +86,23 @@
                                         <i class="fas fa-check"></i>
                                     </button>
                                     {% endif %}
+
+                                    {% if doctor.is_active %}
+                                    <button type="button" class="btn btn-sm btn-outline-warning" onclick="deactivateDoctor({{ doctor.id }})" data-bs-toggle="tooltip" title="Deactivate Doctor">
+                                        <i class="fas fa-user-slash"></i>
+                                    </button>
+                                    {% else %}
+                                    <button type="button" class="btn btn-sm btn-outline-success" onclick="activateDoctor({{ doctor.id }})" data-bs-toggle="tooltip" title="Activate Doctor">
+                                        <i class="fas fa-user-check"></i>
+                                    </button>
+                                    {% endif %}
+
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteDoctor({{ doctor.id }})" data-bs-toggle="tooltip" title="Delete Doctor">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
                             </td>
+
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -508,6 +528,38 @@ function togglePasswordFields() {
         confirmPasswordInput.required = false;
         passwordInput.value = '';
         confirmPasswordInput.value = '';
+    }
+}
+function deactivateDoctor(doctorId) {
+    if (confirm('Are you sure you want to deactivate this doctor?')) {
+        fetch(`/admin/doctors/deactivate/${doctorId}`, { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                showAlert(data.success ? 'success' : 'danger', data.message);
+                if (data.success) setTimeout(() => location.reload(), 1500);
+            });
+    }
+}
+
+function activateDoctor(doctorId) {
+    if (confirm('Are you sure you want to activate this doctor?')) {
+        fetch(`/admin/doctors/activate/${doctorId}`, { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                showAlert(data.success ? 'success' : 'danger', data.message);
+                if (data.success) setTimeout(() => location.reload(), 1500);
+            });
+    }
+}
+
+function deleteDoctor(doctorId) {
+    if (confirm('Are you sure you want to permanently delete this doctor? This action cannot be undone.')) {
+        fetch(`/admin/doctors/delete/${doctorId}`, { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                showAlert(data.success ? 'success' : 'danger', data.message);
+                if (data.success) setTimeout(() => location.reload(), 1500);
+            });
     }
 }
 </script>

@@ -227,3 +227,30 @@ def admin_add_doctor_form():
         return redirect(url_for('admin.admin_login'))
     specializations = Specialization.query.order_by(Specialization.name.asc()).all()
     return render_template('admin/add_doctor.html', specializations=specializations)
+
+@admin_bp.route('/doctors/deactivate/<int:doctor_id>', methods=['POST'])
+def admin_deactivate_doctor(doctor_id):
+    if 'admin_logged_in' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    doctor = Doctor.query.get_or_404(doctor_id)
+    doctor.is_active = False
+    db.session.commit()
+    return jsonify({'success': True, 'message': f'Dr. {doctor.full_name} has been deactivated.'})
+
+@admin_bp.route('/doctors/activate/<int:doctor_id>', methods=['POST'])
+def admin_activate_doctor(doctor_id):
+    if 'admin_logged_in' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    doctor = Doctor.query.get_or_404(doctor_id)
+    doctor.is_active = True
+    db.session.commit()
+    return jsonify({'success': True, 'message': f'Dr. {doctor.full_name} has been activated.'})
+
+@admin_bp.route('/doctors/delete/<int:doctor_id>', methods=['POST'])
+def admin_delete_doctor(doctor_id):
+    if 'admin_logged_in' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    doctor = Doctor.query.get_or_404(doctor_id)
+    db.session.delete(doctor)
+    db.session.commit()
+    return jsonify({'success': True, 'message': f'Dr. {doctor.full_name} has been deleted permanently.'})

@@ -943,6 +943,12 @@ def book_appointment_post():
         patient = User.query.get(session['user_id'])
         doctor = Doctor.query.get(doctor_id)
 
+        if not doctor or not doctor.is_active:
+            if is_ajax:
+                return jsonify(success=False, message="Doctor is not available for appointments.")
+            flash("This doctor is not currently available for appointments.", "danger")
+            return redirect(url_for('patient.book_appointment'))
+
         if not doctor or not patient:
             if is_ajax:
                 return jsonify(success=False, message="Invalid doctor or patient.")
