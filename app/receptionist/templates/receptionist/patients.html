@@ -80,11 +80,6 @@
                                         <button class="btn btn-sm btn-outline-secondary" title="Edit Patient" onclick="editPatient({{ patient.id }})">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <a href="{{ url_for('receptionist.create_appointment', patient_id=patient.id) }}" 
-                                           class="btn btn-sm btn-outline-success" 
-                                           title="Create Appointment">
-                                            <i class="fas fa-calendar-plus"></i>
-                                        </a>
                                     </div>
                                 </td>
                             </tr>
