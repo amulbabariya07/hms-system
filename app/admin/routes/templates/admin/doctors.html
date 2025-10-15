@@ -554,12 +554,24 @@ function activateDoctor(doctorId) {
 
 function deleteDoctor(doctorId) {
     if (confirm('Are you sure you want to permanently delete this doctor? This action cannot be undone.')) {
-        fetch(`/admin/doctors/delete/${doctorId}`, { method: 'POST' })
-            .then(res => res.json())
-            .then(data => {
-                showAlert(data.success ? 'success' : 'danger', data.message);
-                if (data.success) setTimeout(() => location.reload(), 1500);
-            });
+        fetch(`/admin/doctors/delete/${doctorId}`, { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('success', data.message);
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showAlert('danger', data.message);
+            }
+        })
+        .catch(error => {
+            showAlert('danger', 'An error occurred while deleting the doctor.');
+        });
     }
 }
 </script>

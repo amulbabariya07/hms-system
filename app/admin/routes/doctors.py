@@ -3,6 +3,7 @@ from app import db
 from app.models import Doctor, Specialization
 from werkzeug.security import generate_password_hash
 from . import admin_bp, clean_mobile_number
+from datetime import datetime, date
 
 @admin_bp.route('/doctors')
 def admin_doctors():
@@ -250,7 +251,54 @@ def admin_activate_doctor(doctor_id):
 def admin_delete_doctor(doctor_id):
     if 'admin_logged_in' not in session:
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
-    doctor = Doctor.query.get_or_404(doctor_id)
-    db.session.delete(doctor)
-    db.session.commit()
-    return jsonify({'success': True, 'message': f'Dr. {doctor.full_name} has been deleted permanently.'})
+    
+    try:
+        doctor = Doctor.query.get_or_404(doctor_id)
+        
+        from app.models import Appointment
+        today = date.today()
+        
+        # Check different types of appointments
+        future_appointments = Appointment.query.filter(
+            Appointment.doctor_id == doctor_id,
+            Appointment.appointment_date > today,
+            Appointment.status.in_(['scheduled', 'confirmed'])
+        ).count()
+        
+        today_appointments = Appointment.query.filter(
+            Appointment.doctor_id == doctor_id,
+            Appointment.appointment_date == today,
+            Appointment.status.in_(['scheduled', 'confirmed', 'today_scheduled', 'under_consultation'])
+        ).count()
+        
+        completed_appointments = Appointment.query.filter(
+            Appointment.doctor_id == doctor_id,
+            Appointment.status == 'completed'
+        ).count()
+        
+        # Build appropriate error message based on appointment types
+        if future_appointments > 0 and today_appointments > 0:
+            message = f'Cannot delete Dr. {doctor.full_name}. This doctor has {today_appointments} appointment(s) today and {future_appointments} future appointment(s) scheduled.'
+        elif future_appointments > 0:
+            message = f'Cannot delete Dr. {doctor.full_name}. This doctor has {future_appointments} future appointment(s) scheduled.'
+        elif today_appointments > 0:
+            message = f'Cannot delete Dr. {doctor.full_name}. This doctor has {today_appointments} appointment(s) scheduled for today.'
+        elif completed_appointments > 0:
+            message = f'Cannot delete Dr. {doctor.full_name}. This doctor has {completed_appointments} completed appointment(s) in history. Consider deactivating instead of deleting to preserve records.'
+        else:
+            # No appointments found, safe to delete
+            db.session.delete(doctor)
+            db.session.commit()
+            return jsonify({
+                'success': True, 
+                'message': f'Dr. {doctor.full_name} has been deleted permanently.'
+            })
+        
+        return jsonify({'success': False, 'message': message})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'success': False, 
+            'message': f'An error occurred while deleting the doctor: {str(e)}'
+        })
