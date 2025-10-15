@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from app import db
-from app.models import User, Doctor, Appointment, ContactQuery, PatientIntakeForm, MedicalPrescription, Medicine
+from app.models import User, Doctor, Appointment, ContactQuery, PatientIntakeForm, MedicalPrescription, Medicine 
 from datetime import datetime
 import re
 
@@ -145,22 +145,39 @@ def add_patient():
 @login_required
 def receptionist_patient_details(patient_id):
     try:
-        patient = User.query.get_or_404(patient_id)
-        return jsonify({
-            'success': True,
-            'patient': {
-                'id': patient.id,
-                'full_name': patient.full_name,
-                'mobile_number': patient.mobile_number,
-                'email': patient.email,
-                'age': patient.age,
-                'gender': patient.gender,
-                'created_at': patient.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-                'appointment_count': len(patient.appointments) if hasattr(patient, 'appointments') else 0
-            }
-        })
+        # Base user (from User model)
+        user = User.query.get(patient_id)
+        if not user:
+            return jsonify({'success': False, 'message': 'Patient not found.'}), 404
+
+        # Extended details (from PatientIntakeForm)
+        intake = PatientIntakeForm.query.filter_by(created_by=str(user.id)).first()
+
+        # Combine both sources
+        patient_data = {
+            'id': user.id,
+            'full_name': user.full_name or 'N/A',
+            'mobile_number': user.mobile_number or 'N/A',
+            'email': user.email or 'N/A',
+            'is_active': user.is_active,
+            'created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S') if user.created_at else 'N/A',
+            'appointment_count': len(user.appointments) if hasattr(user, 'appointments') else 0,
+
+            # From PatientIntakeForm (if available)
+            'age': getattr(intake, 'age', 'N/A') if intake else 'N/A',
+            'gender': getattr(intake, 'gender', 'N/A') if intake else 'N/A',
+            'blood_group': getattr(intake, 'blood_group', 'N/A') if intake else 'N/A',
+            'occupation': getattr(intake, 'occupation', 'N/A') if intake else 'N/A',
+            'reason_for_visit': getattr(intake, 'reason_for_visit', 'N/A') if intake else 'N/A',
+        }
+
+        return jsonify({'success': True, 'patient': patient_data})
+
     except Exception as e:
-        return jsonify({'success': False, 'message': 'Error fetching patient details'})
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': f'Error fetching patient details: {str(e)}'}), 500
+
 
 @receptionist_bp.route('/patients/edit/<int:patient_id>', methods=['POST'])
 @login_required
@@ -456,68 +473,41 @@ def receptionist_delete_appointment(appointment_id):
         db.session.rollback()
         return jsonify({'success': False, 'message': 'An error occurred while deleting the appointment.'})
 
-# New routes for patients queries management
 @receptionist_bp.route('/queries')
 @login_required
 def patients_queries():
-    """Display all patient queries with filtering and sorting options"""
-    try:
-        # Get filter parameters
-        status_filter = request.args.get('status', 'all')
-        priority_filter = request.args.get('priority', 'all')
-        query_type_filter = request.args.get('query_type', 'all')
-        search_query = request.args.get('search', '').strip()
-        view_type = request.args.get('view', 'list')  # list or kanban
-        
-        # Base query
-        queries = ContactQuery.query
-        
-        # Apply filters
-        if status_filter != 'all':
-            queries = queries.filter(ContactQuery.status == status_filter)
-        if priority_filter != 'all':
-            queries = queries.filter(ContactQuery.priority == priority_filter)
-        if query_type_filter != 'all':
-            queries = queries.filter(ContactQuery.query_type == query_type_filter)
-        
-        # Apply search filter
-        if search_query:
-            queries = queries.filter(
-                (ContactQuery.name.ilike(f'%{search_query}%')) |
-                (ContactQuery.email.ilike(f'%{search_query}%')) |
-                (ContactQuery.phone.ilike(f'%{search_query}%')) |
-                (ContactQuery.message.ilike(f'%{search_query}%'))
-            )
-        
-        # Order by created_at descending (newest first)
-        queries = queries.order_by(ContactQuery.created_at.desc()).all()
-        
-        # Get statistics for dashboard
-        total_queries = ContactQuery.query.count()
-        new_queries = ContactQuery.query.filter_by(status='new').count()
-        in_progress_queries = ContactQuery.query.filter_by(status='in_progress').count()
-        resolved_queries = ContactQuery.query.filter_by(status='resolved').count()
-        
-        stats = {
-            'total': total_queries,
-            'new': new_queries,
-            'in_progress': in_progress_queries,
-            'resolved': resolved_queries
-        }
-        
-    except Exception as e:
-        flash(f'Error loading queries: {str(e)}', 'danger')
-        queries = []
-        stats = {'total': 0, 'new': 0, 'in_progress': 0, 'resolved': 0}
-    
-    return render_template('receptionist/patients_queries.html', 
-                         queries=queries, 
-                         stats=stats,
-                         current_status=status_filter,
-                         current_priority=priority_filter,
-                         current_query_type=query_type_filter,
-                         search_query=search_query,
-                         view_type=view_type)
+    status = request.args.get('status', 'new')          # default: 'new'
+    priority = request.args.get('priority', 'all')
+    query_type = request.args.get('query_type', 'all')
+    view = request.args.get('view', 'list')             # default: 'list'
+
+    # Filter your queries
+    queries = ContactQuery.query
+    if status != 'all':
+        queries = queries.filter_by(status=status)
+    if priority != 'all':
+        queries = queries.filter_by(priority=priority)
+    if query_type != 'all':
+        queries = queries.filter_by(query_type=query_type)
+
+    queries = queries.all()
+
+    # Stats for cards
+    stats = {
+        'total': ContactQuery.query.count(),
+        'new': ContactQuery.query.filter_by(status='new').count(),
+        'in_progress': ContactQuery.query.filter_by(status='in_progress').count(),
+        'resolved': ContactQuery.query.filter_by(status='resolved').count(),
+    }
+
+    return render_template('receptionist/patients_queries.html',
+        stats=stats,
+        queries=queries,
+        current_status=status,
+        current_priority=priority,
+        current_query_type=query_type,
+        view_type=view
+    )
 
 @receptionist_bp.route('/queries/<int:query_id>')
 @login_required
@@ -599,14 +589,16 @@ def get_query_details(query_id):
                 'priority': query.priority,
                 'status': query.status,
                 'message': query.message,
+                'response': query.response or '',
                 'created_at': created_at,
                 'resolved_at': resolved_at,
                 'updated_at': updated_at,
-                'assigned_to': query.assigned_to
+                'assigned_to': query.assigned_to or 'N/A'
             }
         })
     except Exception as e:
         return jsonify({'success': False, 'message': 'Error fetching query details'})
+
 
 @receptionist_bp.route('/queries/<int:query_id>/reply', methods=['POST'])
 @login_required
@@ -635,19 +627,9 @@ def reply_to_query(query_id):
         )
 
         mail_config = get_mail_settings()
-        required_fields = ['MAIL_SERVER', 'MAIL_PORT', 'MAIL_USERNAME', 'MAIL_PASSWORD', 'MAIL_DEFAULT_EMAIL']
-        missing = [field for field in required_fields if not mail_config.get(field)]
-        if missing:
-            return jsonify({
-                'success': False,
-                'message': 'Email configuration is incomplete. Please ask the admin to set up email settings in the Email Configuration panel before sending replies.'
-            }), 400
-
         msg = MIMEText(html_body, "html")
         msg['Subject'] = subject
-        name = mail_config['MAIL_DEFAULT_NAME']
-        email = mail_config['MAIL_DEFAULT_EMAIL']
-        msg['From'] = f"{name} <{email}>"
+        msg['From'] = f"{mail_config['MAIL_DEFAULT_NAME']} <{mail_config['MAIL_DEFAULT_EMAIL']}>"
         msg['To'] = recipient_email
 
         server = smtplib.SMTP(mail_config['MAIL_SERVER'], mail_config['MAIL_PORT'])
@@ -657,10 +639,18 @@ def reply_to_query(query_id):
         server.sendmail(mail_config['MAIL_DEFAULT_EMAIL'], [recipient_email], msg.as_string())
         server.quit()
 
+        # ✅ Auto mark as resolved once reply sent
+        query.response = message
+        query.status = 'resolved'
+        query.resolved_at = datetime.utcnow()
+        query.updated_at = datetime.utcnow()
+        db.session.commit()
+
         return jsonify({'success': True})
 
     except Exception as e:
-        return jsonify({'success': False, 'message': 'An error occurred while sending the reply. Please check your email configuration or try again later.'})
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)})
 
 @receptionist_bp.route('/patient/<int:patient_id>/intake-readonly')
 @login_required
@@ -696,3 +686,42 @@ def get_prescription_info(appointment_id):
         })
     else:
         return jsonify({'has_prescription': False})
+
+@receptionist_bp.route('/patients/update/<int:patient_id>', methods=['POST'])
+@login_required
+def update_patient(patient_id):
+    try:
+        data = request.get_json()
+        user = User.query.get(patient_id)
+        if not user:
+            return jsonify({'success': False, 'message': 'Patient not found.'}), 404
+
+        # Update User model fields
+        user.full_name = data.get('full_name', user.full_name)
+        user.email = data.get('email', user.email)
+        user.mobile_number = data.get('mobile_number', user.mobile_number)
+
+        # Update or create PatientIntakeForm record
+        intake = PatientIntakeForm.query.filter_by(created_by=str(user.id)).first()
+        if not intake:
+            intake = PatientIntakeForm(created_by=str(user.id))
+            db.session.add(intake)
+
+        intake.age = data.get('age')
+        intake.gender = data.get('gender')
+        intake.blood_group = data.get('blood_group')
+        intake.occupation = data.get('occupation')
+        intake.reason_for_visit = data.get('reason_for_visit')
+
+        db.session.commit()
+
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)})
+
+@receptionist_bp.route('/queries/<int:query_id>/check_reply')
+def check_reply(query_id):
+    query = ContactQuery.query.get_or_404(query_id)
+    has_reply = bool(query.response and query.response.strip())
+    return jsonify({'has_reply': has_reply})
