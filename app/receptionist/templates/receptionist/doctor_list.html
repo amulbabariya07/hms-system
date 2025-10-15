@@ -1,0 +1,58 @@
+{% extends "receptionist/base_receptionist.html" %}
+
+{% block page_title %}Doctor List{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('receptionist.receptionist_dashboard') }}">Dashboard</a></li>
+<li class="breadcrumb-item active" aria-current="page">Doctor List</li>
+{% endblock %}
+
+{% block content %}
+<div class="receptionist-card">
+  <div class="receptionist-card-header">
+    <h5 class="mb-0"><i class="fas fa-user-md me-2"></i>Approved Doctors</h5>
+  </div>
+  <div class="receptionist-card-body">
+    {% if doctors %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Doctor Name</th>
+            <th>Specialization</th>
+            <th>Email</th>
+            <th>Mobile</th>
+            <th>Experience (yrs)</th>
+            <th>License No.</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for doctor in doctors %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ doctor.full_name }}</td>
+            <td>{{ doctor.specialization.name if doctor.specialization else 'N/A' }}</td>
+            <td>{{ doctor.email or '-' }}</td>
+            <td>{{ doctor.mobile_number }}</td>
+            <td>{{ doctor.experience_years }}</td>
+            <td>{{ doctor.license_number }}</td>
+            <td>
+              {% if doctor.is_verified %}
+              <span class="badge bg-success">Approved</span>
+              {% else %}
+              <span class="badge bg-warning text-dark">Pending</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <p class="text-muted mb-0">No approved doctors found.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

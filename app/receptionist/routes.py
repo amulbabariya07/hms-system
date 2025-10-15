@@ -1,8 +1,16 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from app import db
-from app.models import User, Doctor, Appointment, ContactQuery, PatientIntakeForm, MedicalPrescription, Medicine 
+from app.models import User, Doctor, Appointment, ContactQuery, PatientIntakeForm, MedicalPrescription, Medicine, Payment
 from datetime import datetime
+from datetime import date
 import re
+from flask import send_file
+import io
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A5
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 
 receptionist_bp = Blueprint('receptionist', __name__, template_folder='templates')
 
@@ -725,3 +733,112 @@ def check_reply(query_id):
     query = ContactQuery.query.get_or_404(query_id)
     has_reply = bool(query.response and query.response.strip())
     return jsonify({'has_reply': has_reply})
+
+
+@receptionist_bp.route('/doctor_list')
+def doctor_list():
+    """Display list of verified/approved doctors."""
+    doctors = Doctor.query.filter_by(is_verified=True).all()
+    return render_template('receptionist/doctor_list.html', doctors=doctors)
+
+from datetime import date
+from flask import request, render_template
+from sqlalchemy import func, or_, cast, String
+
+@receptionist_bp.route("/payment_records")
+def payment_records():
+    search = request.args.get("search", "").strip()
+    selected_date = request.args.get("date")
+
+    # Default to today's date if none selected
+    if not selected_date:
+        selected_date = date.today().strftime("%Y-%m-%d")
+
+    # Start query
+    query = Payment.query
+
+    # Filter by date
+    query = query.filter(func.date(Payment.created_at) == selected_date)
+
+    # Apply search (join Appointment for patient name)
+    if search:
+        query = query.join(Appointment, isouter=True).filter(
+            or_(
+                Appointment.patient_name.ilike(f"%{search}%"),
+                cast(Payment.appointment_id, String).ilike(f"%{search}%"),  # ✅ CAST HERE
+                Payment.razorpay_payment_id.ilike(f"%{search}%")
+            )
+        )
+
+    payments = query.order_by(Payment.created_at.desc()).all()
+
+    return render_template(
+        "receptionist/payment_records.html",
+        payments=payments,
+        current_date=selected_date
+    )
+
+@receptionist_bp.route('/payment/<int:payment_id>/receipt')
+@login_required
+def download_payment_receipt(payment_id):
+    payment = Payment.query.get_or_404(payment_id)
+    appointment = payment.appointment
+
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A5, rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20)
+    elements = []
+
+    styles = getSampleStyleSheet()
+    title_style = styles['Heading1']
+    title_style.alignment = 1  # Center
+    normal_style = styles['Normal']
+
+    # Header: Hospital Name
+    elements.append(Paragraph("<b>HealthCare+</b>", title_style))
+    elements.append(Spacer(1, 10))
+    elements.append(Paragraph("Payment Receipt", styles['Heading2']))
+    elements.append(Spacer(1, 20))
+
+    # Payment Info
+    payment_data = [
+        ['Payment ID:', payment.razorpay_payment_id],
+        ['Amount:', f"{payment.amount:.2f}"],
+        ['Status:', payment.status.capitalize()],
+        ['Date:', payment.created_at.strftime('%Y-%m-%d %H:%M')]
+    ]
+    payment_table = Table(payment_data, colWidths=[100, 150])
+    payment_table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.lightgrey),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+        ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
+        ('ALIGN', (1,0), (-1,-1), 'LEFT'),
+    ]))
+    elements.append(payment_table)
+    elements.append(Spacer(1, 15))
+
+    # Appointment & Patient Info
+    if appointment:
+        appointment_data = [
+            ['Appointment ID:', appointment.id],
+            ['Patient Name:', appointment.patient_name],
+            ['Doctor:', appointment.doctor.full_name if appointment.doctor else 'N/A'],
+            ['Doctor Specialization:', appointment.doctor.specialization.name if appointment.doctor and appointment.doctor.specialization else 'N/A']
+        ]
+        appointment_table = Table(appointment_data, colWidths=[130, 150])
+        appointment_table.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.lightgrey),
+            ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+            ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
+            ('ALIGN', (1,0), (-1,-1), 'LEFT'),
+        ]))
+        elements.append(appointment_table)
+        elements.append(Spacer(1, 20))
+
+    # Footer
+    elements.append(Paragraph("Thank you for choosing HealthCare+!", normal_style))
+    elements.append(Paragraph("Visit again for a healthier tomorrow.", normal_style))
+
+    doc.build(elements)
+    buffer.seek(0)
+
+    return send_file(buffer, as_attachment=True, download_name=f"Receipt_{payment.razorpay_payment_id}.pdf", mimetype='application/pdf')

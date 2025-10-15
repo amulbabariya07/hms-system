@@ -1,0 +1,75 @@
+{% extends "receptionist/base_receptionist.html" %}
+
+{% block page_title %}Payment Records{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('receptionist.receptionist_dashboard') }}">Dashboard</a></li>
+<li class="breadcrumb-item active" aria-current="page">Payment Records</li>
+{% endblock %}
+
+{% block content %}
+<div class="receptionist-card">
+  <div class="receptionist-card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0"><i class="fas fa-file-invoice-dollar me-2"></i>Payment Records</h5>
+    <form id="filterForm" class="d-flex" method="get" action="{{ url_for('receptionist.payment_records') }}">
+      <input type="text" class="form-control me-2" name="search" placeholder="Search by Patient, Appointment ID..." value="{{ request.args.get('search', '') }}">
+      <button type="submit" class="btn btn-light text-dark me-1">Search</button>
+      <input type="date" class="form-control me-2" name="date" id="paymentDate" value="{{ request.args.get('date', current_date) }}">
+      <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+  </div>
+  <div class="receptionist-card-body">
+    {% if payments %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Payment ID</th>
+            <th>Appointment ID</th>
+            <th>Patient</th>
+            <th>Amount (₹)</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for payment in payments %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ payment.razorpay_payment_id }}</td>
+            <td>{{ payment.appointment_id }}</td>
+            <td>{{ payment.appointment.patient_name if payment.appointment else 'N/A' }}</td>
+            <td>{{ "%.2f"|format(payment.amount) }}</td>
+            <td>
+              {% if payment.status == 'captured' %}
+                <span class="badge bg-success">Success</span>
+              {% elif payment.status == 'failed' %}
+                <span class="badge bg-danger">Failed</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">{{ payment.status|capitalize }}</span>
+              {% endif %}
+            </td>
+            <td>{{ payment.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>
+              <a href="{{ url_for('receptionist.download_payment_receipt', payment_id=payment.id) }}" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-download me-1"></i>Receipt
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <p class="text-muted mb-0">No payment records found for selected date.</p>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  // Optional: auto-submit on date change
+  document.getElementById('paymentDate').addEventListener('change', function() {
+    document.getElementById('filterForm').submit();
+  });
+</script>
+{% endblock %}

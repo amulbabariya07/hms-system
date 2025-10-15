@@ -265,6 +265,18 @@
                                 Create Appointment
                             </a>
                         </li>
+                        <li class="nav-item mb-2">
+                            <a class="nav-link d-flex align-items-center gap-2 {% if request.endpoint == 'receptionist.doctor_list' %}active{% endif %}" href="{{ url_for('receptionist.doctor_list') }}">
+                                <i class="fas fa-user-md"></i>
+                                Doctor List
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a class="nav-link d-flex align-items-center gap-2 {% if request.endpoint == 'receptionist.payment_records' %}active{% endif %}" href="{{ url_for('receptionist.payment_records') }}">
+                                <i class="fas fa-file-invoice-dollar"></i>
+                                Payment Records
+                            </a>
+                        </li>
                         <!-- Added new Patients Query menu item after Create Appointment -->
                         <li class="nav-item mb-2">
                             <a class="nav-link d-flex align-items-center gap-2 {% if request.endpoint == 'receptionist.patients_queries' %}active{% endif %}" href="{{ url_for('receptionist.patients_queries') }}">
