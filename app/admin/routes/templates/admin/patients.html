@@ -53,9 +53,7 @@
                             <th class="py-3 ps-4" style="width: 25%;">Patient</th>
                             <th class="py-3">Mobile Number</th>
                             <th class="py-3">Email Address</th>
-                            <th class="py-3">Age/Gender</th>
                             <th class="py-3">Registration Date</th>
-                            <th class="py-3 text-center">Status</th>
                             <th class="py-3 text-end pe-4">Actions</th>
                         </tr>
                     </thead>
@@ -91,32 +89,13 @@
                             </td>
                             <td>
                                 <div class="lh-sm">
-                                    {% if patient.age %}
-                                    <span class="badge text-bg-info fw-normal">{{ patient.age }} years</span>
-                                    {% endif %}
-                                    {% if patient.gender %}
-                                    <small class="text-muted d-block mt-1">{{ patient.gender.title() }}</small>
-                                    {% endif %}
-                                </div>
-                            </td>
-                            <td>
-                                <div class="lh-sm">
                                     <strong class="text-dark">{{ patient.created_at.strftime('%d %b %Y') }}</strong>
                                     <br>
                                     <small class="text-muted">{{ patient.created_at.strftime('%I:%M %p') }}</small>
                                 </div>
                             </td>
-                            <td class="text-center">
-                                <span class="badge bg-success-subtle text-success-emphasis rounded-pill fw-medium d-inline-flex align-items-center px-3 py-2">
-                                    <i class="fas fa-circle fa-xs me-2" style="font-size: 0.5rem; color: #198754;"></i>
-                                    Active
-                                </span>
-                            </td>
                             <td class="text-end pe-4">
                                 <div class="btn-group gap-1" role="group">
-                                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="viewPatientDetails({{ patient.id }})" title="View Details">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
                                     <button type="button" class="btn btn-sm btn-outline-secondary" onclick="editPatient({{ patient.id }})" title="Edit Patient">
                                         <i class="fas fa-edit"></i>
                                     </button>
@@ -137,27 +116,6 @@
                 <p class="text-muted">No patients have registered in the system yet.</p>
             </div>
             {% endif %}
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="patientDetailsModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-info text-white border-0">
-                <h5 class="modal-title">
-                    <i class="fas fa-user-circle me-2"></i>
-                    Patient Details
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4" id="patientDetailsContent">
-                <div class="d-flex justify-content-center py-5">
-                    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -188,27 +146,6 @@
                             <label for="editEmail" class="form-label fw-bold">Email</label>
                             <input type="email" class="form-control" id="editEmail" name="email">
                         </div>
-                        <div class="col-md-6">
-                            <label for="editAge" class="form-label fw-bold">Age</label>
-                            <input type="number" class="form-control" id="editAge" name="age" min="1" max="120">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="editGender" class="form-label fw-bold">Gender</label>
-                            <select class="form-select" id="editGender" name="gender">
-                                <option value="" selected>Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="editAddress" class="form-label fw-bold">Address</label>
-                            <input type="text" class="form-control" id="editAddress" name="address">
-                        </div>
-                        <div class="col-12">
-                            <label for="editMedicalHistory" class="form-label fw-bold">Medical History</label>
-                            <textarea class="form-control" id="editMedicalHistory" name="medical_history" rows="3" placeholder="Any relevant medical history..."></textarea>
-                        </div>
                     </div>
                 </form>
             </div>
@@ -235,80 +172,49 @@ document.getElementById('searchPatients').addEventListener('keyup', function() {
     });
 });
 
-// View patient details
-function viewPatientDetails(patientId) {
-    const modal = new bootstrap.Modal(document.getElementById('patientDetailsModal'));
-    const content = document.getElementById('patientDetailsContent');
-    
-    content.innerHTML = `<div class="d-flex justify-content-center py-5"><div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"><span class="visually-hidden">Loading...</span></div></div>`;
-    modal.show();
-    
-    fetch(`{{ url_for("admin.admin_patient_details", patient_id=0) }}`.replace('0', patientId))
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const patient = data.patient;
-                content.innerHTML = `
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <h6 class="text-primary mb-3 fw-bold border-bottom pb-2">Personal Information</h6>
-                            <dl class="row mb-0">
-                                <dt class="col-sm-4">Full Name:</dt><dd class="col-sm-8">${patient.full_name}</dd>
-                                <dt class="col-sm-4">Mobile:</dt><dd class="col-sm-8">${patient.mobile_number}</dd>
-                                <dt class="col-sm-4">Email:</dt><dd class="col-sm-8">${patient.email || '<span class="text-muted">Not provided</span>'}</dd>
-                                <dt class="col-sm-4">Age:</dt><dd class="col-sm-8">${patient.age || '<span class="text-muted">Not provided</span>'}</dd>
-                                <dt class="col-sm-4">Gender:</dt><dd class="col-sm-8">${patient.gender ? patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1) : '<span class="text-muted">Not provided</span>'}</dd>
-                                <dt class="col-sm-4">Address:</dt><dd class="col-sm-8">${patient.address || '<span class="text-muted">Not provided</span>'}</dd>
-                            </dl>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="text-primary mb-3 fw-bold border-bottom pb-2">Account Information</h6>
-                            <dl class="row mb-0">
-                                <dt class="col-sm-5">Patient ID:</dt><dd class="col-sm-7">#${patient.id}</dd>
-                                <dt class="col-sm-5">Registered On:</dt><dd class="col-sm-7">${patient.created_at}</dd>
-                                <dt class="col-sm-5">Appointments:</dt><dd class="col-sm-7">${patient.appointment_count || 0}</dd>
-                                <dt class="col-sm-5">Status:</dt><dd class="col-sm-7"><span class="badge text-bg-success">Active</span></dd>
-                            </dl>
-                        </div>
-                        ${patient.medical_history ? `
-                        <div class="col-12">
-                            <h6 class="text-primary mb-3 fw-bold border-bottom pb-2">Medical History</h6>
-                            <p class="text-muted fst-italic bg-light p-3 rounded">${patient.medical_history}</p>
-                        </div>` : ''}
-                    </div>`;
-            } else {
-                content.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>Error loading patient details: ${data.message}</div>`;
-            }
-        })
-        .catch(error => {
-            content.innerHTML = `<div class="alert alert-danger"><i class="fas fa-server me-2"></i>A network error occurred. Please try again.</div>`;
-        });
-}
-
 // Edit patient
 function editPatient(patientId) {
-    fetch(`{{ url_for("admin.admin_patient_details", patient_id=0) }}`.replace('0', patientId))
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const patient = data.patient;
-                document.getElementById('editPatientId').value = patient.id;
-                document.getElementById('editFullName').value = patient.full_name;
-                document.getElementById('editMobileNumber').value = patient.mobile_number;
-                document.getElementById('editEmail').value = patient.email || '';
-                document.getElementById('editAge').value = patient.age || '';
-                document.getElementById('editGender').value = patient.gender || '';
-                document.getElementById('editAddress').value = patient.address || '';
-                document.getElementById('editMedicalHistory').value = patient.medical_history || '';
-                const modal = new bootstrap.Modal(document.getElementById('editPatientModal'));
-                modal.show();
-            } else {
-                showAlert('danger', 'Error loading patient data: ' + data.message);
-            }
-        })
-        .catch(error => {
-            showAlert('danger', 'A network error occurred while fetching patient data.');
-        });
+    const serverUrl = '{{ url_for("admin.admin_patient_details", patient_id=0) }}'.replace('0', patientId);
+    
+    console.log('Fetching patient details for ID:', patientId, 'URL:', serverUrl);
+    
+    fetch(serverUrl, { 
+        credentials: 'same-origin',
+        headers: { 
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        console.log('Response status:', response.status, response.statusText);
+        
+        if (!response.ok) {
+            // Try to get error message from response body
+            return response.text().then(text => {
+                console.error('Error response text:', text);
+                throw new Error(`HTTP ${response.status}: ${response.statusText}. Response: ${text}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Received data:', data);
+        
+        if (data.success) {
+            const patient = data.patient;
+            document.getElementById('editPatientId').value = patient.id;
+            document.getElementById('editFullName').value = patient.full_name || '';
+            document.getElementById('editMobileNumber').value = patient.mobile_number || '';
+            
+            const modal = new bootstrap.Modal(document.getElementById('editPatientModal'));
+            modal.show();
+        } else {
+            showAlert('danger', 'Error loading patient data: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching patient details:', error);
+        showAlert('danger', 'Failed to load patient data: ' + error.message);
+    });
 }
 
 // Submit edit patient form
@@ -318,10 +224,11 @@ function submitEditPatient() {
     const patientId = document.getElementById('editPatientId').value;
     const submitBtn = document.querySelector('#editPatientModal .btn-primary');
     const originalText = submitBtn.innerHTML;
+    
     submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Updating...';
     submitBtn.disabled = true;
     
-    fetch(`{{ url_for("admin.admin_edit_patient", patient_id=0) }}`.replace('0', patientId), {
+    fetch(`/admin/patients/edit/${patientId}`, {
         method: 'POST',
         body: formData
     })
@@ -336,6 +243,7 @@ function submitEditPatient() {
         }
     })
     .catch(error => {
+        console.error('Error updating patient:', error);
         showAlert('danger', 'A network error occurred while updating the patient.');
     })
     .finally(() => {
@@ -361,7 +269,11 @@ function showAlert(type, message) {
             <button type="button" class="btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>`;
     document.body.appendChild(alertDiv);
-    setTimeout(() => { bootstrap.Alert.getOrCreateInstance(alertDiv).close(); }, 5000);
+    setTimeout(() => { 
+        if (alertDiv.parentNode) {
+            alertDiv.parentNode.removeChild(alertDiv);
+        }
+    }, 5000);
 }
 </script>
 {% endblock %}

@@ -10,7 +10,12 @@ def admin_appointments():
         flash('Please login to access appointments.', 'warning')
         return redirect(url_for('admin.admin_login'))
     
-    appointments = Appointment.query.order_by(Appointment.created_at.desc()).all()
+    # Optional patient filter: show only appointments for a given patient when requested
+    patient_id = request.args.get('patient_id', type=int)
+    if patient_id:
+        appointments = Appointment.query.filter_by(patient_id=patient_id).order_by(Appointment.appointment_date.desc(), Appointment.appointment_time.desc()).all()
+    else:
+        appointments = Appointment.query.order_by(Appointment.created_at.desc()).all()
     # Compute display status for each appointment
     today = datetime.now().date()
     for appt in appointments:

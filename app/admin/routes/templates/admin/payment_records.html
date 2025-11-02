@@ -36,7 +36,7 @@
                         <th scope="col">Amount</th>
                         <th scope="col" class="text-center">Status</th>
                         <th scope="col">Date</th>
-                        <th scope="col">Razorpay ID</th>
+                        <!-- <th scope="col">Razorpay ID</th> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -69,8 +69,18 @@
                             <span class="text-muted">{{ payment.created_at.strftime('%b %d, %Y') }}</span>
                             <small class="d-block text-muted">{{ payment.created_at.strftime('%I:%M %p') }}</small>
                         </td>
-                        <td>
+                        <!-- <td>
                             <code>{{ payment.razorpay_payment_id or 'N/A' }}</code>
+                        </td> -->
+                        <td class="text-center">
+                            {% if payment.razorpay_payment_id %}
+                                <a href="{{ url_for('admin.download_receipt', payment_id=payment.id) }}" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-download me-1"></i> Download
+                                </a>
+                            {% else %}
+                                <span class="text-muted">N/A</span>
+                            {% endif %}
                         </td>
                     </tr>
                     {% else %}
