@@ -4,6 +4,11 @@ from app.models import Doctor, Specialization
 from werkzeug.security import generate_password_hash
 from . import admin_bp, clean_mobile_number
 from datetime import datetime, date
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import random
+from app.models import MailSetting
 
 @admin_bp.route('/doctors')
 def admin_doctors():
@@ -173,9 +178,40 @@ def admin_approve_doctor(doctor_id):
     try:
         doctor = Doctor.query.get_or_404(doctor_id)
         doctor.is_verified = True
-        # Activate doctor upon approval
         doctor.is_active = True
+
+        # Generate a temporary password and update the doctor's stored password (hashed)
+        temp_password = ''.join(str(random.randint(0, 9)) for _ in range(8))
+        doctor.password = generate_password_hash(temp_password)
+
         db.session.commit()
+
+        # Send approval email with login details if email present
+        try:
+            mail_config = MailSetting.query.first()
+            if mail_config and doctor.email:
+                login_link = url_for('doctor.doctor_login', _external=True)
+                html_body = render_template('email/doctor_approved.html',
+                                            full_name=doctor.full_name,
+                                            mobile=doctor.mobile_number,
+                                            temp_password=temp_password,
+                                            login_link=login_link,
+                                            mail_default_name=mail_config.mail_default_name or 'HMS Team')
+
+                msg = MIMEMultipart('alternative')
+                msg['Subject'] = 'Your account has been approved'
+                msg['From'] = f"{mail_config.mail_default_name} <{mail_config.mail_default_email}>"
+                msg['To'] = doctor.email
+                msg.attach(MIMEText(html_body, 'html'))
+
+                server = smtplib.SMTP(mail_config.mail_server, mail_config.mail_port)
+                if mail_config.mail_use_tls:
+                    server.starttls()
+                server.login(mail_config.mail_username, mail_config.mail_password)
+                server.sendmail(mail_config.mail_default_email, doctor.email, msg.as_string())
+                server.quit()
+        except Exception as e:
+            print('Failed to send approval email:', e)
 
         return jsonify({'success': True, 'message': f'Dr. {doctor.full_name} has been approved successfully!'})
 
@@ -190,6 +226,29 @@ def admin_reject_doctor(doctor_id):
 
     try:
         doctor = Doctor.query.get_or_404(doctor_id)
+        # Send rejection email before deletion
+        try:
+            mail_config = MailSetting.query.first()
+            if mail_config and doctor.email:
+                html_body = render_template('email/doctor_rejected.html',
+                                            full_name=doctor.full_name,
+                                            mail_default_name=mail_config.mail_default_name or 'HMS Team')
+
+                msg = MIMEMultipart('alternative')
+                msg['Subject'] = 'Your account application status'
+                msg['From'] = f"{mail_config.mail_default_name} <{mail_config.mail_default_email}>"
+                msg['To'] = doctor.email
+                msg.attach(MIMEText(html_body, 'html'))
+
+                server = smtplib.SMTP(mail_config.mail_server, mail_config.mail_port)
+                if mail_config.mail_use_tls:
+                    server.starttls()
+                server.login(mail_config.mail_username, mail_config.mail_password)
+                server.sendmail(mail_config.mail_default_email, doctor.email, msg.as_string())
+                server.quit()
+        except Exception as e:
+            print('Failed to send rejection email:', e)
+
         db.session.delete(doctor)
         db.session.commit()
         

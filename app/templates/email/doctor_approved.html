@@ -1,0 +1,14 @@
+<html>
+<body>
+  <p>Dear {{ full_name }},</p>
+  <p>Good news your hospital/doctor profile has been approved by the admin team.</p>
+  <p>You can now log in to the portal using the following credentials:</p>
+  <ul>
+    <li>Mobile: {{ mobile }}</li>
+    <li>Password: <strong>{{ temp_password }}</strong></li>
+  </ul>
+  <p>Login here: <a href="{{ login_link }}">{{ login_link }}</a></p>
+  <p>If you did not request this or have any questions, reply to this email.</p>
+  <p>Regards,<br>{{ mail_default_name }}</p>
+</body>
+</html>
