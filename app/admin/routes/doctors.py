@@ -175,18 +175,33 @@ def admin_doctors_approval():
 def admin_approve_doctor(doctor_id):
     if 'admin_logged_in' not in session:
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
     try:
         doctor = Doctor.query.get_or_404(doctor_id)
         doctor.is_verified = True
         doctor.is_active = True
 
-        # Generate a temporary password and update the doctor's stored password (hashed)
-        temp_password = ''.join(str(random.randint(0, 9)) for _ in range(8))
-        doctor.password = generate_password_hash(temp_password)
+        # Get the plain password from request (you'll need to capture it during approval)
+        # If you don't have it, you'll need to generate a temporary one
+        plain_password = request.form.get('password')
+        print("\n\n\n")
+        print("______plain_password ", plain_password)
+        print("\n\n\n")
+        
+        # If password not provided in request, you can generate a temporary one
+        if not plain_password:
+            # Generate a random temporary password
+            import string
+            import secrets
+            alphabet = string.ascii_letters + string.digits
+            plain_password = ''.join(secrets.choice(alphabet) for i in range(8))
+            
+            # Update doctor's password with the generated one
+            doctor.password = generate_password_hash(plain_password)
 
         db.session.commit()
 
-        # Send approval email with login details if email present
+        # Send approval email with login details INCLUDING PASSWORD
         try:
             mail_config = MailSetting.query.first()
             if mail_config and doctor.email:
@@ -194,8 +209,8 @@ def admin_approve_doctor(doctor_id):
                 html_body = render_template('email/doctor_approved.html',
                                             full_name=doctor.full_name,
                                             mobile=doctor.mobile_number,
-                                            temp_password=temp_password,
                                             login_link=login_link,
+                                            password=plain_password,  # Pass the password to template
                                             mail_default_name=mail_config.mail_default_name or 'HMS Team')
 
                 msg = MIMEMultipart('alternative')
