@@ -170,14 +170,15 @@ def admin_doctors_approval():
 def admin_approve_doctor(doctor_id):
     if 'admin_logged_in' not in session:
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
-
     try:
         doctor = Doctor.query.get_or_404(doctor_id)
         doctor.is_verified = True
+        # Activate doctor upon approval
+        doctor.is_active = True
         db.session.commit()
-        
+
         return jsonify({'success': True, 'message': f'Dr. {doctor.full_name} has been approved successfully!'})
-    
+
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': 'An error occurred while approving the doctor.'})

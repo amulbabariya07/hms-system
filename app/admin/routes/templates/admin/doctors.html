@@ -67,9 +67,10 @@
                                     </span>
                                 {% endif %}
                                 <br>
-                                <small class="{% if doctor.is_active %}text-success{% else %}text-danger{% endif %}">
-                                    <i class="fas fa-{% if doctor.is_active %}check{% else %}times{% endif %} me-1"></i>
-                                    {% if doctor.is_active %}Active{% else %}Inactive{% endif %}
+                                {# Show Active only when both verified and active. Pending = not verified. #}
+                                <small class="{% if doctor.is_active and doctor.is_verified %}text-success{% else %}text-danger{% endif %}">
+                                    <i class="fas fa-{% if doctor.is_active and doctor.is_verified %}check{% else %}times{% endif %} me-1"></i>
+                                    {% if doctor.is_active and doctor.is_verified %}Active{% else %}Inactive{% endif %}
                                 </small>
                             </td>
                             <td>{{ doctor.created_at.strftime('%b %d, %Y') }}</td>
@@ -92,9 +93,16 @@
                                         <i class="fas fa-user-slash"></i>
                                     </button>
                                     {% else %}
-                                    <button type="button" class="btn btn-sm btn-outline-success" onclick="activateDoctor({{ doctor.id }})" data-bs-toggle="tooltip" title="Activate Doctor">
-                                        <i class="fas fa-user-check"></i>
-                                    </button>
+                                        {# If doctor is not verified, prevent activation until approved #}
+                                        {% if not doctor.is_verified %}
+                                            <button type="button" class="btn btn-sm btn-outline-secondary disabled" data-bs-toggle="tooltip" title="Cannot activate until approved">
+                                                <i class="fas fa-user-check"></i>
+                                            </button>
+                                        {% else %}
+                                            <button type="button" class="btn btn-sm btn-outline-success" onclick="activateDoctor({{ doctor.id }})" data-bs-toggle="tooltip" title="Activate Doctor">
+                                                <i class="fas fa-user-check"></i>
+                                            </button>
+                                        {% endif %}
                                     {% endif %}
 
                                     <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteDoctor({{ doctor.id }})" data-bs-toggle="tooltip" title="Delete Doctor">

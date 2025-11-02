@@ -156,7 +156,8 @@ def doctor_signup():
         qualification=qualification,
         hospital_affiliation=hospital_affiliation if hospital_affiliation else None,
         password=hashed_password,
-        is_verified=False  # Set to False by default, requires admin approval
+    is_verified=False,  # Set to False by default, requires admin approval
+    is_active=False     # Ensure account remains inactive until admin approves
     )
 
     db.session.add(new_doctor)
