@@ -750,17 +750,14 @@ from sqlalchemy import func, or_, cast, String
 @receptionist_bp.route("/payment_records")
 def payment_records():
     search = request.args.get("search", "").strip()
-    selected_date = request.args.get("date")
-
-    # Default to today's date if none selected
-    if not selected_date:
-        selected_date = date.today().strftime("%Y-%m-%d")
+    selected_date = request.args.get("date", "").strip()
 
     # Start query
     query = Payment.query
 
-    # Filter by date
-    query = query.filter(func.date(Payment.created_at) == selected_date)
+    # If a date was provided, filter by that date. If blank, show all records.
+    if selected_date:
+        query = query.filter(func.date(Payment.created_at) == selected_date)
 
     # Apply search (join Appointment for patient name)
     if search:

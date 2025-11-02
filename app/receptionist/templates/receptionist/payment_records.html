@@ -13,7 +13,7 @@
     <form id="filterForm" class="d-flex" method="get" action="{{ url_for('receptionist.payment_records') }}">
       <input type="text" class="form-control me-2" name="search" placeholder="Search by Patient, Appointment ID..." value="{{ request.args.get('search', '') }}">
       <button type="submit" class="btn btn-light text-dark me-1">Search</button>
-      <input type="date" class="form-control me-2" name="date" id="paymentDate" value="{{ request.args.get('date', current_date) }}">
+  <input type="date" class="form-control me-2" name="date" id="paymentDate" value="{{ request.args.get('date', '') }}">
       <button type="submit" class="btn btn-primary">Filter</button>
     </form>
   </div>

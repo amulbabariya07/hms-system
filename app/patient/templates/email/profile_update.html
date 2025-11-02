@@ -39,22 +39,23 @@
     <div class="container">
         <h2>Your Profile Has Been Updated</h2>
         <p>Hi {{ full_name }},</p>
-        <p>Here’s a summary of your profile information (old vs. new):</p>
+        <p>Here's a summary of your profile information (old vs. new):</p>
+
 
         <table>
             <tr>
                 <td class="label">Full Name:</td>
-                <td>{{ old_full_name }} → {{ full_name }}</td>
+                <td>{{ old_full_name }} => {{ full_name }}</td>
             </tr>
 
             <tr>
                 <td class="label">Email:</td>
-                <td>{{ old_email or "Not Set" }} → {{ email or "Not Set" }}</td>
+                <td>{{ old_email or "Not Set" }} => {{ email or "Not Set" }}</td>
             </tr>
 
             <tr>
                 <td class="label">Mobile Number:</td>
-                <td>{{ old_mobile or "Not Set" }} → {{ mobile_number or "Not Set" }}</td>
+                <td>{{ old_mobile or "Not Set" }} => {{ mobile_number or "Not Set" }}</td>
             </tr>
             <tr>
                 <td class="label">Password:</td>

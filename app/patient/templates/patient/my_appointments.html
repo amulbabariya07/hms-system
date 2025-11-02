@@ -53,7 +53,7 @@
                     <div class="appointment-details">
                         <div class="doctor-info">
                             <h4 class="doctor-name">Dr. {{ appointment.doctor.full_name }}</h4>
-                            <p class="doctor-specialization">{{ appointment.doctor.specialization }}</p>
+                            <p class="doctor-specialization">{{ appointment.doctor.specialization.name if appointment.doctor.specialization else 'General Practice' }}</p>
                         </div>
                         <div class="info-grid">
                             <div class="info-item">

@@ -1281,11 +1281,15 @@ def send_forgot_password_email(receiver_email, full_name, code):
         code=code
     )
 
+    # Encode the email content properly
     msg = MIMEMultipart("alternative")
     msg['Subject'] = "Your Password Reset Code"
     msg['From'] = sender_email
     msg['To'] = receiver_email
-    msg.attach(MIMEText(html_content, "html"))
+    
+    # Use UTF-8 encoding explicitly
+    html_part = MIMEText(html_content, "html", "utf-8")
+    msg.attach(html_part)
 
     try:
         with smtplib.SMTP(mail_config.mail_server, mail_config.mail_port) as server:
@@ -1293,13 +1297,9 @@ def send_forgot_password_email(receiver_email, full_name, code):
                 server.starttls()
             server.login(mail_config.mail_username, mail_config.mail_password)
             server.sendmail(sender_email, receiver_email, msg.as_string())
-        print("\n\n\n")
         print(f"Forgot password code sent to {receiver_email}")
-        print("\n\n\n")
     except Exception as e:
-        print('\n\n\n')
-        print("Failed to send email:", e)
-        print('\n\n\n')
+        print(f"Failed to send email: {e}")
 
 import io
 from flask import send_file
@@ -1356,7 +1356,11 @@ def download_appointment(appointment_id):
     c.setFont("Helvetica-Bold", 12)
     c.drawString(80, y, "Specialization:")
     c.setFont("Helvetica", 12)
-    c.drawString(200, y, appointment.doctor.specialization)
+    # ReportLab expects a text (str). `appointment.doctor.specialization` is a model
+    # object (Specialization). Use its `name` attribute or fall back to a safe string.
+    spec = appointment.doctor.specialization
+    spec_text = spec.name if spec and hasattr(spec, 'name') else (str(spec) if spec else 'General Practice')
+    c.drawString(200, y, spec_text)
 
     y -= line_height
     c.setFont("Helvetica-Bold", 12)
