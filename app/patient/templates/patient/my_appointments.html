@@ -52,14 +52,10 @@
                     
                     <div class="appointment-details">
                         <div class="doctor-info">
-                            <h4 class="doctor-name">Dr. {{ appointment.doctor.full_name }}</h4>
+                            <h4 class="doctor-name">{{ appointment.doctor.full_name }}</h4>
                             <p class="doctor-specialization">{{ appointment.doctor.specialization.name if appointment.doctor.specialization else 'General Practice' }}</p>
                         </div>
                         <div class="info-grid">
-                            <div class="info-item">
-                                <i class="fas fa-clock"></i>
-                                <span>{{ appointment.appointment_time.strftime('%I:%M %p') }}</span>
-                            </div>
                             <div class="info-item">
                                 <i class="fas fa-hospital"></i>
                                 <span>{{ appointment.doctor.hospital_affiliation or 'Private Clinic' }}</span>

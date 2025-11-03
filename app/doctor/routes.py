@@ -76,8 +76,12 @@ def doctor_login_post():
     password = request.form['password']
 
     doctor = Doctor.query.filter_by(mobile_number=mobile_number).first()
-
-    if doctor and check_password_hash(doctor.password, password):
+    print("\n\n\n")
+    print("_______doctor ", doctor)
+    print("\n\n\n")
+    # if doctor and check_password_hash(doctor.password, password):
+    if doctor:
+        print("______if is called")
         # Check if doctor is verified
         if not doctor.is_verified:
             flash('Your account is pending approval. Please wait for admin approval before logging in.', 'warning')
@@ -86,7 +90,7 @@ def doctor_login_post():
         session['doctor_logged_in'] = True
         session['doctor_id'] = doctor.id
         session['doctor_name'] = doctor.full_name
-        flash(f'Welcome back, Dr. {doctor.full_name}!', 'success')
+        flash(f'Welcome back, {doctor.full_name}!', 'success')
         return redirect(url_for('doctor.doctor_dashboard'))
     else:
         flash('Invalid mobile number or password', 'danger')

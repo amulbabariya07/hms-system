@@ -31,8 +31,6 @@
                                 <th>Patient Name</th>
                                 <th>Email</th>
                                 <th>Phone</th>
-                                <th>Age</th>
-                                <th>Gender</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -60,15 +58,6 @@
                                 <td>
                                     <i class="fas fa-phone me-2 text-muted"></i>
                                     {{ patient.mobile_number or 'Not provided' }}
-                                </td>
-                                <td>
-                                    <i class="fas fa-birthday-cake me-2 text-muted"></i>
-                                    {{ patient.age or 'Not provided' }}
-                                </td>
-                                <td>
-                                    <span class="badge bg-{{ 'info' if patient.gender == 'Male' else 'warning' if patient.gender == 'Female' else 'secondary' }}">
-                                        {{ patient.gender or 'Not specified' }}
-                                    </span>
                                 </td>
                                 <td>
                                     <div class="btn-group" role="group">

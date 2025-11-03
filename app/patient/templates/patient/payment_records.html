@@ -13,7 +13,6 @@
                         <table class="table table-hover">
                             <thead class="table-primary">
                                 <tr>
-                                    <th>Payment ID</th>
                                     <th>Appointment Date</th>
                                     <th>Doctor</th>
                                     <th>Amount</th>
@@ -25,7 +24,6 @@
                             <tbody>
                                 {% for payment in payments %}
                                 <tr>
-                                    <td>{{ payment.razorpay_payment_id }}</td>
                                     <td>{{ payment.appointment.appointment_date.strftime('%d-%b-%Y') }}</td>
                                     <td>Dr. {{ payment.appointment.doctor.full_name }}</td>
                                     <td>₹{{ "%.2f"|format(payment.amount) }}</td>

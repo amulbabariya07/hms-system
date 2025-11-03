@@ -63,7 +63,7 @@ def download_receipt(payment_id):
         alignment=1,
         spaceAfter=10
     )
-    elements.append(Paragraph("Healthy Life Clinic", header_style))
+    elements.append(Paragraph("HlthCare+", header_style))
     elements.append(Spacer(1, 15))
 
     # Horizontal line
@@ -110,7 +110,7 @@ def download_receipt(payment_id):
     )
     elements.append(Paragraph("Thank you for your payment!", thank_style))
     elements.append(Spacer(1, 10))
-    elements.append(Paragraph("We appreciate your trust in Healthy Life Clinic.", styles["Normal"]))
+    elements.append(Paragraph("We appreciate your trust in HelthCare+.", styles["Normal"]))
 
     # Footer
     footer_style = ParagraphStyle(

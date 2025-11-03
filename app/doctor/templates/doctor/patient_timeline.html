@@ -59,12 +59,6 @@
                                         {{ appt.appointment_date.strftime('%B %d, %Y') }}
                                     </h5>
                                 </div>
-                                <div class="col-md-6 text-md-end">
-                                    <span class="badge bg-white text-primary fs-6">
-                                        <i class="fas fa-clock me-1"></i>
-                                        {{ appt.appointment_time.strftime('%I:%M %p') if appt.appointment_time else 'Time N/A' }}
-                                    </span>
-                                </div>
                             </div>
                         </div>
 
@@ -86,7 +80,7 @@
                                 <div class="col-sm-6 text-sm-end">
                                     <small class="text-muted">
                                         <i class="fas fa-user-md me-1"></i>
-                                        Dr. {{ appt.doctor.full_name }}
+                                        {{ appt.doctor.full_name }}
                                     </small>
                                 </div>
                             </div>
