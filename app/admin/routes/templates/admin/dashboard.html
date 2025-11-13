@@ -129,7 +129,7 @@
                 <div>
                   {% if activity.type == 'appointment' %}
                     <h6 class="mb-0">Appointment: {{ activity.patient_name }}</h6>
-                    <small class="text-muted">With Dr. {{ activity.doctor_name }} - {{ activity.department }}</small>
+                    <small class="text-muted">With {{ activity.doctor_name }} - {{ activity.department }}</small>
                   {% elif activity.type == 'patient' %}
                     <h6 class="mb-0">New Registration: {{ activity.name }}</h6>
                     <small class="text-muted">New patient account created.</small>

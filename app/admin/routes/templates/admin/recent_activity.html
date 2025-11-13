@@ -34,13 +34,13 @@
               <h6 class="mt-1 mb-1">
                 {% if activity.type == 'appointment' %}
                   <i class="fas fa-calendar-check me-1 text-primary"></i>
-                  Appointment: {{ activity.patient_name }} with Dr. {{ activity.doctor_name }} - {{ activity.department }}
+                  Appointment: {{ activity.patient_name }} with {{ activity.doctor_name }} - {{ activity.department }}
                 {% elif activity.type == 'patient' %}
                   <i class="fas fa-user-plus me-1 text-info"></i>
                   New Patient: {{ activity.name }} registered
                 {% elif activity.type == 'doctor' %}
                   <i class="fas fa-user-md me-1 text-success"></i>
-                  New Doctor: Dr. {{ activity.name }} joined - {{ activity.department }}
+                  New Doctor: {{ activity.name }} joined - {{ activity.department }}
                 {% endif %}
               </h6>
             </div>

@@ -984,7 +984,7 @@ def book_appointment_post():
             send_appointment_email(
                 patient_email=patient.email,
                 patient_name=patient.full_name,
-                doctor_name=f"Dr. {doctor.full_name}",
+                doctor_name=doctor.full_name,
                 appointment_date=appointment.appointment_date.strftime('%d %B %Y'),
                 appointment_time=appointment.appointment_time.strftime('%I:%M %p'),
                 reason=reason
@@ -1350,7 +1350,7 @@ def download_appointment(appointment_id):
     c.setFont("Helvetica-Bold", 12)
     c.drawString(80, y, "Doctor:")
     c.setFont("Helvetica", 12)
-    c.drawString(200, y, f"Dr. {appointment.doctor.full_name}")
+    c.drawString(200, y, f"{appointment.doctor.full_name}")
 
     y -= line_height
     c.setFont("Helvetica-Bold", 12)
@@ -1580,7 +1580,7 @@ def download_prescription_pdf(appointment_id):
     elements.append(Paragraph("🏥 HelthCare+", header_style))
     elements.append(Spacer(1, 10))
     elements.append(Paragraph(f"<b>Appointment Date:</b> {appointment.appointment_date.strftime('%d-%b-%Y')} at {appointment.appointment_time.strftime('%I:%M %p') if appointment.appointment_time else ''}", subheader_style))
-    elements.append(Paragraph(f"<b>Doctor:</b> Dr. {appointment.doctor.full_name}", subheader_style))
+    elements.append(Paragraph(f"<b>Doctor:</b> {appointment.doctor.full_name}", subheader_style))
     elements.append(Paragraph(f"<b>Patient ID:</b> {appointment.patient_id}", subheader_style))
     elements.append(Spacer(1, 15))
 
@@ -1679,7 +1679,7 @@ def download_payment_receipt(payment_id):
         ("Status:", payment.status.upper()),
         ("Appointment ID:", str(payment.appointment.id)),
         ("Patient Name:", payment.appointment.patient_name),
-        ("Doctor:", f"Dr. {payment.appointment.doctor.full_name}"),
+        ("Doctor:", payment.appointment.doctor.full_name),
         ("Appointment Date:", payment.appointment.appointment_date.strftime('%d-%b-%Y')),
         ("Appointment Time:", payment.appointment.appointment_time.strftime('%I:%M %p') if payment.appointment.appointment_time else 'N/A')
     ]

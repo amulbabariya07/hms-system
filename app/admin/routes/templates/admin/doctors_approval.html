@@ -47,7 +47,7 @@
                             <span class="visually-hidden">Pending Approval</span>
                         </span>
                     </div>
-                    <h5 class="card-title mt-3 mb-0">Dr. {{ doctor.full_name }}</h5>
+                    <h5 class="card-title mt-3 mb-0">{{ doctor.full_name }}</h5>
                     <p class="text-muted mb-0">{{ doctor.specialization }}</p>
                 </div>
 
@@ -157,7 +157,7 @@ function showDoctorDetails(doctorId) {
                         <hr class="mt-2">
                         <dl class="row">
                             <dt class="col-sm-5">Full Name</dt>
-                            <dd class="col-sm-7">: Dr. ${doctor.full_name}</dd>
+                            <dd class="col-sm-7">:${doctor.full_name}</dd>
                             <dt class="col-sm-5">Mobile Number</dt>
                             <dd class="col-sm-7">: ${doctor.mobile_number}</dd>
                             <dt class="col-sm-5">Email</dt>

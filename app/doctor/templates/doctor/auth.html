@@ -1105,6 +1105,21 @@
 </style>
 
 <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('doctorName');
+    const prefix = 'Dr. ';
+
+    input.addEventListener('input', () => {
+        if (!input.value.startsWith(prefix)) {
+            input.value = prefix + input.value.replace(prefix, '');
+        }
+    });
+
+    // Ensure prefix is there on load
+    if (!input.value.startsWith(prefix)) {
+        input.value = prefix;
+    }
+});
 document.addEventListener('DOMContentLoaded', function() {
     const authContainer = document.getElementById('auth-container');
     

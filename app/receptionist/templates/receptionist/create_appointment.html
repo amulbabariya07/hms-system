@@ -50,7 +50,7 @@
                                 {% for doctor in doctors %}
                                 <!-- Enhanced doctor display with full_name and specialization -->
                                 <option value="{{ doctor.id }}">
-                                    Dr. {{ doctor.full_name }} 
+                                    {{ doctor.full_name }} 
                                     {% if doctor.specialization %}({{ doctor.specialization }}){% endif %}
                                     {% if doctor.mobile_number %} - {{ doctor.mobile_number }}{% endif %}
                                 </option>
